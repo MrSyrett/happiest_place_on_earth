@@ -768,6 +768,7 @@ function HappiestPlace() {
   const [editIdx, setEditIdx] = useState(0);
   const [placeOk, setPlaceOk] = useState(null);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [goingHome, setGoingHome] = useState(false);
   const setupFile = useRef(null);
 
   useEffect(() => { save("bde:anchors:v2", anchors); }, [anchors]);
@@ -817,7 +818,7 @@ function HappiestPlace() {
     setEditIdx(0);
     setEditing(true);
     if (parkId) setMapPark(parkId);
-    setTab("map");
+    if (screen === "play") setTab("map");
   }
   const walkCount = (parkId) => ATTRACTIONS.filter((a) => a.kind !== "shop"
     && (!parkId || a.park === parkId)
@@ -919,6 +920,7 @@ function HappiestPlace() {
     setScreen("play"); setT(OPEN); setJoy(50); setEnergy(100); setFuel(72); setComfort(100); setWallet(300);
     setPos({ park: "dl", x: 592, y: 675, landName: "Main Street" }); setMapPark("dl"); setVisited({});
     setLl(0); setBoughtLl(false); setLog([]); setTab("map"); setSel(null); setCat("ride");
+    setGoingHome(false);
     setMods({ mult: 1, until: 0, closures: {} });
     setEventCard(null); setEventLog([]);
     lastEvent.current = 0;
@@ -1203,6 +1205,7 @@ function HappiestPlace() {
   const mapReady = !!(basemap && transforms.dl && transforms.dca);
   if (screen === "title")
     return <Title ready={mapReady} mode={mode} setMode={setMode}
+      onSetup={() => setScreen("setup")}
       onStart={() => (mapReady ? start() : setScreen("setup"))} />;
   if (screen === "end")
     return <End joy={joy} t={t} wallet={wallet} energy={energy} comfort={comfort} visited={visited} seed={seed} mode={mode} onAgain={start} />;
@@ -1224,110 +1227,19 @@ function HappiestPlace() {
     const ready = !basemap || (transforms.dl && transforms.dca);
     return (
       <Shell>
-        <NavBar title="Set Up Your Map" />
-        {calib ? (
+        <NavBar title={calib ? "Calibrate" : editing ? "Adjust Pins" : "Map Setup"}
+          onBack={calib || editing ? undefined : () => setScreen("title")} />
+        {calib || editing ? (
           <div style={{ flex: 1, position: "relative", minHeight: 0 }}>
-            <ParkMap {...mapProps} park={calib} items={[]} sel={null} onSelect={() => {}} visited={{}} />
+            <ParkMap {...mapProps}
+              park={calib || mapPark}
+              items={editing ? ATTRACTIONS.filter((x) => x.kind !== "shop"
+                && ((showBoth && basemap) || x.park === mapPark)).map(place) : []}
+              sel={null} onSelect={() => {}} visited={{}} />
           </div>
         ) : (
           <div style={{ flex: 1, overflowY: "auto", background: C.gap }}>
-            <Card>
-              <p style={{ margin: "0 0 14px", fontSize: 15.5, lineHeight: 1.5, color: C.grey }}>
-                Play on the built-in map, or load the official resort map and play on the real thing.
-                Your image is read on this device only.
-              </p>
-              <Step n="1" title="Load a map image" done={!!basemap}>
-                <input ref={setupFile} type="file" accept="image/*" style={{ display: "none" }}
-                  onChange={(e) => { const f = e.target.files && e.target.files[0]; if (f) loadBasemap(f); e.target.value = ""; }} />
-                <Row>
-                  <Pill onClick={() => setupFile.current && setupFile.current.click()} solid>
-                    {basemap ? "Choose different image" : "Choose image"}
-                  </Pill>
-                  {basemap && <Pill onClick={() => { setBasemap(null); setAnchors({ dl: [], dca: [] }); }}>Remove</Pill>}
-                </Row>
-                {basemap && usedPreset && (
-                  <Note tone="good">Recognised as the official resort map — already calibrated.</Note>
-                )}
-              </Step>
-              {basemap && Object.values(PARKS).map((p, i) => (
-                <Step key={p.id} n={String(i + 2)} title={`Calibrate ${p.short}`} done={!!transforms[p.id]}>
-                  <div style={{ fontSize: 14.5, color: C.grey, marginBottom: 8 }}>
-                    Tap {ANCHORS[p.id][0].label}, then {ANCHORS[p.id][1].label}.
-                  </div>
-                  <Pill solid={!transforms[p.id]}
-                    onClick={() => { setAnchors((A) => ({ ...A, [p.id]: [] })); setCalib(p.id); }}>
-                    {transforms[p.id] ? "Redo" : "Start"}
-                  </Pill>
-                </Step>
-              ))}
-            </Card>
-            <div style={{ padding: "4px 16px 26px" }}>
-              <BigButton disabled={!ready} onClick={start}>
-                {ready ? "Open the Gates" : "Calibrate both parks first"}
-              </BigButton>
-              {basemap && !ready && (
-                <TextLink onClick={() => { setBasemap(null); setAnchors({ dl: [], dca: [] }); }}
-                  style={{ display: "block", textAlign: "center", marginTop: 14 }}>
-                  Skip and use the built-in map
-                </TextLink>
-              )}
-            </div>
-          </div>
-        )}
-      </Shell>
-    );
-  }
-
-  /* ---------- play ---------- */
-  const selA = sel ? byId[sel] : null;
-  const listed = visible
-    .map((a) => ({ a, w: walkMinutes(pos, place(a)) }))
-    .sort((p, q) => p.w - q.w);
-
-  return (
-    <Shell>
-      <StatusBar t={t} joy={joy} energy={energy} fuel={fuel} comfort={comfort} wallet={wallet} ll={ll} seed={seed} />
-
-      {(tab === "map" || tab === "list") && !editing && !run && (
-        <>
-          <CatTabs cat={cat} setCat={setCat} />
-          <FilterRow
-            mapPark={mapPark} setMapPark={setMapPark}
-            eOnly={eOnly} setEOnly={setEOnly}
-            hideDone={hideDone} setHideDone={setHideDone}
-            onReset={() => { setEOnly(false); setHideDone(false); setCat("ride"); }}
-          />
-        </>
-      )}
-
-      {tab === "map" && (
-        <div style={{ flex: 1, position: "relative", minHeight: 0 }}>
-          <ParkMap {...mapProps}
-            items={(editing ? ATTRACTIONS.filter((a) => a.kind !== "shop" && ((showBoth && basemap) || a.park === mapPark)) : visible).map(place)}
-            sel={sel} onSelect={setSel} visited={visited} />
-          {flash && <Flash key={flash.key} name={flash.name} net={flash.net} />}
-          {run && <ActivityRunner run={run} speed={speed} setSpeed={setSpeed} onSkip={skipRun} />}
-          {!editing && !run && <ShowListButton onClick={() => setTab("list")} />}
-        </div>
-      )}
-
-      {tab === "list" && !run && (
-        <div style={{ flex: 1, overflowY: "auto", background: C.gap }}>
-          {listed.length === 0 && <Empty>Nothing matches those filters right now.</Empty>}
-          {listed.map(({ a, w }) => (
-            <AttractionCard key={a.id} a={a} wait={waits[a.id]} walk={w} reps={visited[a.id] || 0}
-              ll={ll} llOk={LL_OK.has(a.id)} t={t} wallet={wallet}
-              onOpen={() => setSel(a.id)} onGo={beginAttraction} />
-          ))}
-          <div style={{ height: 12 }} />
-        </div>
-      )}
-
-      {tab === "day" && <DayLog log={log} />}
-      {tab === "you" && <YouTab onBreak={beginBreak} onBuyLL={buyLightningLane} wallet={wallet} ll={ll} boughtLl={boughtLl}
-        energy={energy} fuel={fuel} comfort={comfort} joy={joy} visited={visited} t={t} seedWeather={seed.weather} />}
-      {tab === "setup" && (
-        <div style={{ flex: 1, overflowY: "auto", background: C.gap }}>
+            <div style={{ flex: 1, overflowY: "auto", background: C.gap }}>
           <Card>
             <Note>
               If every pin looks uniformly shifted or scaled — all of them pulled in toward the
@@ -1432,7 +1344,7 @@ function HappiestPlace() {
                     .slice(0, 40).map((a) => (
                       <button key={a.id} onClick={() => {
                         setEditQueue([a.id]); setEditIdx(0); setEditing(true);
-                        setPickSearch(""); setTab("map");
+                        setPickSearch(""); if (screen === "play") setTab("map");
                       }} style={{
                         display: "flex", width: "100%", alignItems: "center", gap: 10, cursor: "pointer",
                         background: C.white, border: "none", borderBottom: `1px solid ${C.rule}`,
@@ -1474,7 +1386,7 @@ function HappiestPlace() {
                 setEditIdx(0);
                 setConfirmReset(false);
                 setEditing(true);
-                setTab("map");
+                if (screen === "play") setTab("map");
               }}>
                 {confirmReset ? "Tap again to confirm" : "Start over from scratch"}
               </Pill>
@@ -1508,6 +1420,94 @@ function HappiestPlace() {
             )}
           </Card>
         </div>
+            <div style={{ padding: "4px 16px 26px" }}>
+              <BigButton disabled={!ready} onClick={start}>
+                {ready ? "Open the Gates" : "Calibrate both parks first"}
+              </BigButton>
+            </div>
+          </div>
+        )}
+      </Shell>
+    );
+  }
+
+  /* ---------- play ---------- */
+  const selA = sel ? byId[sel] : null;
+  const listed = visible
+    .map((a) => ({ a, w: walkMinutes(pos, place(a)) }))
+    .sort((p, q) => p.w - q.w);
+
+  return (
+    <Shell>
+      <StatusBar t={t} joy={joy} energy={energy} fuel={fuel} comfort={comfort} wallet={wallet} ll={ll} seed={seed} />
+
+      {(tab === "map" || tab === "list") && !editing && !run && (
+        <>
+          <CatTabs cat={cat} setCat={setCat} />
+          <FilterRow
+            mapPark={mapPark} setMapPark={setMapPark}
+            eOnly={eOnly} setEOnly={setEOnly}
+            hideDone={hideDone} setHideDone={setHideDone}
+            onReset={() => { setEOnly(false); setHideDone(false); setCat("ride"); }}
+          />
+        </>
+      )}
+
+      {tab === "map" && (
+        <div style={{ flex: 1, position: "relative", minHeight: 0 }}>
+          <ParkMap {...mapProps}
+            items={(editing ? ATTRACTIONS.filter((a) => a.kind !== "shop" && ((showBoth && basemap) || a.park === mapPark)) : visible).map(place)}
+            sel={sel} onSelect={setSel} visited={visited} />
+          {flash && <Flash key={flash.key} name={flash.name} net={flash.net} />}
+          {run && <ActivityRunner run={run} speed={speed} setSpeed={setSpeed} onSkip={skipRun} />}
+          {!editing && !run && <ShowListButton onClick={() => setTab("list")} />}
+        </div>
+      )}
+
+      {tab === "list" && !run && (
+        <div style={{ flex: 1, overflowY: "auto", background: C.gap }}>
+          {listed.length === 0 && <Empty>Nothing matches those filters right now.</Empty>}
+          {listed.map(({ a, w }) => (
+            <AttractionCard key={a.id} a={a} wait={waits[a.id]} walk={w} reps={visited[a.id] || 0}
+              ll={ll} llOk={LL_OK.has(a.id)} t={t} wallet={wallet}
+              onOpen={() => setSel(a.id)} onGo={beginAttraction} />
+          ))}
+          <div style={{ height: 12 }} />
+        </div>
+      )}
+
+      {tab === "day" && <DayLog log={log} />}
+      {tab === "you" && <YouTab onBreak={beginBreak} onBuyLL={buyLightningLane} wallet={wallet} ll={ll} boughtLl={boughtLl}
+        energy={energy} fuel={fuel} comfort={comfort} joy={joy} visited={visited} t={t} seedWeather={seed.weather} />}
+      {goingHome && (
+        <>
+          <div onClick={() => setGoingHome(false)}
+            style={{ position: "absolute", inset: 0, background: "rgba(18,40,63,.42)", zIndex: 30 }} />
+          <div style={{
+            position: "absolute", left: 18, right: 18, top: "26%", zIndex: 31, background: C.white,
+            borderRadius: 18, boxShadow: "0 8px 30px rgba(18,40,63,.3)", padding: "18px 18px 20px",
+          }}>
+            <div style={{ fontSize: 20, fontWeight: 800, color: C.navy }}>Call it a day?</div>
+            <div style={{ fontSize: 15.5, color: C.text, lineHeight: 1.5, marginTop: 6 }}>
+              {t < CLOSE
+                ? `There are still ${Math.floor((CLOSE - t) / 60)}h ${(CLOSE - t) % 60}m before the park closes. Heading back now ends the day and scores it where it stands.`
+                : "The park is closing anyway."}
+            </div>
+            <div style={{
+              display: "flex", justifyContent: "space-between", marginTop: 12, padding: "10px 12px",
+              background: C.gap, borderRadius: 10, fontSize: 15.5,
+            }}>
+              <span style={{ color: C.grey }}>Happiness so far</span>
+              <span style={{ fontWeight: 800, color: C.pink }}>{Math.round(joy)}</span>
+            </div>
+            <div style={{ marginTop: 14 }}>
+              <BigButton onClick={() => { setGoingHome(false); setScreen("end"); }}>Head home</BigButton>
+            </div>
+            <TextLink onClick={() => setGoingHome(false)} style={{ display: "block", textAlign: "center", marginTop: 12 }}>
+              Keep going
+            </TextLink>
+          </div>
+        </>
       )}
 
       {eventCard && <EventCard ev={eventCard} onClose={() => setEventCard(null)} onChoose={chooseOption} />}
@@ -1519,7 +1519,7 @@ function HappiestPlace() {
           onClose={() => setSel(null)} onGo={beginAttraction} onTrain={beginTrain} />
       )}
 
-      <TabBar tab={tab} setTab={setTab} disabled={!!run} />
+      <TabBar tab={tab} setTab={(id) => (id === "home" ? setGoingHome(true) : setTab(id))} disabled={!!run} />
     </Shell>
   );
 }
@@ -2546,7 +2546,7 @@ function YouTab({ onBreak, onBuyLL, wallet, ll, boughtLl, energy, fuel, comfort,
 }
 
 function TabBar({ tab, setTab, disabled }) {
-  const items = [["map", "pin", "Map"], ["list", "list", "List"], ["day", "clock", "Day"], ["you", "home", "You"], ["setup", "gear", "Map Setup"]];
+  const items = [["map", "pin", "Map"], ["list", "list", "List"], ["day", "clock", "Day"], ["you", "star", "You"], ["home", "home", "Home"]];
   return (
     <div style={{
       display: "flex", borderTop: `1px solid ${C.rule}`, background: C.white, flexShrink: 0,
@@ -2619,7 +2619,7 @@ function ResortArt() {
 }
 
 /* ---------------- title & end ---------------- */
-function Title({ onStart, ready, mode, setMode }) {
+function Title({ onStart, onSetup, ready, mode, setMode }) {
   return (
     <Shell>
       <div style={{ flex: 1, overflowY: "auto", padding: "52px 24px 30px", textAlign: "center" }}>
@@ -2666,9 +2666,12 @@ function Title({ onStart, ready, mode, setMode }) {
         <BigButton onClick={onStart}>{ready ? "Start the Day" : "Set Up & Play"}</BigButton>
         {ready && (
           <div style={{ fontSize: 14, color: C.greyLt, marginTop: 10 }}>
-            Your map is loaded and calibrated. Change it any time from Map Setup.
+            Your map is loaded and calibrated.
           </div>
         )}
+        <TextLink onClick={onSetup} style={{ display: "block", margin: "16px auto 0" }}>
+          Map setup &amp; pin adjustment
+        </TextLink>
       </div>
     </Shell>
   );
@@ -2693,7 +2696,7 @@ function End({ joy, t, wallet, energy, comfort, visited, seed, mode, onAgain }) 
     <Shell>
       <div style={{ flex: 1, overflowY: "auto", padding: "44px 24px 30px", textAlign: "center" }}>
         <div style={{ fontSize: 12.5, letterSpacing: ".14em", fontWeight: 800, color: C.blue, textTransform: "uppercase" }}>
-          {energy <= 0 ? "You're wiped out" : "Park closed"} · {clock(Math.min(t, CLOSE))}
+          {energy <= 0 ? "You're wiped out" : t < CLOSE ? "Headed home early" : "Park closed"} · {clock(Math.min(t, CLOSE))}
         </div>
         <div style={{ fontSize: 72, fontWeight: 800, color: rank[1], lineHeight: 1.05, margin: "10px 0 0" }}>{final}</div>
         <div style={{ fontSize: 11.5, letterSpacing: ".14em", fontWeight: 800, color: C.greyLt, textTransform: "uppercase", marginBottom: 8 }}>Happiness</div>
