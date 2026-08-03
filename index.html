@@ -499,6 +499,13 @@ const PRESET = Object.fromEntries(Object.entries(ANCHORS).map(([park, list]) => 
   park, list.map((a) => ({ x: a.x, y: a.y })),
 ]));
 
+/* A saved calibration is only meaningful against the anchor positions it was
+   solved from. Adjusting the castle or Space Mountain moves those anchors, which
+   silently re-solved old calibrations into a 10-degree rotation. Fingerprinting
+   means a stale calibration is thrown away instead. */
+const ANCHOR_FINGERPRINT = Object.values(PRESET)
+  .flat().map((p) => `${p.x},${p.y}`).join("|");
+
 function solveTransform(defs, taps) {
   if (!taps || taps.length < 2) return null;
   const [P1, P2] = defs, [Q1, Q2] = taps;
@@ -760,10 +767,17 @@ function HappiestPlace() {
   const lastEvent = useRef(-999);
 
   const [basemap, setBasemap] = useState(() => load("bde:basemap", null));
-  const [anchors, setAnchors] = useState(() => load("bde:anchors:v2", { dl: [], dca: [] }));
+  const [anchors, setAnchors] = useState(() => {
+    const saved = load("bde:calib", null);
+    if (!saved || saved.fp !== ANCHOR_FINGERPRINT) return { dl: [], dca: [] };
+    return { dl: saved.dl || [], dca: saved.dca || [] };
+  });
   const [calib, setCalib] = useState(null);
   const [calibWarn, setCalibWarn] = useState(null);
   const [usedPreset, setUsedPreset] = useState(false);
+  const [anchorFp, setAnchorFp] = useState(ANCHOR_FINGERPRINT);
+  const staleCalib = (() => { const v = load("bde:calib", null); return !!(v && v.fp !== ANCHOR_FINGERPRINT); })();
+  const [calibReset, setCalibReset] = useState(staleCalib);
   const [saveWarn, setSaveWarn] = useState(false);
   const [showBoth, setShowBoth] = useState(false);
   const [nudges, setNudges] = useState(() => load("bde:nudges:v9", {}));      // id -> corrected canonical {x,y}
@@ -774,10 +788,11 @@ function HappiestPlace() {
   const [goingHome, setGoingHome] = useState(false);
   const setupFile = useRef(null);
 
-  useEffect(() => { save("bde:anchors:v2", anchors); }, [anchors]);
+  useEffect(() => { save("bde:calib", { fp: ANCHOR_FINGERPRINT, dl: anchors.dl, dca: anchors.dca }); }, [anchors]);
   useEffect(() => { save("bde:nudges:v9", nudges); }, [nudges]);
   useEffect(() => { save("bde:speed", speed); }, [speed]);
   useEffect(() => { save("bde:mode", mode); }, [mode]);
+  useEffect(() => { try { STORE && ["bde:anchors", "bde:anchors:v2"].forEach((k) => STORE.removeItem(k)); } catch (e) {} }, []);
   useEffect(() => { if (basemap && basemap.bundled) return; setSaveWarn(!save("bde:basemap", basemap)); }, [basemap]);
 
   const transforms = useMemo(() => ({
@@ -879,6 +894,16 @@ function HappiestPlace() {
     setAnchors(official ? { dl: [...PRESET.dl], dca: [...PRESET.dca] } : { dl: [], dca: [] });
     setUsedPreset(official);
   }
+
+  // if the anchors have moved since a calibration was saved, fall back to default
+  useEffect(() => {
+    const both = anchors.dl.length === 2 && anchors.dca.length === 2;
+    if (both && anchorFp && anchorFp !== ANCHOR_FINGERPRINT) {
+      setAnchors({ dl: [...PRESET.dl], dca: [...PRESET.dca] });
+      setAnchorFp(ANCHOR_FINGERPRINT);
+      setCalibReset(true);
+    }
+  }, []);
 
   function loadBasemap(file) {
     const r = new FileReader();
@@ -1211,7 +1236,7 @@ function HappiestPlace() {
       onSetup={() => setScreen("setup")}
       onStart={() => (mapReady ? start() : setScreen("setup"))} />;
   if (screen === "end")
-    return <End joy={joy} t={t} wallet={wallet} energy={energy} comfort={comfort} visited={visited} seed={seed} mode={mode} onAgain={start} />;
+    return <End joy={joy} t={t} wallet={wallet} energy={energy} comfort={comfort} visited={visited} seed={seed} mode={mode} onAgain={start} onTitle={() => setScreen("title")} />;
 
   const mapProps = {
     park: mapPark, waits, pos, basemap, transforms, anchors, calib,
@@ -1256,6 +1281,13 @@ function HappiestPlace() {
                 ? "Using a map from this device. It's remembered between visits."
                 : "Playing on the built-in map."}
             </div>
+            {calibReset && (
+              <Note tone="good">
+                The calibration landmarks moved when you last adjusted pins, so the saved
+                calibration was out of date and has been reset to default. Redo it only if the
+                pins look wrong.
+              </Note>
+            )}
             {saveWarn && (
               <Note tone="bad">
                 This browser wouldn't keep the image between visits (storage is full or blocked).
@@ -1882,9 +1914,9 @@ function StatusBar({ t, joy, energy, fuel, comfort, wallet, ll, seed }) {
         </div>
         <div style={{ flex: 1, display: "flex", gap: 8 }}>
           <Meter label="Energy" v={energy} c={C.amber} />
-          {/* Hunger reads the other way round: the bar fills as you get hungrier,
-              and turns red when it matters. */}
-          <Meter label="Hunger" v={100 - fuel} invert
+          {/* Full and green when you're fed; drains and reddens as hunger sets in,
+              so it reads the same way as Energy and Comfort. */}
+          <Meter label="Hunger" v={fuel}
             c={fuel < 25 ? C.red : fuel < 50 ? C.amber : C.green} />
           <Meter label="Comfort" v={comfort} c={comfort < 30 ? C.red : C.blue} />
         </div>
@@ -1893,11 +1925,11 @@ function StatusBar({ t, joy, energy, fuel, comfort, wallet, ll, seed }) {
   );
 }
 
-function Meter({ label, v, c, invert }) {
+function Meter({ label, v, c }) {
   return (
     <div style={{ flex: 1 }}>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, fontWeight: 700, color: C.greyLt }}>
-        <span>{label}</span><span style={{ color: invert && v > 75 ? C.red : C.text }}>{Math.round(v)}</span>
+        <span>{label}</span><span style={{ color: C.text }}>{Math.round(v)}</span>
       </div>
       <div style={{ height: 4, borderRadius: 2, background: C.rule, marginTop: 2, overflow: "hidden" }}>
         <div style={{ width: `${clamp(v)}%`, height: "100%", background: c, borderRadius: 3, transition: "width .35s ease" }} />
@@ -2681,7 +2713,7 @@ function Title({ onStart, onSetup, ready, mode, setMode }) {
   );
 }
 
-function End({ joy, t, wallet, energy, comfort, visited, seed, mode, onAgain }) {
+function End({ joy, t, wallet, energy, comfort, visited, seed, mode, onAgain, onTitle }) {
   const rides = Object.entries(visited).reduce((s, [id, n]) => {
     const a = byId[id];
     return s + (a && (a.kind === "ride" || a.kind === "night") ? n : 0);
@@ -2718,6 +2750,12 @@ function End({ joy, t, wallet, energy, comfort, visited, seed, mode, onAgain }) 
             ))}
         </div>
         <BigButton onClick={onAgain}>Do It Again</BigButton>
+        <TextLink onClick={onTitle} style={{ display: "block", margin: "16px auto 0" }}>
+          Back to the start screen
+        </TextLink>
+        <div style={{ fontSize: 13.5, color: C.greyLt, marginTop: 6 }}>
+          Change difficulty, or open Map Setup
+        </div>
       </div>
     </Shell>
   );
