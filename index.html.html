@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Best Day Ever" />
+<meta name="theme-color" content="#FFFFFF" />
+<title>Best Day Ever</title>
+<style>
+  html,body{margin:0;padding:0;background:#0E1B26;overscroll-behavior:none;}
+  body{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;}
+  #root{min-height:100vh;min-height:100dvh;}
+  button{font-family:inherit}
+  textarea{-webkit-user-select:text;user-select:text}
+  @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+</head><body>
+<div id="root"></div>
+<script type="text/babel" data-type="module">
+const { useState, useEffect, useMemo, useRef } = React;
+
+
+/* ==========================================================
+   BEST DAY EVER — styled after the Disneyland app
+   ========================================================== */
+
+const STORE = (() => { try { localStorage.setItem("__t","1"); localStorage.removeItem("__t"); return localStorage; } catch (e) { return null; } })();
+const load = (k, f) => { try { const v = STORE && STORE.getItem(k); return v ? JSON.parse(v) : f; } catch (e) { return f; } };
+const save = (k, v) => { if (!STORE) return true; try { STORE.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } };
+
+const C = {
+  blue: "#0578BE",
+  blueDeep: "#0A62A0",
+  blueTint: "#E4F1FA",
+  navy: "#12283F",
+  text: "#1B3A5C",
+  grey: "#5E7186",
+  greyLt: "#8FA1B3",
+  border: "#CBDDEA",
+  rule: "#E9EFF3",
+  gap: "#EDF2F5",
+  white: "#FFFFFF",
+  pink: "#E5397F",
+  amber: "#F0A02A",
+  green: "#2FA84F",
+  red: "#D64541",
+  shadow: "0 1px 3px rgba(18,40,63,.16), 0 4px 12px rgba(18,40,63,.10)",
+};
+const F = "'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+
+/* ---------------- game model (unchanged) ---------------- */
+const DL_RAW = [
+  ["railroad", "Disneyland Railroad", "Main Street", "ride", "B", 20, 10, 7, -2, 0, 0, 594, 682],
+  ["cinema", "Main Street Cinema", "Main Street", "show", "A", 10, 0, 4, 2, 0, 0, 582, 638],
+  ["jolly", "Jolly Holiday Bakery", "Main Street", "dine", "—", 25, 12, 9, 10, 30, 16, 567, 596],
+  ["emporium", "The Emporium", "Main Street", "shop", "—", 15, 0, 12, -2, 0, 48, 609, 644],
+  ["parade", "Electrical Parade", "Main Street", "night", "E", 25, 20, 18, -2, 0, 0, 594, 623],
+  ["fireworks", "Fireworks over the Castle", "Central Plaza", "night", "E", 25, 30, 28, -4, 0, 0, 595, 413],
+
+  ["indy", "Indiana Jones Adventure", "Adventureland", "ride", "E", 5, 45, 20, -8, 0, 0, 483, 558],
+  ["jungle", "Jungle Cruise", "Adventureland", "ride", "D", 12, 35, 13, -3, 0, 0, 501, 535],
+  ["treehouse", "Adventureland Treehouse", "Adventureland", "ride", "B", 12, 5, 7, -6, 0, 0, 486, 577],
+  ["tiki", "Enchanted Tiki Room", "Adventureland", "show", "B", 17, 10, 9, 8, 0, 0, 521, 564],
+  ["bengal", "Bengal Barbecue", "Adventureland", "dine", "—", 20, 10, 10, 8, 28, 14, 508, 548],
+
+  ["pirates", "Pirates of the Caribbean", "New Orleans Sq.", "ride", "D", 15, 30, 16, 2, 0, 0, 410, 529],
+  ["mansion", "Haunted Mansion", "New Orleans Sq.", "ride", "D", 12, 38, 16, 0, 0, 0, 377, 497],
+  ["bayou", "Blue Bayou Restaurant", "New Orleans Sq.", "dine", "—", 75, 20, 26, 25, 55, 72, 397, 524],
+  ["julep", "Mint Julep Bar", "New Orleans Sq.", "dine", "—", 12, 12, 8, 4, 14, 9, 414, 514],
+
+  ["tiana", "Tiana's Bayou Adventure", "Critter Country", "ride", "E", 12, 53, 19, -6, 0, 0, 295, 434],
+  ["pooh", "Winnie the Pooh", "Critter Country", "ride", "C", 5, 15, 7, 2, 0, 0, 272, 405],
+  ["bear", "Hungry Bear Restaurant", "Critter Country", "dine", "—", 25, 12, 11, 10, 30, 19, 311, 420],
+
+  ["rise", "Rise of the Resistance", "Galaxy's Edge", "ride", "E", 18, 64, 24, -10, 0, 0, 322, 154],
+  ["falcon", "Smugglers Run", "Galaxy's Edge", "ride", "E", 8, 36, 16, -4, 0, 0, 381, 189],
+  ["oga", "Oga's Cantina", "Galaxy's Edge", "dine", "—", 30, 25, 18, 6, 10, 34, 351, 200],
+  ["ronto", "Ronto Roasters", "Galaxy's Edge", "dine", "—", 18, 12, 10, 8, 26, 17, 376, 204],
+
+  ["thunder", "Big Thunder Mountain", "Frontierland", "ride", "E", 8, 40, 18, -7, 0, 0, 476, 307],
+  ["twain", "Mark Twain Riverboat", "Frontierland", "ride", "C", 18, 12, 10, 12, 0, 0, 375, 374],
+  ["horseshoe", "Golden Horseshoe Revue", "Frontierland", "show", "B", 22, 5, 11, 10, 0, 0, 470, 446],
+  ["fantasmic", "Fantasmic!", "Frontierland", "night", "E", 30, 45, 30, -8, 0, 0, 418, 422],
+
+  ["matterhorn", "Matterhorn Bobsleds", "Fantasyland", "ride", "E", 8, 45, 16, -9, 0, 0, 695, 319],
+  ["peterpan", "Peter Pan's Flight", "Fantasyland", "ride", "D", 6, 36, 14, -2, 0, 0, 576, 332],
+  ["smallworld", "it's a small world", "Fantasyland", "ride", "C", 16, 20, 11, 10, 0, 0, 618, 250],
+  ["alice", "Alice in Wonderland", "Fantasyland", "ride", "C", 7, 30, 9, -1, 0, 0, 638, 332],
+  ["toad", "Mr. Toad's Wild Ride", "Fantasyland", "ride", "C", 4, 25, 8, -1, 0, 0, 586, 325],
+  ["snow", "Snow White's Enchanted Wish", "Fantasyland", "ride", "C", 5, 25, 8, -1, 0, 0, 559, 342],
+  ["teacups", "Mad Tea Party", "Fantasyland", "ride", "C", 5, 25, 9, -5, 0, 0, 653, 317],
+  ["storybook", "Storybook Land Canal Boats", "Fantasyland", "ride", "B", 10, 20, 9, 6, 0, 0, 659, 279],
+
+  ["railway", "Mickey & Minnie's Runaway Railway", "Toontown", "ride", "E", 10, 40, 19, -3, 0, 0, 647, 107],
+  ["roger", "Roger Rabbit's Car Toon Spin", "Toontown", "ride", "D", 6, 30, 11, -3, 0, 0, 609, 102],
+  ["gadget", "Gadget's Go Coaster", "Toontown", "ride", "B", 3, 20, 6, -2, 0, 0, 624, 122],
+
+  // --- classic Disneyland food & treats ---
+  ["corndog", "Little Red Wagon Corn Dog", "Main Street", "dine", "—", 15, 25, 15, 6, 26, 13, 580, 623],
+  ["gibson", "Gibson Girl Ice Cream Parlor", "Main Street", "dine", "—", 12, 15, 11, 4, 16, 9, 588, 635],
+  ["candy", "Candy Palace Candy Apple", "Main Street", "dine", "—", 8, 8, 9, 2, 12, 11, 601, 633],
+  ["plazainn", "Plaza Inn Fried Chicken", "Main Street", "dine", "—", 45, 18, 20, 18, 48, 34, 611, 606],
+  ["carnation", "Carnation Café", "Main Street", "dine", "—", 40, 20, 17, 16, 42, 30, 576, 617],
+  ["popcorn", "Popcorn Cart", "Main Street", "dine", "—", 6, 5, 7, 2, 10, 7, 597, 652],
+
+  ["dolewhip", "Dole Whip at Tiki Juice Bar", "Adventureland", "dine", "—", 12, 20, 17, 6, 18, 8, 529, 566],
+  ["hideaway", "The Tropical Hideaway", "Adventureland", "dine", "—", 18, 12, 12, 8, 24, 14, 515, 537],
+
+  ["beignets", "Mickey Beignets", "New Orleans Sq.", "dine", "—", 12, 14, 15, 5, 20, 10, 418, 508],
+  ["monte", "Café Orleans Monte Cristo", "New Orleans Sq.", "dine", "—", 50, 22, 21, 18, 46, 38, 404, 518],
+  ["chowder", "Royal Street Veranda Chowder", "New Orleans Sq.", "dine", "—", 15, 10, 12, 8, 26, 14, 406, 537],
+
+  ["harbour", "Harbour Galley Lobster Roll", "Bayou Country", "dine", "—", 18, 12, 13, 8, 26, 18, 322, 428],
+
+  ["rancho", "Rancho del Zocalo", "Frontierland", "dine", "—", 30, 14, 14, 12, 36, 22, 485, 441],
+  ["funnel", "Stage Door Café Funnel Cake", "Frontierland", "dine", "—", 12, 12, 13, 4, 20, 11, 467, 438],
+  ["turkeyleg", "Turkey Leg Cart", "Frontierland", "dine", "—", 10, 8, 13, 6, 30, 15, 456, 413],
+
+  ["maurice", "Maurice's Treats", "Fantasyland", "dine", "—", 10, 12, 11, 4, 18, 10, 563, 348],
+  ["redrose", "Red Rose Taverne", "Fantasyland", "dine", "—", 25, 15, 13, 10, 32, 20, 552, 338],
+  ["edelweiss", "Edelweiss Snacks", "Fantasyland", "dine", "—", 8, 8, 10, 4, 22, 12, 678, 330],
+
+  ["milkstand", "Blue Milk at the Milk Stand", "Galaxy's Edge", "dine", "—", 10, 16, 13, 4, 12, 9, 360, 183],
+
+  ["pizzaplanet", "Alien Pizza Planet", "Tomorrowland", "dine", "—", 25, 14, 12, 10, 34, 19, 802, 505],
+  ["daisy", "Café Daisy", "Toontown", "dine", "—", 15, 10, 9, 8, 24, 14, 634, 118],
+
+  ["space", "Space Mountain", "Tomorrowland", "ride", "E", 8, 58, 21, -8, 0, 0, 736, 571],
+  ["startours", "Star Tours", "Tomorrowland", "ride", "D", 12, 35, 14, -5, 0, 0, 758, 537],
+  ["buzz", "Buzz Lightyear Astro Blasters", "Tomorrowland", "ride", "C", 8, 25, 10, -2, 0, 0, 773, 508],
+  ["nemo", "Finding Nemo Submarines", "Tomorrowland", "ride", "C", 15, 35, 10, 4, 0, 0, 762, 411],
+  ["autopia", "Autopia", "Tomorrowland", "ride", "C", 10, 40, 8, -2, 0, 0, 800, 344],
+  ["orbitor", "Astro Orbitor", "Tomorrowland", "ride", "B", 5, 25, 7, -3, 0, 0, 777, 480],
+  ["grill", "Galactic Grill", "Tomorrowland", "dine", "—", 20, 10, 9, 8, 28, 16, 791, 495],
+];
+
+const DCA_RAW = [
+  ["carthay", "Carthay Circle Restaurant", "Buena Vista St.", "dine", "—", 70, 18, 24, 22, 52, 68, 590, 953],
+  ["trolley", "Red Car Trolley", "Buena Vista St.", "ride", "B", 8, 8, 6, 4, 0, 0, 596, 931],
+  ["fiddler", "Fiddler, Fifer & Practical Café", "Buena Vista St.", "dine", "—", 18, 10, 8, 8, 24, 13, 611, 920],
+
+  ["monsters", "Monsters, Inc. Mike & Sulley", "Hollywood Land", "ride", "C", 6, 20, 9, -1, 0, 0, 764, 954],
+  ["philhar", "Mickey's PhilharMagic", "Hollywood Land", "show", "C", 14, 15, 11, 8, 0, 0, 739, 931],
+  ["animation", "Animation Academy", "Hollywood Land", "show", "B", 30, 10, 12, 12, 0, 0, 752, 920],
+
+  ["webslingers", "WEB SLINGERS", "Avengers Campus", "ride", "D", 6, 45, 14, -3, 0, 0, 704, 1030],
+  ["guardians", "Guardians of the Galaxy", "Avengers Campus", "ride", "E", 7, 55, 21, -9, 0, 0, 647, 1006],
+  ["pym", "Pym Test Kitchen", "Avengers Campus", "dine", "—", 25, 15, 13, 10, 32, 24, 726, 1015],
+
+  ["racers", "Radiator Springs Racers", "Cars Land", "ride", "E", 8, 75, 25, -6, 0, 0, 647, 1211],
+  ["mater", "Mater's Junkyard Jamboree", "Cars Land", "ride", "C", 4, 25, 8, -4, 0, 0, 609, 1237],
+  ["luigi", "Luigi's Rollickin' Roadsters", "Cars Land", "ride", "C", 4, 25, 8, -3, 0, 0, 628, 1247],
+  ["flos", "Flo's V8 Café", "Cars Land", "dine", "—", 22, 12, 11, 9, 30, 18, 599, 1218],
+  ["cozy", "Cozy Cone Motel", "Cars Land", "dine", "—", 10, 8, 7, 4, 16, 11, 615, 1227],
+
+  ["ghirardelli", "Ghirardelli Soda Fountain", "San Fransokyo", "dine", "—", 18, 14, 12, 6, 20, 15, 504, 1159],
+  ["lamplight", "Lamplight Lounge", "Pixar Pier", "dine", "—", 55, 22, 20, 18, 44, 52, 379, 1206],
+
+  ["incredicoaster", "Incredicoaster", "Pixar Pier", "ride", "E", 5, 40, 19, -9, 0, 0, 303, 1245],
+  ["palaround", "Pixar Pal-A-Round", "Pixar Pier", "ride", "D", 12, 40, 13, -1, 0, 0, 254, 1203],
+  ["midway", "Toy Story Midway Mania", "Pixar Pier", "ride", "D", 7, 40, 14, -2, 0, 0, 351, 1256],
+  ["critter", "Jessie's Critter Carousel", "Pixar Pier", "ride", "B", 4, 15, 6, 0, 0, 0, 274, 1226],
+  ["whirlwind", "Inside Out Emotional Whirlwind", "Pixar Pier", "ride", "C", 5, 20, 8, -2, 0, 0, 322, 1218],
+
+  ["mermaid", "Little Mermaid", "Paradise Gardens", "ride", "C", 6, 15, 9, 4, 0, 0, 322, 1126],
+  ["skyschool", "Goofy's Sky School", "Paradise Gardens", "ride", "D", 4, 30, 10, -6, 0, 0, 293, 1141],
+  ["swings", "Silly Symphony Swings", "Paradise Gardens", "ride", "C", 5, 20, 9, -3, 0, 0, 351, 1126],
+  ["zephyr", "Golden Zephyr", "Paradise Gardens", "ride", "B", 4, 15, 6, -1, 0, 0, 370, 1136],
+  ["jellyfish", "Jumpin' Jellyfish", "Paradise Gardens", "ride", "A", 3, 15, 5, -1, 0, 0, 332, 1145],
+
+  ["soarin", "Soarin' Over California", "Grizzly Peak", "ride", "E", 12, 45, 20, 2, 0, 0, 437, 1006],
+  ["grizzly", "Grizzly River Run", "Grizzly Peak", "ride", "E", 8, 40, 17, -8, 0, 0, 472, 971],
+  ["redwood", "Redwood Creek Challenge Trail", "Grizzly Peak", "ride", "B", 20, 0, 8, -10, 0, 0, 418, 958],
+  ["smokejumpers", "Smokejumpers Grill", "Grizzly Peak", "dine", "—", 20, 12, 9, 8, 28, 17, 456, 1006],
+
+  // --- California Adventure food & treats ---
+  ["schmoozies", "Schmoozies Smoothies", "Hollywood Land", "dine", "—", 10, 10, 9, 6, 16, 10, 748, 964],
+  ["wieners", "Award Wieners", "Hollywood Land", "dine", "—", 15, 12, 11, 6, 26, 15, 756, 946],
+  ["jackjack", "Jack-Jack Cookie Num Nums", "Pixar Pier", "dine", "—", 8, 14, 13, 3, 16, 8, 291, 1235],
+  ["snowman", "Adorable Snowman Frosted Treats", "Pixar Pier", "dine", "—", 10, 12, 12, 4, 18, 9, 274, 1216],
+  ["angrydogs", "Angry Dogs", "Pixar Pier", "dine", "—", 12, 10, 10, 5, 24, 13, 314, 1227],
+  ["gardengrill", "Paradise Garden Grill", "Paradise Gardens", "dine", "—", 20, 12, 12, 10, 30, 18, 341, 1111],
+  ["bayside", "Bayside Brews", "Paradise Gardens", "dine", "—", 10, 8, 8, 4, 12, 11, 368, 1141],
+  ["lucky", "Lucky Fortune Cookery", "San Fransokyo", "dine", "—", 18, 12, 11, 8, 26, 16, 513, 1149],
+  ["poultry", "Poultry Palace", "Pixar Pier", "dine", "—", 14, 10, 10, 6, 26, 14, 332, 1252],
+
+  ["woc", "World of Color", "Paradise Bay", "night", "E", 25, 45, 29, -6, 0, 0, 398, 1157],
+];
+
+const LAST_CALL = { rise: 840, twain: 660, redwood: 720 };  // minutes from 8 AM
+
+const NIGHT = {
+  parade: [700, 800],
+  fireworks: [720, 795],
+  fantasmic: [720, 870],
+  woc: [700, 840],
+};
+
+const KEYS = ["id", "name", "landName", "kind", "ticket", "dur", "wait", "joy", "en", "fuel", "cost", "x", "y"];
+const build = (raw, park) =>
+  raw.map((r) => {
+    const o = { park };
+    KEYS.forEach((k, i) => (o[k] = r[i]));
+    if (NIGHT[o.id]) { o.open = NIGHT[o.id][0]; o.close = NIGHT[o.id][1]; }
+    if (LAST_CALL[o.id] !== undefined) o.last = LAST_CALL[o.id];
+    return o;
+  });
+
+const ATTRACTIONS = [...build(DL_RAW, "dl"), ...build(DCA_RAW, "dca")];
+const byId = Object.fromEntries(ATTRACTIONS.map((a) => [a.id, a]));
+
+const PARKS = {
+  dl: { id: "dl", short: "Disneyland", name: "Disneyland Park", entry: { x: 584, y: 780 } },
+  dca: { id: "dca", short: "California Adventure", name: "Disney California Adventure", entry: { x: 587, y: 985 } },
+};
+
+const LL_OK = new Set(["indy", "rise", "space", "thunder", "matterhorn", "tiana", "railway", "peterpan", "mansion", "falcon", "startours", "jungle", "roger", "buzz", "racers", "guardians", "webslingers", "soarin", "grizzly", "incredicoaster", "midway", "monsters", "skyschool"]);
+
+/* ---------- clock, crowds, walking ---------- */
+const OPEN = 0, CLOSE = 960; // 8:00 AM to midnight
+const HOP_MINUTES = 8;      // security + ticket check, on top of the real walk
+const CANVAS_W = 1000;
+const CANVAS_H = 1364;      // matches the clean resort map aspect (1290x1759)
+
+function clock(t) {
+  const h24 = Math.floor((480 + t) / 60) % 24;
+  const m = (480 + t) % 60;
+  const ampm = h24 >= 12 ? "PM" : "AM";
+  const h = h24 % 12 === 0 ? 12 : h24 % 12;
+  return `${h}:${String(m).padStart(2, "0")} ${ampm}`;
+}
+
+/* Real hourly posted-wait shapes, from Queue-Times 2026 averages via
+   mixinsomemagic.com's per-attraction breakdown. The key finding is that rides
+   do NOT share one curve: Tiana's is 5 min at 8 AM and 53 by mid-afternoon,
+   while Peter Pan opens at 34 and barely moves all day. Values below are a
+   fraction of each ride's own afternoon peak, hourly from 8 AM to 11 PM. */
+const PROFILES = {
+  // huge rope-drop advantage: Tiana's, Runaway Railway, Matterhorn
+  swing:  [0.18, 0.33, 0.65, 0.82, 0.92, 0.98, 1.00, 0.99, 0.93, 0.85, 0.75, 0.63, 0.50, 0.42, 0.37, 0.35],
+  // busy from the moment the rope drops, easier late: Space Mountain, Indiana Jones
+  thrill:  [0.60, 0.68, 0.83, 0.92, 0.98, 1.00, 0.99, 0.97, 0.94, 0.89, 0.82, 0.74, 0.66, 0.61, 0.55, 0.53],
+  // genuine morning AND late-night windows: Big Thunder, Haunted Mansion, Smugglers Run
+  classic: [0.33, 0.49, 0.70, 0.85, 0.94, 1.00, 1.00, 0.97, 0.92, 0.86, 0.78, 0.68, 0.58, 0.51, 0.46, 0.43],
+  // opens busy and stays busy: Peter Pan, Rise of the Resistance
+  flat:   [0.87, 0.89, 0.94, 1.00, 1.00, 0.98, 0.97, 0.95, 0.94, 0.92, 0.89, 0.85, 0.80, 0.74, 0.70, 0.64],
+  // high capacity, gentle build: Pirates, small world, Jungle Cruise
+  steady: [0.30, 0.45, 0.62, 0.78, 0.90, 0.97, 1.00, 1.00, 0.95, 0.90, 0.82, 0.72, 0.62, 0.55, 0.48, 0.42],
+  // kid rides peak mid-morning as families arrive, then fade: Toad, Alice, Dumbo
+  family: [0.35, 0.70, 1.00, 0.98, 0.95, 0.92, 0.92, 0.90, 0.88, 0.85, 0.80, 0.70, 0.58, 0.48, 0.40, 0.35],
+};
+
+const CURVE = {
+  tiana: "swing", railway: "swing", matterhorn: "swing",
+  grizzly: "swing", incredicoaster: "swing", soarin: "swing",
+  space: "thrill", indy: "thrill", guardians: "thrill", racers: "thrill",
+  thunder: "classic", mansion: "classic", falcon: "classic", webslingers: "classic",
+  midway: "classic", startours: "classic", jungle: "classic", nemo: "classic",
+  autopia: "classic", roger: "classic", skyschool: "classic",
+  peterpan: "flat", rise: "flat",
+  toad: "family", snow: "family", alice: "family", teacups: "family",
+  storybook: "family", gadget: "family", pooh: "family", mermaid: "family",
+  critter: "family", whirlwind: "family", jellyfish: "family", zephyr: "family",
+  swings: "family", mater: "family", luigi: "family", monsters: "family",
+};
+
+// hourly points, linearly interpolated so waits drift rather than jump
+function dayCurve(id, ticket, t) {
+  const p = PROFILES[CURVE[id] || (ticket === "E" ? "thrill" : "steady")];
+  const x = Math.max(0, Math.min(15, (480 + t) / 60 - 8));
+  const i = Math.floor(x), f = x - i;
+  return p[i] + (p[Math.min(15, i + 1)] - p[i]) * f;
+}
+
+// the hour a ride is typically at its shortest, for the planning hint
+function bestHour(id, ticket) {
+  const p = PROFILES[CURVE[id] || (ticket === "E" ? "thrill" : "steady")];
+  let bi = 0;
+  for (let i = 1; i < p.length; i++) if (p[i] < p[bi]) bi = i;
+  const h = 8 + bi;
+  return `${h % 12 === 0 ? 12 : h % 12} ${h >= 12 ? "PM" : "AM"}`;
+}
+
+function hash(s) {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return ((h >>> 0) % 1000) / 1000;
+}
+
+function waitFor(a, t, crowd, weather) {
+  if (a.kind === "night") return a.wait;
+  if (!a.wait) return 0;
+  if (a.last !== undefined && t > a.last) return 0;
+  const jitter = 0.88 + hash(a.id + Math.floor(t / 20)) * 0.24;
+  const wx = weather === "drizzle" ? 0.82 : weather === "hot" ? 1.04 : 1;
+  // the fireworks pull people off the queues for about forty minutes
+  const fw = t >= 780 && t <= 820 ? 0.9 : 1;
+  const w = a.wait * dayCurve(a.id, a.ticket, t) * crowd * jitter * wx * fw;
+  return Math.max(0, Math.round(w / 5) * 5);   // Disney posts in 5-minute steps
+}
+
+/* Coordinates are measured off the real resort map, so distance is now
+   geographic. The Disneyland berm spans ~752 units and is ~3,000 ft across,
+   giving ~4 ft per unit; a guest covers ~250 ft/min through crowds. */
+const UNITS_PER_MIN = 54;   // detour factor: real paths wind, they are not straight lines
+function walkMinutes(pos, a) {
+  const d = Math.hypot(pos.x - a.x, pos.y - a.y);
+  const base = Math.max(2, Math.round(d / UNITS_PER_MIN) + 2);
+  // crossing between parks means bag check and turnstiles at the far gate
+  return base + (pos.park !== a.park ? HOP_MINUTES : 0);
+}
+
+const WEATHERS = {
+  clear: { label: "Clear · 74°" },
+  hot: { label: "Hot · 96°" },
+  drizzle: { label: "Drizzle · 61°" },
+};
+
+const clamp = (v, lo = 0, hi = 100) => Math.max(lo, Math.min(hi, v));
+
+/* ---------- basemap calibration ----------
+   Two landmarks per park are enough to solve a similarity transform
+   (uniform scale + rotation + translation) from my canonical park
+   coordinates onto whatever map image you load. */
+const ANCHORS = {
+  dl: [
+    { label: "Sleeping Beauty Castle", hint: "the blue castle at the centre of the park", x: 595, y: 356 },
+    { label: "Space Mountain", hint: "the big white ribbed dome in Tomorrowland", x: 736, y: 571 },
+  ],
+  dca: [
+    { label: "Pixar Pal-A-Round", hint: "the Ferris wheel at Pixar Pier", x: 254, y: 1203 },
+    { label: "Carthay Circle", hint: "the domed tower at the top of Buena Vista Street", x: 590, y: 953 },
+  ],
+};
+
+/* Pin positions were measured directly off the official resort map, so if you
+   load that same image no calibration is needed — these anchors are identity. */
+const PRESET = {
+  dl: [{ x: 595, y: 356 }, { x: 736, y: 571 }],
+  dca: [{ x: 254, y: 1203 }, { x: 590, y: 953 }],
+};
+
+function solveTransform(defs, taps) {
+  if (!taps || taps.length < 2) return null;
+  const [P1, P2] = defs, [Q1, Q2] = taps;
+  const px = P2.x - P1.x, py = P2.y - P1.y;
+  const den = px * px + py * py;
+  if (!den) return null;
+  const qx = Q2.x - Q1.x, qy = Q2.y - Q1.y;
+  const a = (qx * px + qy * py) / den;
+  const b = (qy * px - qx * py) / den;
+  const scale = Math.hypot(a, b);
+  // two taps in the same place would collapse every pin onto one point
+  if (!isFinite(scale) || scale < 1e-4) return null;
+  const tx = Q1.x - (a * P1.x - b * P1.y);
+  const ty = Q1.y - (b * P1.x + a * P1.y);
+  if (![a, b, tx, ty].every(isFinite)) return null;
+  return { a, b, tx, ty, scale };
+}
+const safe = (n, fallback) => (typeof n === "number" && isFinite(n) ? n : fallback);
+const invT = (T, x, y) => {
+  if (!T) return { x, y };
+  const d = T.a * T.a + T.b * T.b;
+  if (!d) return { x, y };
+  const dx = x - T.tx, dy = y - T.ty;
+  return { x: (T.a * dx + T.b * dy) / d, y: (-T.b * dx + T.a * dy) / d };
+};
+const applyT = (T, x, y) => (T ? { x: T.a * x - T.b * y + T.tx, y: T.b * x + T.a * y + T.ty } : { x, y });
+
+/* ---------------- icons ---------------- */
+const I = {
+  star: (c, f) => <path d="M12 2.6l2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95z" fill={f ? c : "none"} stroke={c} strokeWidth="1.8" strokeLinejoin="round" />,
+  fork: (c) => <g fill="none" stroke={c} strokeWidth="1.9" strokeLinecap="round"><path d="M7 3v7a2 2 0 004 0V3M9 12v9" /><path d="M17 3c-1.6 1-2.4 3-2.4 5.2 0 1.7.8 2.8 2.4 2.8V21" /></g>,
+  hat: (c) => <g fill="none" stroke={c} strokeWidth="1.9" strokeLinejoin="round"><path d="M6.5 19h11M8 19l1.2-9.5h5.6L16 19z" /><path d="M4.5 6.2l1.6.5.5 1.6.5-1.6 1.6-.5-1.6-.5-.5-1.6-.5 1.6zM16.4 4.1l1.2.4.4 1.2.4-1.2 1.2-.4-1.2-.4-.4-1.2-.4 1.2z" fill={c} stroke="none" /></g>,
+  mickey: (c, f) => <g fill={f ? c : "none"} stroke={c} strokeWidth="1.7"><circle cx="6.4" cy="7.4" r="3.1" /><circle cx="17.6" cy="7.4" r="3.1" /><circle cx="12" cy="15.2" r="5.2" /></g>,
+  home: (c, f) => <path d="M3.5 11L12 4l8.5 7v8.2a1 1 0 01-1 1h-15a1 1 0 01-1-1z" fill={f ? c : "none"} stroke={c} strokeWidth="1.8" strokeLinejoin="round" />,
+  pin: (c, f) => <path d="M12 21.5s7-6.4 7-11.4a7 7 0 10-14 0c0 5 7 11.4 7 11.4z" fill={f ? c : "none"} stroke={c} strokeWidth="1.8" strokeLinejoin="round" />,
+  list: (c) => <g stroke={c} strokeWidth="1.9" strokeLinecap="round"><path d="M4 6.5h.01M4 12h.01M4 17.5h.01M8.5 6.5H20M8.5 12H20M8.5 17.5H20" /></g>,
+  clock: (c, f) => <g fill={f ? c : "none"} stroke={c} strokeWidth="1.8"><circle cx="12" cy="12" r="8.6" /><path d="M12 7v5.2l3.2 2" strokeLinecap="round" fill="none" stroke={f ? C.white : c} /></g>,
+  gear: (c, f) => <g fill="none" stroke={c} strokeWidth="1.8"><circle cx="12" cy="12" r="3.2" fill={f ? c : "none"} /><path d="M19.2 14.4a1.5 1.5 0 00.3 1.7l.1.1a1.8 1.8 0 11-2.6 2.6l-.1-.1a1.5 1.5 0 00-2.6 1.1v.2a1.8 1.8 0 11-3.6 0v-.1a1.5 1.5 0 00-2.6-1.1l-.1.1a1.8 1.8 0 11-2.6-2.6l.1-.1a1.5 1.5 0 00-1.1-2.6h-.2a1.8 1.8 0 110-3.6h.1a1.5 1.5 0 001.1-2.6l-.1-.1A1.8 1.8 0 117.9 4.7l.1.1a1.5 1.5 0 002.6-1.1V3.5a1.8 1.8 0 113.6 0v.1a1.5 1.5 0 002.6 1.1l.1-.1a1.8 1.8 0 112.6 2.6l-.1.1a1.5 1.5 0 001.1 2.6h.2a1.8 1.8 0 110 3.6h-.1a1.5 1.5 0 00-1.4.9z" /></g>,
+  locate: (c) => <path d="M21 3L3 10.5l7.6 2.9L13.5 21z" fill={c} />,
+  chevron: (c) => <path d="M15 5l-7 7 7 7" fill="none" stroke={c} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />,
+  ll: (c) => <path d="M13.6 2L4 13.4h5.2L8.4 22 20 9.6h-6z" fill={c} />,
+};
+const Icon = ({ d, c = C.grey, f = false, s = 24 }) => (
+  <svg width={s} height={s} viewBox="0 0 24 24" style={{ display: "block" }}>{I[d](c, f)}</svg>
+);
+
+const CATS = [
+  { id: "ride", label: "Attractions", icon: "star" },
+  { id: "dine", label: "Dining", icon: "fork" },
+  { id: "show", label: "Entertainment", icon: "hat" },
+  { id: "all", label: "Everything", icon: "mickey" },
+];
+
+/* ================= root ================= */
+function BestDayEver() {
+  useEffect(() => {
+    const l = document.createElement("link");
+    l.rel = "stylesheet";
+    l.href = "https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,600;0,6..12,700;0,6..12,800&display=swap";
+    document.head.appendChild(l);
+    return () => { try { document.head.removeChild(l); } catch (e) {} };
+  }, []);
+
+  const [screen, setScreen] = useState("title");
+  const [t, setT] = useState(OPEN);
+  const [joy, setJoy] = useState(58);
+  const [energy, setEnergy] = useState(100);
+  const [fuel, setFuel] = useState(72);
+  const [wallet, setWallet] = useState(300);
+  const [pos, setPos] = useState({ park: "dl", x: 584, y: 780 });
+  const [mapPark, setMapPark] = useState("dl");
+  const [visited, setVisited] = useState({});
+  const [ll, setLl] = useState(0);
+  const [boughtLl, setBoughtLl] = useState(false);
+  const [log, setLog] = useState([]);
+  const [tab, setTab] = useState("map");
+  const [cat, setCat] = useState("ride");
+  const [eOnly, setEOnly] = useState(false);
+  const [hideDone, setHideDone] = useState(false);
+  const [sel, setSel] = useState(null);
+  const [seed, setSeed] = useState({ crowd: 1, weather: "clear" });
+  const [flash, setFlash] = useState(null);
+  const [run, setRun] = useState(null);      // the activity playing out in real time
+  const [speed, setSpeed] = useState(() => load("bde:speed", 1));
+
+  const [basemap, setBasemap] = useState(() => load("bde:basemap", null));
+  const [anchors, setAnchors] = useState(() => load("bde:anchors", { dl: [], dca: [] }));
+  const [calib, setCalib] = useState(null);
+  const [calibWarn, setCalibWarn] = useState(null);
+  const [usedPreset, setUsedPreset] = useState(false);
+  const [showBoth, setShowBoth] = useState(false);
+  const [nudges, setNudges] = useState(() => load("bde:nudges", {}));      // id -> corrected canonical {x,y}
+  const [editing, setEditing] = useState(false);
+  const [editIdx, setEditIdx] = useState(0);
+  const setupFile = useRef(null);
+
+  useEffect(() => { save("bde:anchors", anchors); }, [anchors]);
+  useEffect(() => { save("bde:basemap", basemap); }, [basemap]);
+  useEffect(() => { save("bde:nudges", nudges); }, [nudges]);
+  useEffect(() => { save("bde:speed", speed); }, [speed]);
+
+  const transforms = useMemo(() => ({
+    dl: solveTransform(ANCHORS.dl, anchors.dl),
+    dca: solveTransform(ANCHORS.dca, anchors.dca),
+  }), [anchors]);
+
+  // corrected positions win over my estimates
+  const place = (a) => (nudges[a.id] ? { ...a, ...nudges[a.id] } : a);
+
+  // walkthrough order: park, then land, so corrections move across the map sensibly
+  const editList = useMemo(() => ATTRACTIONS.filter((a) => a.kind !== "shop")
+    .slice().sort((p, q) => (p.park === q.park ? p.landName.localeCompare(q.landName) || p.name.localeCompare(q.name) : p.park < q.park ? -1 : 1)), []);
+  const editTarget = editing ? editList[Math.min(editIdx, editList.length - 1)] : null;
+
+  function placePin(pt) {
+    if (!editTarget || !pt) return;
+    const T = transforms[editTarget.park];
+    const c = basemap && T ? invT(T, pt.x, pt.y) : pt;
+    if (!isFinite(c.x) || !isFinite(c.y)) return;
+    setNudges((n) => ({ ...n, [editTarget.id]: { x: Math.round(c.x), y: Math.round(c.y) } }));
+    setEditIdx((i) => Math.min(i + 1, editList.length - 1));
+  }
+
+  function loadBasemap(file) {
+    const r = new FileReader();
+    r.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        setBasemap({ src: r.result, w: img.width, h: img.height });
+        const official = Math.abs(img.height / img.width - CANVAS_H / CANVAS_W) < 0.035;
+        setAnchors(official ? { dl: [...PRESET.dl], dca: [...PRESET.dca] } : { dl: [], dca: [] });
+        setUsedPreset(official);
+      };
+      img.src = r.result;
+    };
+    r.readAsDataURL(file);
+  }
+
+  function placeAnchor(park, pt) {
+    if (!pt || !isFinite(pt.x) || !isFinite(pt.y)) return;
+    const cur = anchors[park].length >= 2 ? [] : anchors[park];
+    if (cur.length === 1 && Math.hypot(cur[0].x - pt.x, cur[0].y - pt.y) < 25) {
+      setCalibWarn("Those points are almost on top of each other. Pick a landmark further away — the distance between them sets the scale.");
+      return;
+    }
+    const next = [...cur, { x: pt.x, y: pt.y }];
+    setCalibWarn(null);
+    setAnchors((A) => ({ ...A, [park]: next }));
+    if (next.length === 2) setCalib(null);
+  }
+
+  function start() {
+    const rolls = ["clear", "clear", "hot", "drizzle"];
+    setSeed({ crowd: 0.8 + Math.random() * 0.55, weather: rolls[Math.floor(Math.random() * rolls.length)] });
+    setScreen("play"); setT(OPEN); setJoy(58); setEnergy(100); setFuel(72); setWallet(300);
+    setPos({ park: "dl", x: 584, y: 780 }); setMapPark("dl"); setVisited({});
+    setLl(0); setBoughtLl(false); setLog([]); setTab("map"); setSel(null); setCat("ride");
+  }
+
+  const waits = useMemo(() => {
+    const w = {};
+    for (const a of ATTRACTIONS) w[a.id] = waitFor(a, t, seed.crowd, seed.weather);
+    return w;
+  }, [t, seed]);
+
+  const isOpen = (a) => a.open === undefined || (t >= a.open && t <= a.close);
+
+  const visible = useMemo(() => ATTRACTIONS.filter((a) => {
+    if (!isOpen(a) || a.kind === "shop") return false;
+    if (a.last !== undefined && t > a.last) return false;
+    if (!(showBoth && basemap) && a.park !== mapPark) return false;
+    if (cat === "ride" && a.kind !== "ride") return false;
+    if (cat === "dine" && a.kind !== "dine") return false;
+    if (cat === "show" && a.kind !== "show" && a.kind !== "night") return false;
+    if (eOnly && a.ticket !== "E") return false;
+    if (hideDone && visited[a.id]) return false;
+    return true;
+  }), [mapPark, cat, eOnly, hideDone, visited, t, showBoth, basemap]);
+
+  const push = (text, tone) =>
+    setLog((L) => [{ text, tone, at: clock(t), key: Math.random() }, ...L].slice(0, 60));
+
+  function passTime(mins) {
+    const hot = seed.weather === "hot" ? 1.5 : 1;
+    setEnergy((e) => clamp(e - (mins / 10) * 0.3 * hot));
+    setFuel((f) => clamp(f - (mins / 10) * 0.95));
+    setJoy((j) => clamp(j - (mins / 10) * 0.35));
+    setT((x) => x + mins);
+  }
+
+  /* One minute of an activity. Kept pure so the same maths drives both the
+     live tick and the Skip button. */
+  function minuteDelta(r, i, hot) {
+    const { a, walk, wait, dur } = r;
+    const phase = i < walk ? "walk" : i < walk + wait ? "wait" : "do";
+    let dJoy = -0.035, dEn = -0.03 * hot, dFu = -0.095;
+    if (phase === "walk") { dEn -= 0.45 * hot; dJoy -= 0.05; }
+    if (phase === "wait") { dEn -= 0.06; dJoy -= r.painRate; }
+    if (phase === "do") {
+      dJoy += r.gain / dur;
+      dEn += (a.en > 0 ? a.en : a.en * hot) / dur;
+      dFu += a.fuel / dur;
+    }
+    return { dJoy, dEn, dFu, phase };
+  }
+
+  function beginAttraction(raw, useLL) {
+    const a = place(raw);
+    if (run || a.cost > wallet) return;
+    const walk = walkMinutes(pos, a);
+    const wait = useLL ? 5 : waits[a.id];
+    const reps = visited[a.id] || 0;
+    const rep = reps === 0 ? 1 : reps === 1 ? 0.5 : reps === 2 ? 0.28 : 0.15;
+    const eF = energy > 60 ? 1 : energy > 35 ? 0.85 : energy > 15 ? 0.62 : 0.4;
+    const fF = fuel > 25 ? 1 : 0.72;
+    let gain = a.joy * rep * eF * fF;
+    if (seed.weather === "hot" && a.kind === "dine") gain += 2;
+    if (seed.weather === "drizzle" && a.kind === "ride") gain -= 1.5;
+    gain -= a.cost > 20 ? (a.cost - 20) * 0.09 : 0;
+    gain -= wallet - a.cost < 30 ? 3 : 0;
+    const painRate = a.kind === "dine" || a.kind === "night" ? 0.05 : energy < 30 ? 0.2 : 0.11;
+    setSel(null);
+    setTab("map");
+    setMapPark(a.park);
+    setRun({
+      a, useLL, walk, wait, dur: Math.max(1, a.dur), painRate, gain, reps,
+      i: 0, net: 0, paid: false, from: { ...pos },
+    });
+  }
+
+  function finishRun(r, net) {
+    const { a } = r;
+    setPos({ park: a.park, x: a.x, y: a.y });
+    setMapPark(a.park);
+    setVisited((v) => ({ ...v, [a.id]: (v[a.id] || 0) + 1 }));
+    if (r.useLL) setLl((n) => n - 1);
+    const bits = [`${r.walk} min walk`];
+    if (r.wait) bits.push(`${r.wait} min line`);
+    if (a.cost) bits.push(`$${a.cost}`);
+    push(`${a.name} — ${bits.join(", ")}`, net >= 4 ? "good" : net >= 0 ? "ok" : "bad");
+    setFlash({ name: a.name, net, key: Math.random() });
+    setTimeout(() => setFlash(null), 2600);
+    setRun(null);
+  }
+
+  function stepMinute() {
+    const r = run;
+    if (!r) return;
+    const hot = seed.weather === "hot" ? 1.5 : 1;
+    const total = r.walk + r.wait + r.dur;
+    const { dJoy, dEn, dFu, phase } = minuteDelta(r, r.i, hot);
+
+    setT((x) => x + 1);
+    setJoy((j) => clamp(j + dJoy));
+    setEnergy((e) => clamp(e + dEn));
+    setFuel((f) => clamp(f + dFu));
+
+    if (phase === "walk" && r.walk > 0) {
+      const p = (r.i + 1) / r.walk;
+      setPos({ park: p > 0.5 ? r.a.park : r.from.park, x: r.from.x + (r.a.x - r.from.x) * p, y: r.from.y + (r.a.y - r.from.y) * p });
+    }
+    if (phase === "do" && !r.paid && r.a.cost) setWallet((w) => w - r.a.cost);
+
+    const net = r.net + dJoy;
+    const next = r.i + 1;
+    if (next >= total) finishRun(r, net);
+    else setRun({ ...r, i: next, net, paid: r.paid || phase === "do" });
+  }
+
+  function skipRun() {
+    const r = run;
+    if (!r) return;
+    const hot = seed.weather === "hot" ? 1.5 : 1;
+    const total = r.walk + r.wait + r.dur;
+    let dJ = 0, dE = 0, dF = 0;
+    for (let i = r.i; i < total; i++) {
+      const d = minuteDelta(r, i, hot);
+      dJ += d.dJoy; dE += d.dEn; dF += d.dFu;
+    }
+    setT((x) => x + (total - r.i));
+    setJoy((j) => clamp(j + dJ));
+    setEnergy((e) => clamp(e + dE));
+    setFuel((f) => clamp(f + dF));
+    if (!r.paid && r.a.cost) setWallet((w) => w - r.a.cost);
+    finishRun(r, r.net + dJ);
+  }
+
+  // the clock: one real second per park minute, at 1x
+  useEffect(() => {
+    if (!run || screen !== "play") return;
+    const id = setTimeout(stepMinute, Math.max(45, 1000 / speed));
+    return () => clearTimeout(id);
+  }, [run, speed, screen]);
+
+  const rest = {
+    bench: () => { passTime(20); setEnergy((e) => clamp(e + 20)); setJoy((j) => clamp(j - (energy < 40 ? 0 : 3))); push("Found a bench. Watched the crowd go by.", "ok"); },
+    churro: () => { if (wallet < 7) return; passTime(10); setWallet((w) => w - 7); setFuel((f) => clamp(f + 12)); setEnergy((e) => clamp(e + 4)); setJoy((j) => clamp(j + 5)); push("Churro. $7. Worth it.", "good"); },
+    coffee: () => { if (wallet < 6) return; passTime(12); setWallet((w) => w - 6); setEnergy((e) => clamp(e + 12)); setFuel((f) => clamp(f + 5)); setJoy((j) => clamp(j + 2)); push("Cold brew. Second wind.", "ok"); },
+    wander: () => { passTime(25); setEnergy((e) => clamp(e - 5)); setJoy((j) => clamp(j - 4)); push("Wandered around not doing much. The day is slipping by.", "bad"); },
+    ll: () => { if (wallet < 32 || boughtLl) return; setWallet((w) => w - 32); setLl(5); setBoughtLl(true); setJoy((j) => clamp(j - 2)); push("Bought Lightning Lane Multi Pass — 5 skips, $32", "ok"); },
+  };
+
+  useEffect(() => {
+    if (screen !== "play") return;
+    if (t >= CLOSE || energy <= 0) setScreen("end");
+  }, [t, energy, screen]);
+
+  if (screen === "title") return <Title onStart={() => setScreen("setup")} />;
+  if (screen === "end")
+    return <End joy={joy} t={t} wallet={wallet} energy={energy} visited={visited} seed={seed} onAgain={start} />;
+
+  const mapProps = {
+    park: mapPark, waits, pos, basemap, transforms, anchors, calib,
+    onAnchor: placeAnchor, calibWarn, showBoth,
+    onCancelCalib: () => { setCalib(null); setCalibWarn(null); },
+    editing, editTarget, onPlacePin: placePin,
+    editIdx, editCount: editList.length, nudged: Object.keys(nudges).length,
+    onEditStep: (d) => setEditIdx((i) => Math.max(0, Math.min(editList.length - 1, i + d))),
+    onEditDone: () => setEditing(false),
+  };
+
+  /* ---------- setup ---------- */
+  if (screen === "setup") {
+    const ready = !basemap || (transforms.dl && transforms.dca);
+    return (
+      <Shell>
+        <NavBar title="Set Up Your Map" />
+        {calib ? (
+          <div style={{ flex: 1, position: "relative", minHeight: 0 }}>
+            <ParkMap {...mapProps} park={calib} items={[]} sel={null} onSelect={() => {}} visited={{}} />
+          </div>
+        ) : (
+          <div style={{ flex: 1, overflowY: "auto", background: C.gap }}>
+            <Card>
+              <p style={{ margin: "0 0 14px", fontSize: 15.5, lineHeight: 1.5, color: C.grey }}>
+                Play on the built-in map, or load the official resort map and play on the real thing.
+                Your image is read on this device only.
+              </p>
+              <Step n="1" title="Load a map image" done={!!basemap}>
+                <input ref={setupFile} type="file" accept="image/*" style={{ display: "none" }}
+                  onChange={(e) => { const f = e.target.files && e.target.files[0]; if (f) loadBasemap(f); e.target.value = ""; }} />
+                <Row>
+                  <Pill onClick={() => setupFile.current && setupFile.current.click()} solid>
+                    {basemap ? "Choose different image" : "Choose image"}
+                  </Pill>
+                  {basemap && <Pill onClick={() => { setBasemap(null); setAnchors({ dl: [], dca: [] }); }}>Remove</Pill>}
+                </Row>
+                {basemap && usedPreset && (
+                  <Note tone="good">Recognised as the official resort map — already calibrated.</Note>
+                )}
+              </Step>
+              {basemap && Object.values(PARKS).map((p, i) => (
+                <Step key={p.id} n={String(i + 2)} title={`Calibrate ${p.short}`} done={!!transforms[p.id]}>
+                  <div style={{ fontSize: 14.5, color: C.grey, marginBottom: 8 }}>
+                    Tap {ANCHORS[p.id][0].label}, then {ANCHORS[p.id][1].label}.
+                  </div>
+                  <Pill solid={!transforms[p.id]}
+                    onClick={() => { setAnchors((A) => ({ ...A, [p.id]: [] })); setCalib(p.id); }}>
+                    {transforms[p.id] ? "Redo" : "Start"}
+                  </Pill>
+                </Step>
+              ))}
+            </Card>
+            <div style={{ padding: "4px 16px 26px" }}>
+              <BigButton disabled={!ready} onClick={start}>
+                {ready ? "Open the Gates" : "Calibrate both parks first"}
+              </BigButton>
+              {basemap && !ready && (
+                <TextLink onClick={() => { setBasemap(null); setAnchors({ dl: [], dca: [] }); }}
+                  style={{ display: "block", textAlign: "center", marginTop: 14 }}>
+                  Skip and use the built-in map
+                </TextLink>
+              )}
+            </div>
+          </div>
+        )}
+      </Shell>
+    );
+  }
+
+  /* ---------- play ---------- */
+  const selA = sel ? byId[sel] : null;
+  const listed = visible
+    .map((a) => ({ a, w: walkMinutes(pos, place(a)) }))
+    .sort((p, q) => p.w - q.w);
+
+  return (
+    <Shell>
+      <StatusBar t={t} joy={joy} energy={energy} fuel={fuel} wallet={wallet} ll={ll} seed={seed} />
+
+      {(tab === "map" || tab === "list") && !editing && !run && (
+        <>
+          <CatTabs cat={cat} setCat={setCat} />
+          <FilterRow
+            mapPark={mapPark} setMapPark={setMapPark}
+            eOnly={eOnly} setEOnly={setEOnly}
+            hideDone={hideDone} setHideDone={setHideDone}
+            onReset={() => { setEOnly(false); setHideDone(false); setCat("ride"); }}
+          />
+        </>
+      )}
+
+      {tab === "map" && (
+        <div style={{ flex: 1, position: "relative", minHeight: 0 }}>
+          <ParkMap {...mapProps}
+            items={(editing ? ATTRACTIONS.filter((a) => a.kind !== "shop" && ((showBoth && basemap) || a.park === mapPark)) : visible).map(place)}
+            sel={sel} onSelect={setSel} visited={visited} />
+          {flash && <Flash key={flash.key} name={flash.name} net={flash.net} />}
+          {run && <ActivityRunner run={run} speed={speed} setSpeed={setSpeed} onSkip={skipRun} />}
+          {!editing && !run && <ShowListButton onClick={() => setTab("list")} />}
+        </div>
+      )}
+
+      {tab === "list" && !run && (
+        <div style={{ flex: 1, overflowY: "auto", background: C.gap }}>
+          {listed.length === 0 && <Empty>Nothing matches those filters right now.</Empty>}
+          {listed.map(({ a, w }) => (
+            <AttractionCard key={a.id} a={a} wait={waits[a.id]} walk={w} reps={visited[a.id] || 0}
+              ll={ll} llOk={LL_OK.has(a.id)} t={t} wallet={wallet}
+              onOpen={() => setSel(a.id)} onGo={beginAttraction} />
+          ))}
+          <div style={{ height: 12 }} />
+        </div>
+      )}
+
+      {tab === "day" && <DayLog log={log} />}
+      {tab === "you" && <YouTab rest={rest} wallet={wallet} ll={ll} boughtLl={boughtLl}
+        energy={energy} fuel={fuel} joy={joy} visited={visited} />}
+      {tab === "setup" && (
+        <div style={{ flex: 1, overflowY: "auto", background: C.gap }}>
+          <Card>
+            <div style={{ fontSize: 15.5, color: C.grey, lineHeight: 1.5, marginBottom: 12 }}>
+              {basemap ? "Playing on your own map image." : "Playing on the built-in map."}
+            </div>
+            <input ref={setupFile} type="file" accept="image/*" style={{ display: "none" }}
+              onChange={(e) => { const f = e.target.files && e.target.files[0]; if (f) loadBasemap(f); e.target.value = ""; }} />
+            <Row>
+              <Pill solid onClick={() => setupFile.current && setupFile.current.click()}>
+                {basemap ? "Change image" : "Load map image"}
+              </Pill>
+              {basemap && <Pill onClick={() => { setBasemap(null); setAnchors({ dl: [], dca: [] }); setShowBoth(false); }}>Remove</Pill>}
+            </Row>
+            {basemap && Object.values(PARKS).map((p) => (
+              <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 14 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, color: C.navy, fontSize: 15.5 }}>{p.name}</div>
+                  <div style={{ fontSize: 14, color: transforms[p.id] ? C.green : C.red, fontWeight: 600 }}>
+                    {transforms[p.id] ? "Calibrated" : `${anchors[p.id].length}/2 points placed`}
+                  </div>
+                </div>
+                <Pill onClick={() => { setAnchors((A) => ({ ...A, [p.id]: [] })); setCalib(p.id); setTab("map"); }}>
+                  {transforms[p.id] ? "Redo" : "Start"}
+                </Pill>
+              </div>
+            ))}
+            {basemap && transforms.dl && transforms.dca && (
+              <div style={{ marginTop: 16 }}>
+                <Toggle on={showBoth} onClick={() => setShowBoth(!showBoth)} label="Show both parks at once" />
+              </div>
+            )}
+          </Card>
+
+          <Card>
+            <div style={{ fontSize: 17, fontWeight: 800, color: C.navy, marginBottom: 6 }}>Adjust pin positions</div>
+            <div style={{ fontSize: 15.5, color: C.grey, lineHeight: 1.5, marginBottom: 12 }}>
+              My placements are estimates, so some pins sit in the wrong spot. This walks you through
+              every attraction one at a time — tap where it really is and it advances to the next.
+              Pinch to zoom in first; corrections are saved as you go.
+            </div>
+            <Row>
+              <Pill solid onClick={() => { setEditing(true); setEditIdx(0); setTab("map"); }}>
+                {Object.keys(nudges).length ? "Continue adjusting" : "Start adjusting"}
+              </Pill>
+              {Object.keys(nudges).length > 0 && (
+                <Pill onClick={() => setNudges({})}>Reset all</Pill>
+              )}
+            </Row>
+            {Object.keys(nudges).length > 0 && (
+              <>
+                <Note tone="good">{Object.keys(nudges).length} of {ATTRACTIONS.filter((a) => a.kind !== "shop").length} repositioned.</Note>
+                <div style={{ fontSize: 14.5, color: C.grey, marginTop: 14, lineHeight: 1.5 }}>
+                  Send this back to me and I'll bake the corrections into the game permanently:
+                </div>
+                <textarea readOnly onFocus={(e) => e.target.select()}
+                  value={"const FIXED = {\n" + Object.entries(nudges).map(([k, v]) => `  "${k}": [${v.x}, ${v.y}],`).join("\n") + "\n};"}
+                  style={{
+                    width: "100%", height: 130, marginTop: 8, padding: 10, boxSizing: "border-box",
+                    border: `1px solid ${C.border}`, borderRadius: 10, background: C.gap,
+                    fontFamily: "ui-monospace, Menlo, monospace", fontSize: 12.5, color: C.text, resize: "vertical",
+                  }} />
+              </>
+            )}
+          </Card>
+        </div>
+      )}
+
+      {selA && !calib && !editing && !run && (
+        <Sheet a={selA} wait={waits[selA.id]} walk={walkMinutes(pos, place(selA))}
+          hop={pos.park !== selA.park} reps={visited[selA.id] || 0}
+          wallet={wallet} ll={ll} llOk={LL_OK.has(selA.id)} t={t}
+          onClose={() => setSel(null)} onGo={beginAttraction} />
+      )}
+
+      <TabBar tab={tab} setTab={setTab} disabled={!!run} />
+    </Shell>
+  );
+}
+
+/* ================= map ================= */
+function ParkMap({ park, items, waits, pos, sel, onSelect, visited, basemap, transforms, calib, anchors, onAnchor, calibWarn, onCancelCalib, showBoth,
+                  editing, editTarget, onPlacePin, editIdx, editCount, nudged, onEditStep, onEditDone }) {
+  const H = basemap ? Math.round(CANVAS_W * basemap.h / basemap.w) : CANVAS_H;
+  const T = transforms[park];
+  const fitted = !!(basemap && T);
+
+  const [view, setView] = useState(null);
+  const drag = useRef(null), moved = useRef(false), pinch = useRef(null), layer = useRef(null);
+  const raf = useRef(0), pendingRef = useRef(null), lastTap = useRef(0);
+
+  useEffect(() => {
+    if (fitted && !showBoth) {
+      const c = applyT(T, 500, park === "dl" ? 470 : 1150);
+      const raw = 1 / (T.scale * 1.35);
+      setView({ cx: safe(c.x, 500), cy: safe(c.y, H / 2), k: isFinite(raw) ? Math.max(0.35, Math.min(9, raw)) : 1 });
+    } else if (basemap) {
+      setView({ cx: 500, cy: H / 2, k: 1 });
+    } else {
+      setView({ cx: 500, cy: park === "dl" ? 470 : 1150, k: 1.55 });
+    }
+  }, [park, fitted, showBoth, basemap && basemap.src, T && T.scale, T && T.tx]);
+
+  const v = view || { cx: 500, cy: H / 2, k: 1 };
+  const clampK = (k) => (isFinite(k) ? Math.max(0.35, Math.min(9, k)) : 1);
+
+  const paint = (nv) => {
+    const g = layer.current;
+    if (!g) return;
+    g.setAttribute("transform",
+      `translate(500 ${H / 2}) scale(${safe(nv.k, 1)}) translate(${-safe(nv.cx, 500)} ${-safe(nv.cy, H / 2)})`);
+  };
+  const schedule = (nv) => {
+    pendingRef.current = nv;
+    if (raf.current) return;
+    raf.current = requestAnimationFrame(() => { raf.current = 0; if (pendingRef.current) paint(pendingRef.current); });
+  };
+  useEffect(() => () => { if (raf.current) cancelAnimationFrame(raf.current); }, []);
+
+  /* Freeze the screen->map matrix at gesture start. Recomputing it per frame
+     made the same finger position map to a moving coordinate, which is what
+     caused the pan to judder. */
+  const onDown = (cx, cy) => {
+    const g = layer.current, m = g && g.getScreenCTM();
+    if (!m) return;
+    drag.current = { inv: m.inverse(), sx: cx, sy: cy, cx: v.cx, cy: v.cy, last: null };
+    moved.current = false;
+  };
+  const onMove = (cx, cy) => {
+    const d = drag.current, g = layer.current;
+    if (!d || !g) return;
+    const svg = g.ownerSVGElement;
+    const p1 = svg.createSVGPoint(); p1.x = d.sx; p1.y = d.sy;
+    const p2 = svg.createSVGPoint(); p2.x = cx; p2.y = cy;
+    const a = p1.matrixTransform(d.inv), b = p2.matrixTransform(d.inv);
+    const dx = b.x - a.x, dy = b.y - a.y;
+    if (Math.abs(dx) + Math.abs(dy) > 6) moved.current = true;
+    const nv = { k: v.k, cx: d.cx - dx, cy: d.cy - dy };
+    d.last = nv; schedule(nv);
+  };
+  const onUp = () => { const d = drag.current; drag.current = null; if (d && d.last) setView(d.last); };
+
+  const spread = (e) => Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+  const touchStart = (e) => {
+    if (e.touches.length >= 2) {
+      const d = spread(e);
+      pinch.current = d > 0 ? { d, k: v.k, cx: v.cx, cy: v.cy } : null;
+      drag.current = null; moved.current = true;
+    } else if (e.touches.length === 1) onDown(e.touches[0].clientX, e.touches[0].clientY);
+  };
+  const touchMove = (e) => {
+    if (e.touches.length >= 2) {
+      const p = pinch.current;
+      if (!p || !(p.d > 0)) return;
+      const d = spread(e);
+      if (!(d > 0)) return;
+      const nv = { cx: p.cx, cy: p.cy, k: clampK(p.k * (d / p.d)) };
+      p.last = nv; schedule(nv);
+      p.n = (p.n || 0) + 1;
+      if (p.n % 5 === 0) setView(nv);
+    } else if (e.touches.length === 1) onMove(e.touches[0].clientX, e.touches[0].clientY);
+  };
+  const touchEnd = (e) => {
+    const left = e && e.touches ? e.touches.length : 0;
+    if (left < 2 && pinch.current) { if (pinch.current.last) setView(pinch.current.last); pinch.current = null; }
+    if (left === 1) onDown(e.touches[0].clientX, e.touches[0].clientY);
+    else if (left === 0) onUp();
+  };
+
+  function toMap(cx, cy) {
+    const g = layer.current;
+    if (!g) return null;
+    const svg = g.ownerSVGElement, p = svg.createSVGPoint();
+    p.x = cx; p.y = cy;
+    const m = g.getScreenCTM();
+    return m ? p.matrixTransform(m.inverse()) : null;
+  }
+  function surfaceTap(e) {
+    if ((!calib && !editing) || moved.current) return;
+    const now = Date.now();
+    if (now - lastTap.current < 500) return;
+    const tc = e.changedTouches && e.changedTouches[0];
+    const cx = tc ? tc.clientX : e.clientX, cy = tc ? tc.clientY : e.clientY;
+    if (cx == null) return;
+    const pt = toMap(cx, cy);
+    if (!pt || !isFinite(pt.x) || !isFinite(pt.y)) return;
+    lastTap.current = now;
+    if (calib) onAnchor(calib, pt);
+    else if (editing) onPlacePin(pt);
+  }
+
+  const pinK = (H / 1000) / v.k;
+  const shown = showBoth && fitted ? items : items.filter((a) => a.park === park);
+  const step = calib ? anchors[calib].length : 0;
+  const recenter = () => {
+    const p = fitted ? applyT(transforms[pos.park], pos.x, pos.y) : pos;
+    setView({ cx: safe(p.x, 500), cy: safe(p.y, H / 2), k: Math.max(v.k, 2.2) });
+  };
+
+  return (
+    <div style={{ position: "absolute", inset: 0, overflow: "hidden", background: "#DCE6EA", touchAction: "none" }}
+      onTouchStart={touchStart} onTouchMove={touchMove} onTouchCancel={touchEnd}
+      onTouchEnd={(e) => { touchEnd(e); surfaceTap(e); }}
+      onMouseDown={(e) => onDown(e.clientX, e.clientY)} onMouseMove={(e) => onMove(e.clientX, e.clientY)}
+      onMouseUp={onUp} onMouseLeave={onUp} onClick={surfaceTap}>
+      <svg viewBox={`0 0 ${CANVAS_W} ${H}`} preserveAspectRatio="xMidYMid slice"
+        style={{ width: "100%", height: "100%", display: "block" }}>
+        <g ref={layer} transform={`translate(500 ${H / 2}) scale(${safe(v.k, 1)}) translate(${-safe(v.cx, 500)} ${-safe(v.cy, H / 2)})`}>
+          {basemap
+            ? <image href={basemap.src} xlinkHref={basemap.src} x="0" y="0" width={CANVAS_W} height={H} style={{ pointerEvents: "none" }} />
+            : <ResortArt />}
+
+          {calib && anchors[calib].map((p, i) => (
+            <g key={i} transform={`translate(${p.x} ${p.y}) scale(${pinK})`} style={{ pointerEvents: "none" }}>
+              <circle r="14" fill="none" stroke={C.blue} strokeWidth="3" />
+              <circle r="4" fill={C.blue} />
+              <text x="18" y="6" style={{ fontFamily: F, fontSize: 16, fontWeight: 800, fill: C.blue }}>{i + 1}</text>
+            </g>
+          ))}
+
+          {!calib && !editing && pos.park === park && (() => {
+            const p = fitted ? applyT(transforms[pos.park], pos.x, pos.y) : pos;
+            if (!isFinite(p.x)) return null;
+            return (
+              <g transform={`translate(${p.x} ${p.y}) scale(${pinK})`} style={{ pointerEvents: "none" }}>
+                <circle r="19" fill={C.blue} opacity=".18" />
+                <circle r="9" fill={C.blue} stroke={C.white} strokeWidth="3.5" />
+              </g>
+            );
+          })()}
+
+          {!calib && shown.map((a) => {
+            const p = fitted ? applyT(transforms[a.park], a.x, a.y) : a;
+            if (!isFinite(p.x) || !isFinite(p.y)) return null;
+            const isTarget = editing && editTarget && editTarget.id === a.id;
+            return <MapPin key={a.id} a={a} px={p.x} py={p.y} w={waits[a.id]} pinK={safe(pinK, 1)}
+              selected={isTarget || (!editing && sel === a.id)} done={!!visited[a.id]}
+              dim={editing && !isTarget} nameLabel={editing ? a.name : null}
+              onTap={() => { if (moved.current) return; if (editing) onPlacePin({ x: a.x, y: a.y }); else onSelect(a.id); }} />;
+          })}
+        </g>
+      </svg>
+
+      {!calib && (
+        <button onClick={recenter} aria-label="Centre on me" style={{
+          position: "absolute", left: 14, bottom: 16, width: 52, height: 52, borderRadius: 26,
+          background: C.white, border: "none", boxShadow: C.shadow, cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}><Icon d="locate" c={C.blue} s={24} /></button>
+      )}
+
+      {editing && editTarget && (
+        <div style={{
+          position: "absolute", left: 12, right: 12, top: 12, background: C.white,
+          borderRadius: 14, boxShadow: C.shadow, padding: "12px 14px",
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+            <div style={{ fontSize: 12, letterSpacing: ".08em", fontWeight: 800, color: C.blue, textTransform: "uppercase" }}>
+              {editIdx + 1} of {editCount} · {nudged} moved
+            </div>
+            <TextLink onClick={(e) => { e.stopPropagation(); onEditDone(); }}>Done</TextLink>
+          </div>
+          <div style={{ fontSize: 17, fontWeight: 800, color: C.navy, marginTop: 2 }}>{editTarget.name}</div>
+          <div style={{ fontSize: 14.5, color: C.grey, marginTop: 1 }}>
+            {editTarget.landName} · {PARKS[editTarget.park].short} — tap where it really is
+          </div>
+          <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+            <Pill onClick={(e) => { e.stopPropagation(); onEditStep(-1); }}>Back</Pill>
+            <Pill onClick={(e) => { e.stopPropagation(); onEditStep(1); }}>Skip</Pill>
+          </div>
+        </div>
+      )}
+
+      {calib && (
+        <div style={{
+          position: "absolute", left: 12, right: 12, top: 12, background: C.white,
+          borderRadius: 14, boxShadow: C.shadow, padding: "12px 14px",
+        }}>
+          <div style={{ fontSize: 12, letterSpacing: ".08em", fontWeight: 800, color: C.blue, textTransform: "uppercase" }}>
+            {PARKS[calib].short} — point {Math.min(step + 1, 2)} of 2
+          </div>
+          <div style={{ fontSize: 17, fontWeight: 800, color: C.navy, marginTop: 2 }}>
+            Tap {ANCHORS[calib][Math.min(step, 1)].label}
+          </div>
+          <div style={{ fontSize: 14.5, color: C.grey, marginTop: 2, lineHeight: 1.4 }}>
+            {ANCHORS[calib][Math.min(step, 1)].hint}. Pinch to zoom in first for accuracy.
+          </div>
+          {calibWarn && <Note tone="bad">{calibWarn}</Note>}
+          <TextLink onClick={(e) => { e.stopPropagation(); onCancelCalib(); }} style={{ marginTop: 10, display: "inline-block" }}>
+            Cancel
+          </TextLink>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* the Disney-app style wait bubble */
+function MapPin({ a, px, py, w, pinK, selected, done, dim, nameLabel, onTap }) {
+  const isRide = a.kind === "ride" || a.kind === "night";
+  const showNum = isRide && w > 0;
+  const label = showNum ? String(w) : null;
+  const bw = showNum ? 74 : 46;
+  const bh = showNum ? 56 : 46;
+  const bg = selected ? C.blue : C.white;
+  const fg = selected ? C.white : C.navy;
+  return (
+    <g transform={`translate(${px} ${py}) scale(${pinK})`} onClick={(e) => { e.stopPropagation(); onTap(); }}
+      opacity={dim ? 0.42 : 1} style={{ cursor: "pointer" }}>
+      {nameLabel && selected && (
+        <>
+          <text x="0" y="24" textAnchor="middle" stroke={C.white} strokeWidth="4.5" strokeLinejoin="round"
+            style={{ fontFamily: F, fontSize: 15, fontWeight: 800 }}>{nameLabel}</text>
+          <text x="0" y="24" textAnchor="middle" style={{ fontFamily: F, fontSize: 15, fontWeight: 800, fill: C.blue }}>{nameLabel}</text>
+        </>
+      )}
+      <path d={`M${-bw / 2} ${-bh - 12} h${bw} a8 8 0 018 8 v${bh - 16} a8 8 0 01-8 8 h${-bw / 2 + 7} l-7 12 l-7 -12 h${-bw / 2 + 7} a8 8 0 01-8 -8 v${-bh + 16} a8 8 0 018 -8 z`}
+        transform={`translate(0 ${-2})`} fill={bg} stroke={done ? C.border : "rgba(18,40,63,.14)"} strokeWidth="1.5" />
+      {showNum ? (
+        <>
+          <text x="0" y={-bh + 20} textAnchor="middle" style={{ fontFamily: F, fontSize: 27, fontWeight: 800, fill: done ? C.greyLt : fg }}>{label}</text>
+          <text x="0" y={-bh + 38} textAnchor="middle" style={{ fontFamily: F, fontSize: 13, fontWeight: 600, fill: selected ? C.white : C.grey }}>Min Wait</text>
+        </>
+      ) : (
+        <g transform={`translate(-11 ${-bh - 1}) scale(0.92)`}>
+          {a.kind === "dine" ? I.fork(selected ? C.white : C.navy)
+            : isRide ? I.star(selected ? C.white : C.navy, true)
+            : I.hat(selected ? C.white : C.navy)}
+        </g>
+      )}
+    </g>
+  );
+}
+
+/* ================= chrome ================= */
+function Shell({ children }) {
+  return (
+    <div style={{ background: "#0E1B26", display: "flex", justifyContent: "center", minHeight: "100vh" }}>
+      <div style={{
+        width: "100%", maxWidth: 440, background: C.white, height: "100vh",
+        display: "flex", flexDirection: "column", position: "relative", overflow: "hidden",
+        fontFamily: F, color: C.text, WebkitFontSmoothing: "antialiased",
+      }}>{children}</div>
+    </div>
+  );
+}
+
+function NavBar({ title, onBack }) {
+  return (
+    <div style={{
+      display: "flex", alignItems: "center", padding: "14px 12px", borderBottom: `1px solid ${C.rule}`,
+      flexShrink: 0, background: C.white,
+    }}>
+      <div style={{ width: 30 }}>{onBack && <button onClick={onBack} style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}><Icon d="chevron" c={C.blue} s={22} /></button>}</div>
+      <div style={{ flex: 1, textAlign: "center", fontSize: 18, fontWeight: 800, color: C.navy }}>{title}</div>
+      <div style={{ width: 30 }} />
+    </div>
+  );
+}
+
+function StatusBar({ t, joy, energy, fuel, wallet, ll, seed }) {
+  return (
+    <div style={{ padding: "10px 16px 11px", borderBottom: `1px solid ${C.rule}`, flexShrink: 0, background: C.white }}>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 9 }}>
+          <span style={{ fontSize: 21, fontWeight: 800, color: C.navy }}>{clock(t)}</span>
+          <span style={{ fontSize: 13.5, color: C.greyLt, fontWeight: 600 }}>
+            {WEATHERS[seed.weather].label} · {seed.crowd > 1.15 ? "Packed" : seed.crowd > 0.95 ? "Busy" : "Light"}
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+          {ll > 0 && (
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 2, color: C.blue, fontWeight: 800, fontSize: 13.5 }}>
+              <svg width="13" height="13" viewBox="0 0 24 24">{I.ll(C.blue)}</svg>{ll}
+            </span>
+          )}
+          <span style={{ fontSize: 19, fontWeight: 800, color: C.green }}>${Math.max(0, Math.round(wallet))}</span>
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
+        <Meter label="Joy" v={joy} c={C.pink} />
+        <Meter label="Energy" v={energy} c={C.amber} />
+        <Meter label="Fed" v={fuel} c={C.green} />
+      </div>
+    </div>
+  );
+}
+
+function Meter({ label, v, c }) {
+  return (
+    <div style={{ flex: 1 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, fontWeight: 700, color: C.greyLt }}>
+        <span>{label}</span><span style={{ color: C.text }}>{Math.round(v)}</span>
+      </div>
+      <div style={{ height: 5, borderRadius: 3, background: C.rule, marginTop: 3, overflow: "hidden" }}>
+        <div style={{ width: `${clamp(v)}%`, height: "100%", background: c, borderRadius: 3, transition: "width .35s ease" }} />
+      </div>
+    </div>
+  );
+}
+
+function CatTabs({ cat, setCat }) {
+  return (
+    <div style={{ display: "flex", padding: "10px 4px 8px", borderBottom: `1px solid ${C.rule}`, flexShrink: 0, background: C.white }}>
+      {CATS.map((c) => {
+        const on = cat === c.id;
+        return (
+          <button key={c.id} onClick={() => setCat(c.id)} style={{
+            flex: 1, background: "none", border: "none", cursor: "pointer", padding: "2px 0",
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+          }}>
+            <span style={{
+              width: 40, height: 40, borderRadius: 20, background: on ? C.blueTint : "transparent",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}><Icon d={c.icon} c={on ? C.blue : C.navy} f={c.icon === "star" && on} s={23} /></span>
+            <span style={{ fontSize: 12.5, fontWeight: on ? 800 : 600, color: on ? C.blue : C.navy }}>{c.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function FilterRow({ mapPark, setMapPark, eOnly, setEOnly, hideDone, setHideDone, onReset }) {
+  return (
+    <div style={{
+      display: "flex", gap: 8, padding: "10px 12px", overflowX: "auto", flexShrink: 0,
+      background: C.white, borderBottom: `1px solid ${C.rule}`, alignItems: "center",
+    }}>
+      <Chip on={mapPark === "dl"} onClick={() => setMapPark("dl")}>Disneyland</Chip>
+      <Chip on={mapPark === "dca"} onClick={() => setMapPark("dca")}>California Adventure</Chip>
+      <Chip on={eOnly} onClick={() => setEOnly(!eOnly)}>E-Tickets</Chip>
+      <Chip on={hideDone} onClick={() => setHideDone(!hideDone)}>Not Done Yet</Chip>
+      <TextLink onClick={onReset} style={{ whiteSpace: "nowrap", paddingLeft: 2 }}>Reset All Filters</TextLink>
+    </div>
+  );
+}
+
+const Chip = ({ on, onClick, children }) => (
+  <button onClick={onClick} style={{
+    padding: "7px 15px", borderRadius: 20, whiteSpace: "nowrap", cursor: "pointer",
+    border: `1.5px solid ${on ? C.blue : C.border}`, background: on ? C.blue : C.white,
+    color: on ? C.white : C.navy, fontFamily: F, fontSize: 14.5, fontWeight: 700,
+  }}>{children}</button>
+);
+
+const TextLink = ({ onClick, children, style }) => (
+  <button onClick={(e) => onClick && onClick(e)} style={{
+    background: "none", border: "none", padding: 0, cursor: "pointer",
+    color: C.blue, fontFamily: F, fontSize: 15, fontWeight: 700, ...style,
+  }}>{children}</button>
+);
+
+const Pill = ({ onClick, solid, children }) => (
+  <button onClick={(e) => onClick && onClick(e)} style={{
+    padding: "9px 18px", borderRadius: 22, cursor: "pointer", fontFamily: F, fontSize: 15, fontWeight: 700,
+    border: `1.5px solid ${C.blue}`, background: solid ? C.blue : C.white, color: solid ? C.white : C.blue,
+  }}>{children}</button>
+);
+
+const Row = ({ children }) => <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>{children}</div>;
+
+const Card = ({ children }) => (
+  <div style={{ background: C.white, padding: 16, marginBottom: 10 }}>{children}</div>
+);
+
+const Empty = ({ children }) => (
+  <div style={{ padding: "40px 24px", textAlign: "center", color: C.grey, fontSize: 15.5 }}>{children}</div>
+);
+
+const Note = ({ tone, children }) => (
+  <div style={{
+    marginTop: 9, fontSize: 14.5, lineHeight: 1.45, fontWeight: 600,
+    color: tone === "good" ? C.green : tone === "bad" ? C.red : C.grey,
+  }}>{children}</div>
+);
+
+const BigButton = ({ disabled, onClick, children }) => (
+  <button onClick={onClick} disabled={disabled} style={{
+    width: "100%", padding: "15px 18px", borderRadius: 26, border: "none", cursor: disabled ? "default" : "pointer",
+    background: disabled ? "#C9D6E0" : C.blue, color: C.white, fontFamily: F, fontSize: 17, fontWeight: 800,
+    boxShadow: disabled ? "none" : "0 2px 6px rgba(5,120,190,.34)",
+  }}>{children}</button>
+);
+
+const Toggle = ({ on, onClick, label }) => (
+  <button onClick={onClick} style={{
+    display: "flex", alignItems: "center", gap: 12, width: "100%", background: "none",
+    border: "none", padding: 0, cursor: "pointer", fontFamily: F,
+  }}>
+    <span style={{ flex: 1, textAlign: "left", fontSize: 15.5, fontWeight: 700, color: C.navy }}>{label}</span>
+    <span style={{ width: 50, height: 30, borderRadius: 15, background: on ? C.blue : "#C9D6E0", position: "relative", transition: "background .2s" }}>
+      <span style={{
+        position: "absolute", top: 3, left: on ? 23 : 3, width: 24, height: 24, borderRadius: 12,
+        background: C.white, boxShadow: "0 1px 3px rgba(0,0,0,.3)", transition: "left .2s",
+      }} />
+    </span>
+  </button>
+);
+
+function Step({ n, title, done, children }) {
+  return (
+    <div style={{ display: "flex", gap: 12, marginBottom: 18 }}>
+      <div style={{
+        width: 28, height: 28, borderRadius: 14, flexShrink: 0, background: done ? C.green : C.blueTint,
+        color: done ? C.white : C.blue, display: "flex", alignItems: "center", justifyContent: "center",
+        fontSize: 14, fontWeight: 800,
+      }}>{done ? "✓" : n}</div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 16, fontWeight: 800, color: C.navy, marginBottom: 7 }}>{title}</div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function ShowListButton({ onClick }) {
+  return (
+    <button onClick={onClick} style={{
+      position: "absolute", right: 14, bottom: 16, display: "flex", alignItems: "center", gap: 9,
+      padding: "13px 22px", borderRadius: 28, background: C.white, border: "none",
+      boxShadow: C.shadow, cursor: "pointer", fontFamily: F, fontSize: 17, fontWeight: 700, color: C.navy,
+    }}>
+      <Icon d="list" c={C.navy} s={21} />Show List
+    </button>
+  );
+}
+
+/* ---------------- attraction card (list) ---------------- */
+function AttractionCard({ a, wait, walk, reps, ll, llOk, t, wallet, onOpen, onGo }) {
+  const isRide = a.kind === "ride" || a.kind === "night";
+  const canLL = ll > 0 && llOk && wait > 15;
+  const broke = a.cost > wallet;
+  const sub = [a.landName, a.ticket !== "—" ? `${a.ticket}-Ticket` : null, reps ? `Done ${reps}×` : null]
+    .filter(Boolean).join(" · ");
+
+  return (
+    <div style={{ background: C.white, padding: "16px 16px 18px", marginBottom: 10 }}>
+      <div style={{ display: "flex", gap: 12 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 19, fontWeight: 800, color: C.navy, lineHeight: 1.2 }}>{a.name}</div>
+          <div style={{ fontSize: 14.5, color: C.grey, marginTop: 3 }}>{sub}</div>
+        </div>
+        <div style={{
+          width: 54, height: 54, borderRadius: 10, flexShrink: 0, background: C.blueTint,
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <Icon d={a.kind === "dine" ? "fork" : isRide ? "star" : "hat"} c={C.blue} f={isRide} s={26} />
+        </div>
+      </div>
+
+      <InfoBox>
+        <div>
+          <div style={{ fontSize: 15.5, fontWeight: 800, color: C.navy }}>
+            {a.kind === "dine" ? "Table Wait" : isRide ? "Standby Line" : "Next Show"}
+          </div>
+          <div style={{ marginTop: 3 }}>
+            <span style={{ fontSize: 23, fontWeight: 800, color: wait > 45 ? C.red : C.navy }}>{wait || "—"}</span>
+            <span style={{ fontSize: 15.5, color: C.text, marginLeft: 5 }}>Minutes</span>
+            <span style={{ fontSize: 15, color: C.grey, marginLeft: 10 }}>· {walk} min walk</span>
+          </div>
+        </div>
+        <TextLink onClick={onOpen}>View Details</TextLink>
+      </InfoBox>
+
+      {canLL && (
+        <InfoBox>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+              <svg width="17" height="17" viewBox="0 0 24 24">{I.ll(C.navy)}</svg>
+              <span style={{ fontSize: 15.5, fontWeight: 800, color: C.navy }}>Multi Pass Experience</span>
+            </div>
+            <div style={{ fontSize: 15, color: C.text, marginTop: 3 }}>
+              Earliest Time Available <b style={{ color: C.navy }}>{clock(t + walk + 5)}</b>
+            </div>
+          </div>
+          <TextLink onClick={() => onGo(a, true)}>Select</TextLink>
+        </InfoBox>
+      )}
+
+      <div style={{ marginTop: 12 }}>
+        <BigButton disabled={broke} onClick={() => onGo(a, false)}>
+          {broke ? "Not enough money" : a.kind === "dine" ? `Eat Here${a.cost ? ` · $${a.cost}` : ""}` : isRide ? "Join Standby Line" : "Go Watch"}
+        </BigButton>
+      </div>
+    </div>
+  );
+}
+
+const InfoBox = ({ children }) => (
+  <div style={{
+    display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+    border: `1.5px solid ${C.blue}`, borderRadius: 12, padding: "12px 14px", marginTop: 13,
+  }}>{children}</div>
+);
+
+/* ---------------- detail sheet ---------------- */
+function Sheet({ a, wait, walk, hop, reps, wallet, ll, llOk, t, onClose, onGo }) {
+  const canLL = ll > 0 && llOk && wait > 15;
+  const broke = a.cost > wallet;
+  const total = walk + wait + a.dur;
+  const isRide = a.kind === "ride" || a.kind === "night";
+  return (
+    <>
+      <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(18,40,63,.42)", zIndex: 20 }} />
+      <div style={{
+        position: "absolute", left: 0, right: 0, bottom: 0, zIndex: 21, background: C.white,
+        borderRadius: "18px 18px 0 0", padding: "10px 16px 20px", animation: "up .2s ease-out",
+        maxHeight: "86%", overflowY: "auto",
+      }}>
+        <style>{`@keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+          @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}`}</style>
+        <div style={{ width: 38, height: 4, borderRadius: 2, background: "#D5DFE7", margin: "0 auto 14px" }} />
+        <div style={{ fontSize: 21, fontWeight: 800, color: C.navy, lineHeight: 1.2 }}>{a.name}</div>
+        <div style={{ fontSize: 14.5, color: C.grey, marginTop: 3 }}>
+          {a.landName} · {PARKS[a.park].short}{a.ticket !== "—" ? ` · ${a.ticket}-Ticket` : ""}
+        </div>
+
+        {hop && (
+          <div style={{
+            marginTop: 12, background: "#FFF4E5", border: `1px solid #F3D5A6`, borderRadius: 10,
+            padding: "10px 12px", fontSize: 14.5, color: "#8A5B12", fontWeight: 600,
+          }}>
+            Park hop — includes {HOP_MINUTES} extra minutes for bag check and turnstiles at the other gate.
+          </div>
+        )}
+
+        <div style={{ display: "flex", marginTop: 14, border: `1px solid ${C.border}`, borderRadius: 12, overflow: "hidden" }}>
+          {[["Walk", walk], [a.kind === "dine" ? "Seated" : "Line", wait], ["On It", a.dur], ["Total", total]].map(([k, val], i) => (
+            <div key={k} style={{
+              flex: 1, padding: "10px 4px", textAlign: "center",
+              borderRight: i < 3 ? `1px solid ${C.border}` : "none", background: i === 3 ? C.blueTint : C.white,
+            }}>
+              <div style={{ fontSize: 19, fontWeight: 800, color: i === 3 ? C.blue : C.navy }}>{val}</div>
+              <div style={{ fontSize: 12, color: C.grey, fontWeight: 600 }}>{k} min</div>
+            </div>
+          ))}
+        </div>
+
+        {isRide && a.wait > 0 && (
+          <div style={{
+            marginTop: 12, background: C.blueTint, borderRadius: 10, padding: "10px 12px",
+            fontSize: 14.5, color: C.blueDeep, fontWeight: 600, lineHeight: 1.4,
+          }}>
+            Typically shortest around <b>{bestHour(a.id, a.ticket)}</b> · peaks near <b>{a.wait} min</b> mid-afternoon
+            {a.last !== undefined ? ` · last call ${clock(a.last)}` : ""}
+          </div>
+        )}
+        <div style={{ fontSize: 15.5, color: C.text, lineHeight: 1.5, marginTop: 12 }}>
+          {a.cost ? `$${a.cost} per person. ` : "No extra cost. "}
+          {reps > 0 && `You've done this ${reps}×, so it won't hit the same. `}
+          {a.en <= -7 && "This one will beat you up a little."}
+          {a.en >= 8 && "A good chance to get off your feet."}
+        </div>
+
+        <div style={{ marginTop: 16 }}>
+          <BigButton disabled={broke} onClick={() => onGo(a, false)}>
+            {broke ? "Not enough money" : a.kind === "dine" ? "Eat Here" : isRide ? "Join Standby Line" : "Go Watch"}
+          </BigButton>
+        </div>
+        {canLL && (
+          <button onClick={() => onGo(a, true)} style={{
+            width: "100%", marginTop: 10, padding: "14px 18px", borderRadius: 26, cursor: "pointer",
+            background: C.white, border: `1.5px solid ${C.blue}`, color: C.blue,
+            fontFamily: F, fontSize: 16.5, fontWeight: 800,
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          }}>
+            <svg width="17" height="17" viewBox="0 0 24 24">{I.ll(C.blue)}</svg>
+            Use Lightning Lane
+          </button>
+        )}
+      </div>
+    </>
+  );
+}
+
+
+function ActivityRunner({ run, speed, setSpeed, onSkip }) {
+  const { a, walk, wait, dur, i, net } = run;
+  const total = walk + wait + dur;
+  const phase = i < walk ? "walk" : i < walk + wait ? "wait" : "do";
+  const isRide = a.kind === "ride" || a.kind === "night";
+  const label = phase === "walk" ? "Walking there"
+    : phase === "wait" ? (a.kind === "dine" ? "Waiting for a table" : "In line")
+    : a.kind === "dine" ? "Eating" : isRide ? "On the ride" : "Watching";
+  const left = phase === "walk" ? walk - i : phase === "wait" ? walk + wait - i : total - i;
+  const seg = [["Walk", walk], [a.kind === "dine" ? "Table" : "Line", wait], [a.kind === "dine" ? "Meal" : "Ride", dur]];
+
+  return (
+    <div style={{
+      position: "absolute", left: 0, right: 0, bottom: 0, zIndex: 24, background: C.white,
+      borderRadius: "18px 18px 0 0", boxShadow: "0 -4px 20px rgba(18,40,63,.18)", padding: "14px 16px 18px",
+    }}>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+        <div style={{
+          width: 46, height: 46, borderRadius: 23, flexShrink: 0,
+          background: phase === "do" ? C.blue : C.blueTint,
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <Icon d={phase === "walk" ? "locate" : phase === "wait" ? "clock" : a.kind === "dine" ? "fork" : isRide ? "star" : "hat"}
+            c={phase === "do" ? C.white : C.blue} f={phase === "do" && isRide} s={22} />
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 12, letterSpacing: ".08em", fontWeight: 800, color: C.blue, textTransform: "uppercase" }}>{label}</div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: C.navy, lineHeight: 1.2, marginTop: 1 }}>{a.name}</div>
+        </div>
+        <div style={{ textAlign: "right", flexShrink: 0 }}>
+          <div style={{ fontSize: 26, fontWeight: 800, color: C.navy, lineHeight: 1 }}>{left}</div>
+          <div style={{ fontSize: 11.5, color: C.grey, fontWeight: 700 }}>MIN LEFT</div>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", gap: 3, marginTop: 13 }}>
+        {seg.map(([nm, len], si) => {
+          const before = seg.slice(0, si).reduce((x, y) => x + y[1], 0);
+          const fill = clamp(((i - before) / Math.max(1, len)) * 100);
+          const active = i >= before && i < before + len;
+          return (
+            <div key={nm} style={{ flex: Math.max(1, len) }}>
+              <div style={{ height: 7, borderRadius: 4, background: C.rule, overflow: "hidden" }}>
+                <div style={{ width: `${fill}%`, height: "100%", background: active ? C.blue : C.green, transition: "width .3s linear" }} />
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: active ? C.blue : C.greyLt, marginTop: 3, textAlign: "center" }}>
+                {nm} {len}m
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 13 }}>
+        <div style={{ flex: 1, fontSize: 15, fontWeight: 800, color: net >= 0 ? C.green : C.red }}>
+          {net >= 0 ? "+" : ""}{net.toFixed(1)} joy so far
+        </div>
+        {[1, 2, 4, 8].map((sp) => (
+          <button key={sp} onClick={() => setSpeed(sp)} style={{
+            minWidth: 38, padding: "6px 8px", borderRadius: 16, cursor: "pointer",
+            border: `1.5px solid ${speed === sp ? C.blue : C.border}`,
+            background: speed === sp ? C.blue : C.white, color: speed === sp ? C.white : C.navy,
+            fontFamily: F, fontSize: 13.5, fontWeight: 800,
+          }}>{sp}×</button>
+        ))}
+        <Pill onClick={onSkip}>Skip</Pill>
+      </div>
+    </div>
+  );
+}
+
+function Flash({ name, net }) {
+  const bad = net < 0, good = net >= 4;
+  return (
+    <div style={{
+      position: "absolute", left: 12, right: 12, top: 12, zIndex: 15, background: C.white,
+      borderRadius: 14, boxShadow: C.shadow, padding: "11px 14px",
+      borderLeft: `5px solid ${bad ? C.red : good ? C.green : C.blue}`,
+    }}>
+      <div style={{ fontSize: 11.5, letterSpacing: ".09em", fontWeight: 800, textTransform: "uppercase", color: C.greyLt }}>
+        {bad ? "That cost you" : good ? "Worth it" : "Done"}
+      </div>
+      <div style={{ fontSize: 16, fontWeight: 800, color: C.navy, marginTop: 1 }}>
+        {name} <span style={{ color: bad ? C.red : C.green }}>{net >= 0 ? "+" : ""}{net.toFixed(1)} joy</span>
+      </div>
+    </div>
+  );
+}
+
+function DayLog({ log }) {
+  return (
+    <div style={{ flex: 1, overflowY: "auto", background: C.gap }}>
+      {log.length === 0 && <Empty>Nothing yet. Tap a pin on the map to get going.</Empty>}
+      {log.length > 0 && (
+        <div style={{ background: C.white, padding: "4px 16px" }}>
+          {log.map((e) => (
+            <div key={e.key} style={{ display: "flex", gap: 12, padding: "12px 0", borderBottom: `1px solid ${C.rule}` }}>
+              <div style={{ width: 64, flexShrink: 0, fontSize: 13.5, fontWeight: 800, color: C.blue }}>{e.at}</div>
+              <div style={{ fontSize: 15, lineHeight: 1.4, color: e.tone === "bad" ? C.red : C.text }}>{e.text}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function YouTab({ rest, wallet, ll, boughtLl, energy, fuel, joy, visited }) {
+  const advice =
+    energy < 25 ? "You're running on fumes. Sit down before you ride anything else — tired guests get almost nothing out of an E-Ticket."
+    : fuel < 25 ? "You're hungry, and it's dulling everything. Eat something."
+    : joy < 40 ? "The day's gotten away from you. Go do something big."
+    : "You're in good shape. Keep moving.";
+  const done = Object.values(visited).reduce((s, n) => s + n, 0);
+  return (
+    <div style={{ flex: 1, overflowY: "auto", background: C.gap }}>
+      <Card>
+        <div style={{ fontSize: 12, letterSpacing: ".08em", fontWeight: 800, color: C.blue, textTransform: "uppercase" }}>How you're doing</div>
+        <div style={{ fontSize: 16.5, lineHeight: 1.45, color: C.text, marginTop: 5 }}>{advice}</div>
+        <div style={{ fontSize: 14.5, color: C.grey, marginTop: 9 }}>{done} experiences so far today.</div>
+      </Card>
+      <Card>
+        <div style={{ fontSize: 17, fontWeight: 800, color: C.navy, marginBottom: 12 }}>Take a break</div>
+        <Row>
+          <Pill onClick={rest.bench}>Sit down · 20 min</Pill>
+          <Pill onClick={rest.churro}>Churro · $7</Pill>
+          <Pill onClick={rest.coffee}>Cold brew · $6</Pill>
+          <Pill onClick={rest.wander}>Wander · 25 min</Pill>
+        </Row>
+      </Card>
+      <Card>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+          <svg width="18" height="18" viewBox="0 0 24 24">{I.ll(C.navy)}</svg>
+          <span style={{ fontSize: 17, fontWeight: 800, color: C.navy }}>Lightning Lane Multi Pass</span>
+        </div>
+        {boughtLl ? (
+          <div style={{ fontSize: 15.5, color: C.text }}>
+            {ll > 0 ? `${ll} skips left. They appear on rides with a real line.` : "All five skips used. That's it for today."}
+          </div>
+        ) : (
+          <>
+            <div style={{ fontSize: 15.5, color: C.text, lineHeight: 1.5, marginBottom: 12 }}>
+              Five skips for $32. Cuts any eligible line to five minutes — but the money stings, and it's gone once spent.
+            </div>
+            <BigButton disabled={wallet < 32} onClick={rest.ll}>Buy for $32</BigButton>
+          </>
+        )}
+      </Card>
+    </div>
+  );
+}
+
+function TabBar({ tab, setTab, disabled }) {
+  const items = [["map", "pin", "Map"], ["list", "list", "List"], ["day", "clock", "Day"], ["you", "home", "You"], ["setup", "gear", "Map Setup"]];
+  return (
+    <div style={{
+      display: "flex", borderTop: `1px solid ${C.rule}`, background: C.white, flexShrink: 0,
+      paddingBottom: "env(safe-area-inset-bottom)",
+    }}>
+      {items.map(([id, ic, label]) => {
+        const on = tab === id;
+        return (
+          <button key={id} onClick={() => !disabled && setTab(id)} style={{
+            flex: 1, background: "none", border: "none", cursor: disabled ? "default" : "pointer",
+            opacity: disabled && !on ? .4 : 1, padding: "9px 0 8px",
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
+          }}>
+            <Icon d={ic} c={on ? C.blue : C.greyLt} f={on && (ic === "pin" || ic === "home")} s={22} />
+            <span style={{ fontSize: 11, fontWeight: on ? 800 : 600, color: on ? C.blue : C.greyLt }}>{label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ---------------- built-in map ---------------- */
+function ResortArt() {
+  const LANDS = [
+    ["Mickey's Toontown", 624, 138], ["Galaxy's Edge", 339, 223], ["Fantasyland", 591, 347],
+    ["Bayou Country", 268, 471], ["Frontierland", 471, 482], ["Tomorrowland", 760, 522],
+    ["New Orleans Sq.", 353, 583], ["Adventureland", 494, 609], ["Main Street, U.S.A.", 584, 642],
+    ["Buena Vista St.", 586, 1005], ["Grizzly Peak", 440, 1026], ["Hollywood Land", 738, 1022],
+    ["Avengers Campus", 676, 1101], ["Paradise Gardens", 316, 1201], ["San Fransokyo", 481, 1244],
+    ["Pixar Pier", 300, 1380], ["Cars Land", 615, 1322],
+  ];
+  const G = "#B9D3A8", G2 = "#9BC088", W = "#9CC6D8", P = "#EFE7D8";
+  return (
+    <g>
+      <rect x="0" y="0" width={CANVAS_W} height={CANVAS_H} fill={G} />
+      {/* the schematic was drawn against the previous map's framing; this puts
+          it in the current coordinate space with the same fit used for the pins */}
+      <g transform="translate(35.15 -36.84) scale(0.95633)">
+      <ellipse cx="530" cy="430" rx="352" ry="338" fill={G2} />
+      <ellipse cx="530" cy="430" rx="332" ry="318" fill={P} />
+      <rect x="200" y="958" width="600" height="448" rx="48" fill={P} />
+      <rect x="545" y="770" width="85" height="196" fill={P} />
+      <path d="M300 400c-20-70 30-110 90-85 50 21 40 85 10 125-32 42-84 22-100-40z" fill={W} />
+      <ellipse cx="762" cy="466" rx="46" ry="28" fill={W} />
+      <ellipse cx="380" cy="1258" rx="88" ry="60" fill={W} />
+      <circle cx="584" cy="508" r="36" fill="#F7F2E7" />
+      <rect x="572" y="500" width="24" height="258" fill="#F7F2E7" />
+      <g transform="translate(585 411)">
+        <rect x="-26" y="-4" width="52" height="24" fill="#DCC9A8" />
+        <rect x="-9" y="-26" width="18" height="26" fill="#F7F2E7" />
+        <path d="M-12 -26L0 -46 12 -26z" fill="#5B8FC9" />
+      </g>
+      <path d="M668 396l22-46 22 46z" fill="#F2F4F6" />
+      <path d="M438 384l23-46 23 46z" fill="#C98A63" />
+      <path d="M428 1078l29-54 29 54z" fill="#A9A19A" />
+      <path d="M608 1332l32-58 32 58z" fill="#C97A4B" />
+      <path d="M710 660q23-58 46 0z" fill="#EDEFF1" />
+      <circle cx="229" cy="1296" r="22" fill="#F7F2E7" stroke="#C9B99B" strokeWidth="2" />
+      {LANDS.map(([txt, x, y]) => (
+        <g key={txt}>
+          <text x={x} y={y} textAnchor="middle" stroke="#FFFFFF" strokeWidth="3.5" strokeLinejoin="round"
+            style={{ fontFamily: F, fontSize: 15, fontWeight: 700 }}>{txt}</text>
+          <text x={x} y={y} textAnchor="middle" style={{ fontFamily: F, fontSize: 15, fontWeight: 700, fill: "#4A5F72" }}>{txt}</text>
+        </g>
+      ))}
+      </g>
+    </g>
+  );
+}
+
+/* ---------------- title & end ---------------- */
+function Title({ onStart }) {
+  return (
+    <Shell>
+      <div style={{ flex: 1, overflowY: "auto", padding: "52px 24px 30px", textAlign: "center" }}>
+        <div style={{
+          width: 74, height: 74, borderRadius: 37, background: C.blueTint, margin: "0 auto 20px",
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}><Icon d="mickey" c={C.blue} f s={40} /></div>
+        <div style={{ fontSize: 12.5, letterSpacing: ".2em", fontWeight: 800, color: C.blue, textTransform: "uppercase" }}>
+          One day · Two parks
+        </div>
+        <h1 style={{ fontSize: 38, fontWeight: 800, color: C.navy, margin: "8px 0 14px", lineHeight: 1.1 }}>
+          Best Day Ever
+        </h1>
+        <p style={{ fontSize: 16.5, lineHeight: 1.55, color: C.text, maxWidth: 330, margin: "0 auto 22px" }}>
+          The gates open at 8:00 AM with $300 in your pocket. Tap a pin to walk there and get in line.
+          Rides, food and shows lift your joy. Long lines, dead time, sore feet and sticker shock pull it back down.
+        </p>
+        <div style={{ background: C.gap, borderRadius: 14, padding: 16, textAlign: "left", maxWidth: 340, margin: "0 auto 26px" }}>
+          <div style={{ fontSize: 12, letterSpacing: ".08em", fontWeight: 800, color: C.blue, textTransform: "uppercase", marginBottom: 7 }}>
+            Reading the map
+          </div>
+          <div style={{ fontSize: 15.5, lineHeight: 1.55, color: C.text }}>
+            Each bubble shows the current standby wait. Every walk across the map costs minutes you
+            don't get back, so the shortest line isn't always the best move. Repeat rides pay less
+            each time.
+          </div>
+        </div>
+        <BigButton onClick={onStart}>Plan the Day</BigButton>
+      </div>
+    </Shell>
+  );
+}
+
+function End({ joy, t, wallet, energy, visited, seed, onAgain }) {
+  const rides = Object.entries(visited).reduce((s, [id, n]) => {
+    const a = byId[id];
+    return s + (a && (a.kind === "ride" || a.kind === "night") ? n : 0);
+  }, 0);
+  const unique = Object.keys(visited).length;
+  const both = new Set(Object.keys(visited).map((id) => byId[id].park)).size === 2;
+  const final = clamp(joy + Math.min(8, unique * 0.4) + (wallet > 0 ? 2 : 0) + (both ? 3 : 0));
+  const rank =
+    final >= 92 ? ["Best Day Ever", C.pink] : final >= 80 ? ["A truly magical day", C.blue] :
+    final >= 66 ? ["A great day", C.blue] : final >= 50 ? ["A good day", C.navy] :
+    final >= 34 ? ["A perfectly fine day", C.navy] : ["You should've stayed at the hotel", C.grey];
+  return (
+    <Shell>
+      <div style={{ flex: 1, overflowY: "auto", padding: "44px 24px 30px", textAlign: "center" }}>
+        <div style={{ fontSize: 12.5, letterSpacing: ".14em", fontWeight: 800, color: C.blue, textTransform: "uppercase" }}>
+          {energy <= 0 ? "You're wiped out" : "Park closed"} · {clock(Math.min(t, CLOSE))}
+        </div>
+        <div style={{ fontSize: 78, fontWeight: 800, color: rank[1], lineHeight: 1.05, margin: "10px 0 2px" }}>{Math.round(final)}</div>
+        <div style={{ fontSize: 21, fontWeight: 800, color: C.navy, marginBottom: 24 }}>{rank[0]}</div>
+        <div style={{ background: C.gap, borderRadius: 14, padding: "6px 16px", textAlign: "left", maxWidth: 340, margin: "0 auto 26px" }}>
+          {[["Attractions ridden", rides], ["Different things tried", unique], ["Both parks", both ? "Yes (+3)" : "No"],
+            ["Money left", `$${Math.max(0, Math.round(wallet))}`], ["Energy remaining", `${Math.round(energy)}%`],
+            ["Conditions", `${WEATHERS[seed.weather].label}, ${seed.crowd > 1.15 ? "packed" : seed.crowd > 0.95 ? "busy" : "light"}`]]
+            .map(([k, val]) => (
+              <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: `1px solid ${C.rule}`, fontSize: 15.5 }}>
+                <span style={{ color: C.grey }}>{k}</span>
+                <span style={{ fontWeight: 800, color: C.navy }}>{val}</span>
+              </div>
+            ))}
+        </div>
+        <BigButton onClick={onAgain}>Do It Again</BigButton>
+      </div>
+    </Shell>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<BestDayEver />);
+</script>
+</body></html>
