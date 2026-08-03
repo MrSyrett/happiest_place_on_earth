@@ -225,6 +225,10 @@ const DCA_RAW = [
   ["lucky", "Lucky Fortune Cookery", "San Fransokyo", "dine", "—", 18, 12, 11, 8, 26, 16, 515, 1158],
   ["poultry", "Poultry Palace", "Pixar Pier", "dine", "—", 14, 10, 10, 6, 26, 14, 374, 1261],
 
+  ["auntcass", "Aunt Cass Café", "San Fransokyo", "dine", "—", 22, 12, 12, 10, 32, 18, 548, 1145],
+  ["cocina", "Cocina Cucamonga Mexican Grill", "San Fransokyo", "dine", "—", 20, 12, 11, 8, 30, 17, 505, 1135],
+  ["corndogcastle", "Corn Dog Castle", "Paradise Gardens", "dine", "—", 10, 12, 10, 4, 24, 13, 275, 1140],
+  ["hollywoodlounge", "Hollywood Lounge", "Hollywood Land", "dine", "—", 15, 10, 9, 8, 14, 16, 730, 908],
   ["boardwalk", "Games of the Boardwalk", "Pixar Pier", "ride", "A", 8, 5, 6, -2, 0, 10, 269, 1240],
   ["djunior", "Disney Junior Dream Factory", "Hollywood Land", "show", "B", 22, 10, 9, 8, 0, 0, 650, 956],
   ["bakery", "The Bakery Tour", "San Fransokyo", "dine", "—", 15, 5, 8, 4, 14, 7, 523, 1121],
@@ -303,7 +307,7 @@ const INDOOR = new Set([
   // California Adventure
   "guardians", "webslingers", "midway", "soarin", "monsters", "philhar", "animation",
   "turtletalk", "djunior", "lamplight", "carthay", "ghirardelli", "lucky", "bakery",
-  "pym", "flos", "schmoozies", "boardwalk",
+  "pym", "flos", "schmoozies", "boardwalk", "auntcass", "cocina", "hollywoodlounge",
 ]);
 const WET = new Set(["grizzly", "tiana"]);
 
@@ -764,7 +768,6 @@ function HappiestPlace() {
 
   const savedMap = (() => {
     const v = load("bde:map", null);
-    // all-or-nothing: a blob stamped with an older frame is stale in every part
     return v && v.baseFrame === frameKey(FRAME_DEFAULT) ? v : null;
   })();
   const [screen, setScreen] = useState("title");
