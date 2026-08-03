@@ -289,6 +289,36 @@ const SINGLE_JOY = 0.75;   // three quarters of the happiness
    opportunity to spot rather than a strategy to lean on. Stable in 45-minute
    blocks so the option does not flicker while you are looking at it. */
 
+/* ---------------- comfort ----------------
+   Heat and rain wear you down; air conditioning and a seat put it back.
+   INDOOR is the properly climate-controlled stuff; WET rides are a relief in
+   the heat and thoroughly unpleasant when it's already raining. */
+const INDOOR = new Set([
+  // Disneyland
+  "pirates", "mansion", "smallworld", "peterpan", "snow", "toad", "pinocchio", "alice",
+  "space", "startours", "buzz", "nemo", "indy", "tiki", "lincoln", "cinema", "rise",
+  "falcon", "railway", "roger", "bluey", "launchbay", "mickeyhouse", "minniehouse",
+  "oga", "bayou", "monte", "plazainn", "carnation", "gibson", "jolly", "redrose",
+  "rancho", "bear", "harbour", "grill", "pizzaplanet", "daisy", "chowder",
+  // California Adventure
+  "guardians", "webslingers", "midway", "soarin", "monsters", "philhar", "animation",
+  "turtletalk", "djunior", "lamplight", "carthay", "ghirardelli", "lucky", "bakery",
+  "pym", "flos", "schmoozies", "boardwalk",
+]);
+const WET = new Set(["grizzly", "tiana"]);
+
+function comfortDelta(a, weather) {
+  if (WET.has(a.id)) return weather === "hot" ? 16 : weather === "drizzle" ? -10 : 2;
+  if (INDOOR.has(a.id)) return 20;
+  if (a.kind === "show") return 9;    // seated and usually shaded
+  if (a.kind === "dine") return 6;
+  if (a.kind === "train") return 7;   // shaded, and you're sitting down
+  return -5;                          // out in it
+}
+
+// how fast comfort bleeds away just standing around, per minute
+const COMFORT_DRAIN = { clear: 0.05, hot: 0.16, drizzle: 0.13 };
+
 const LL_OK = new Set(["indy", "rise", "space", "thunder", "matterhorn", "tiana", "railway", "peterpan", "mansion", "falcon", "startours", "jungle", "roger", "buzz", "racers", "guardians", "webslingers", "soarin", "grizzly", "incredicoaster", "midway", "monsters", "skyschool"]);
 
 /* ---------- clock, crowds, walking ---------- */
@@ -516,9 +546,9 @@ const EVENTS = [
     text: "The register wouldn't take the card, so the cast member just waved you through.", money: 14, joy: 5 },
   { id: "bench", kind: "good", when: "day", w: 7, title: "Perfect shady bench",
     text: "Empty, shaded, and right by a snack cart. You sit for a bit longer than planned.",
-    energy: 12, minutesLost: 10, joy: 3 },
+    energy: 12, minutesLost: 10, joy: 3, comfort: 12 },
   { id: "breeze", kind: "good", when: "day", w: 6, title: "The weather turns lovely",
-    text: "The heat breaks and a breeze comes through. Everything feels easier.", energy: 10, joy: 5 },
+    text: "The heat breaks and a breeze comes through. Everything feels easier.", energy: 10, joy: 5, comfort: 20 },
   { id: "birthday", kind: "good", when: "day", w: 4, title: "Free celebration button",
     text: "City Hall hands you a button. Cast members wish you a happy day for the rest of the afternoon.", joy: 9 },
 
@@ -550,7 +580,7 @@ const EVENTS = [
     waitMult: 1.3, minutes: 60, joy: -3 },
   { id: "rain", kind: "bad", when: "day", w: 7, title: "Sudden downpour",
     text: "It comes down hard for a while. Lines shrink, but so does everyone's patience.",
-    waitMult: 0.8, minutes: 50, energy: -8, joy: -6 },
+    waitMult: 0.8, minutes: 50, energy: -8, joy: -6, comfort: -22 },
   { id: "spill", kind: "bad", when: "day", w: 7, title: "You dropped it",
     text: "The churro made it about four steps. A bird got there before you did.", money: -8, joy: -5 },
   { id: "lost", kind: "bad", when: "day", w: 5, title: "Lost something",
@@ -569,26 +599,26 @@ const EVENTS = [
    Everything here trades one resource for another. `window` limits an option
    to part of the day (minutes from 8 AM). */
 const BREAKS = [
-  { id: "bench", name: "Sit down for a bit", mins: 20, cost: 0, joy: -2, en: 22, fuel: 0,
+  { id: "bench", name: "Sit down for a bit", mins: 20, cost: 0, joy: -2, en: 22, fuel: 0, comfort: 10,
     desc: "Find a bench in the shade and let your feet recover." },
-  { id: "water", name: "Water and shade", mins: 10, cost: 0, joy: 2, en: 8, fuel: 4,
+  { id: "water", name: "Water and shade", mins: 10, cost: 0, joy: 2, en: 8, fuel: 4, comfort: 18,
     desc: "Free cup of ice water and ten minutes out of the sun." },
-  { id: "people", name: "People watching on Main Street", mins: 30, cost: 0, joy: 5, en: 14, fuel: 0,
+  { id: "people", name: "People watching on Main Street", mins: 30, cost: 0, joy: 5, en: 14, fuel: 0, comfort: 8,
     desc: "Park yourself by the hub and watch the world go by. Costs nothing but time." },
-  { id: "churro", name: "Churro from a cart", mins: 10, cost: 7, joy: 6, en: 4, fuel: 12,
+  { id: "churro", name: "Churro from a cart", mins: 10, cost: 7, joy: 6, en: 4, fuel: 12, comfort: 3,
     desc: "Cinnamon sugar, still warm. Non-negotiable." },
-  { id: "coffee", name: "Cold brew", mins: 12, cost: 6, joy: 2, en: 14, fuel: 5,
+  { id: "coffee", name: "Cold brew", mins: 12, cost: 6, joy: 2, en: 14, fuel: 5, comfort: 6,
     desc: "The afternoon wall is real. This helps." },
-  { id: "pins", name: "Pin trading", mins: 20, cost: 14, joy: 9, en: -2, fuel: 0,
+  { id: "pins", name: "Pin trading", mins: 20, cost: 14, joy: 9, en: -2, fuel: 0, comfort: 4,
     desc: "Buy a starter pin and work the lanyards. Cast members always trade." },
-  { id: "photo", name: "Find a PhotoPass spot", mins: 15, cost: 0, joy: 7, en: -2, fuel: 0,
+  { id: "photo", name: "Find a PhotoPass spot", mins: 15, cost: 0, joy: 7, en: -2, fuel: 0, comfort: 2,
     desc: "A proper photo of everyone, for once." },
-  { id: "shopping", name: "Browse the shops", mins: 35, cost: 45, joy: 14, en: 3, fuel: 0,
+  { id: "shopping", name: "Browse the shops", mins: 35, cost: 45, joy: 14, en: 3, fuel: 0, comfort: 26,
     desc: "Air conditioning, a slow lap of the Emporium, and something you didn't plan to buy." },
-  { id: "nap", name: "Mid-day break at the hotel", mins: 240, cost: 0, joy: 12, en: 95, fuel: 16,
+  { id: "nap", name: "Mid-day break at the hotel", mins: 240, cost: 0, joy: 12, en: 95, fuel: 16, comfort: 100,
     window: [120, 600],
     desc: "Back to the room, feet up, an actual nap. You lose four hours of park time and come back a different person." },
-  { id: "wander", name: "Wander with no plan", mins: 25, cost: 0, joy: -5, en: -5, fuel: 0,
+  { id: "wander", name: "Wander with no plan", mins: 25, cost: 0, joy: -5, en: -5, fuel: 0, comfort: -6,
     desc: "Drift around. Pleasant for five minutes, then the day is quietly slipping away." },
 ];
 
@@ -612,8 +642,8 @@ const CHOICES = [
   { id: "poncho", w: 8, title: "It starts absolutely pelting down",
     text: "There are ponchos in the shop on the corner, or a covered walkway you could sit out under.",
     options: [
-      { label: "Buy a poncho and carry on", sub: "$15, no time lost", money: -15, joy: -2 },
-      { label: "Shelter until it passes", sub: "Half an hour, but you rest", joy: -3, energy: 13, minutesLost: 30, waitMult: 0.8, minutes: 40 },
+      { label: "Buy a poncho and carry on", sub: "$15, no time lost", money: -15, joy: -2, comfort: 8 },
+      { label: "Shelter until it passes", sub: "Half an hour, but you rest", joy: -3, energy: 13, comfort: 20, minutesLost: 30, waitMult: 0.8, minutes: 40 },
     ] },
   { id: "spareLL", w: 7, title: "A stranger offers you their spare Lightning Lane",
     text: "They're heading home early and would rather someone got the use of it. They ask twenty dollars.",
@@ -630,7 +660,7 @@ const CHOICES = [
   { id: "walkup", w: 7, title: "A walk-up table has opened at a sit-down restaurant",
     text: "No reservation needed. It isn't cheap and it will take a while.",
     options: [
-      { label: "Take the table", sub: "$58 and an hour", money: -58, joy: 17, energy: 20, fuel: 48, minutesLost: 60 },
+      { label: "Take the table", sub: "$58 and an hour", money: -58, joy: 17, energy: 20, fuel: 48, comfort: 22, minutesLost: 60 },
       { label: "Grab something quick instead", sub: "$12 and ten minutes", money: -12, joy: 4, fuel: 18, minutesLost: 10 },
     ] },
   { id: "shortline", w: 9, title: "You pass a headliner with almost no line",
@@ -702,6 +732,7 @@ function HappiestPlace() {
   const [joy, setJoy] = useState(50);
   const [energy, setEnergy] = useState(100);
   const [fuel, setFuel] = useState(72);
+  const [comfort, setComfort] = useState(100);
   const [wallet, setWallet] = useState(300);
   const [pos, setPos] = useState({ park: "dl", x: 592, y: 675, landName: "Main Street" });
   const [mapPark, setMapPark] = useState("dl");
@@ -885,7 +916,7 @@ function HappiestPlace() {
 
   function start() {
     setSeed(rollConditions(mode));
-    setScreen("play"); setT(OPEN); setJoy(50); setEnergy(100); setFuel(72); setWallet(300);
+    setScreen("play"); setT(OPEN); setJoy(50); setEnergy(100); setFuel(72); setComfort(100); setWallet(300);
     setPos({ park: "dl", x: 592, y: 675, landName: "Main Street" }); setMapPark("dl"); setVisited({});
     setLl(0); setBoughtLl(false); setLog([]); setTab("map"); setSel(null); setCat("ride");
     setMods({ mult: 1, until: 0, closures: {} });
@@ -921,24 +952,27 @@ function HappiestPlace() {
     const hot = seed.weather === "hot" ? 1.5 : 1;
     setEnergy((e) => clamp(e - (mins / 10) * 0.3 * hot * drain));
     setFuel((f) => clamp(f - (mins / 10) * 0.95));
+    setComfort((c) => clamp(c - mins * (COMFORT_DRAIN[seed.weather] || 0.06) * drain));
     setJoy((j) => happy(j - (mins / 10) * 0.35 * drain));
     setT((x) => x + mins);
   }
 
   /* One minute of an activity. Kept pure so the same maths drives both the
      live tick and the Skip button. */
-  function minuteDelta(r, i, hot, dr) {
+  function minuteDelta(r, i, hot, dr, wx) {
     const { a, walk, wait, dur } = r;
     const phase = i < walk ? "walk" : i < walk + wait ? "wait" : "do";
-    let dJoy = -0.035 * dr, dEn = -0.03 * hot * dr, dFu = -0.095;
-    if (phase === "walk") { dEn -= 0.45 * hot * dr; dJoy -= 0.05 * dr; }
-    if (phase === "wait") { dEn -= 0.06 * dr; dJoy -= r.painRate * dr; }
+    const base = COMFORT_DRAIN[wx] || COMFORT_DRAIN.clear;
+    let dJoy = -0.035 * dr, dEn = -0.03 * hot * dr, dFu = -0.095, dCf = -base * dr;
+    if (phase === "walk") { dEn -= 0.45 * hot * dr; dJoy -= 0.05 * dr; dCf -= base * 1.1; }
+    if (phase === "wait") { dEn -= 0.06 * dr; dJoy -= r.painRate * dr; dCf -= base * 0.9; }
     if (phase === "do") {
       dJoy += r.gain / dur;
       dEn += (a.en > 0 ? a.en : a.en * hot) / dur;
       dFu += a.fuel / dur;
+      dCf += (r.comfort !== undefined ? r.comfort : 0) / dur;
     }
-    return { dJoy, dEn, dFu, phase };
+    return { dJoy, dEn, dFu, dCf, phase };
   }
 
   function beginTrain(station, destId) {
@@ -961,7 +995,7 @@ function HappiestPlace() {
     setMapPark("dl");
     setRun({
       a: synthetic, useLL: false, walk, wait, dur: Math.max(1, mins),
-      painRate: 0.06, gain: synthetic.joy * eF, reps: 0,
+      painRate: 0.06, gain: synthetic.joy * eF, reps: 0, comfort: 7,
       i: 0, net: 0, paid: true, from: { ...pos }, board: { x: from.x, y: from.y },
     });
   }
@@ -979,7 +1013,8 @@ function HappiestPlace() {
     const rep = reps === 0 ? 1 : reps === 1 ? 0.5 : reps === 2 ? 0.28 : 0.15;
     const eF = energy > 60 ? 1 : energy > 35 ? 0.85 : energy > 15 ? 0.62 : 0.4;
     const fF = fuel > 25 ? 1 : 0.72;
-    let gain = a.joy * rep * eF * fF;
+    const cF = comfort > 60 ? 1 : comfort > 35 ? 0.9 : comfort > 15 ? 0.76 : 0.6;
+    let gain = a.joy * rep * eF * fF * cF;
     if (seed.weather === "hot" && a.kind === "dine") gain += 2;
     if (seed.weather === "drizzle" && a.kind === "ride") gain -= 1.5;
     if (single) gain *= SINGLE_JOY;
@@ -991,6 +1026,7 @@ function HappiestPlace() {
     setMapPark(a.park);
     setRun({
       a, useLL, single, walk, wait, dur: Math.max(1, a.dur), painRate, gain, reps,
+      comfort: comfortDelta(a, seed.weather),
       i: 0, net: 0, paid: false, from: { ...pos },
     });
   }
@@ -1000,6 +1036,7 @@ function HappiestPlace() {
     if (e.joy) setJoy((j) => happy(j + e.joy));
     if (e.energy) setEnergy((en) => clamp(en + e.energy));
     if (e.fuel) setFuel((f) => clamp(f + e.fuel));
+    if (e.comfort) setComfort((c) => clamp(c + e.comfort));
     if (e.money) setWallet((w) => Math.max(0, w + e.money));
     if (e.ll) setLl((n) => n + e.ll);
     if (e.timeShift) setT((x) => x + e.timeShift);
@@ -1044,6 +1081,7 @@ function HappiestPlace() {
     if (ev.joy) setJoy((j) => happy(j + ev.joy));
     if (ev.energy) setEnergy((e) => clamp(e + ev.energy));
     if (ev.fuel) setFuel((f) => clamp(f + ev.fuel));
+    if (ev.comfort) setComfort((c) => clamp(c + ev.comfort));
     if (ev.money) setWallet((w) => Math.max(0, w + ev.money));
     if (ev.ll) setLl((n) => n + ev.ll);
     if (ev.timeShift) setT((x) => x + ev.timeShift);
@@ -1081,7 +1119,7 @@ function HappiestPlace() {
     if (!r) return;
     const hot = seed.weather === "hot" ? 1.5 : 1;
     const total = r.walk + r.wait + r.dur;
-    const { dJoy, dEn, dFu, phase } = minuteDelta(r, r.i, hot, drain);
+    const { dJoy, dEn, dFu, dCf, phase } = minuteDelta(r, r.i, hot, drain, seed.weather);
 
     setT((x) => x + 1);
     setJoy((j) => happy(j + dJoy));
@@ -1113,15 +1151,16 @@ function HappiestPlace() {
     if (!r) return;
     const hot = seed.weather === "hot" ? 1.5 : 1;
     const total = r.walk + r.wait + r.dur;
-    let dJ = 0, dE = 0, dF = 0;
+    let dJ = 0, dE = 0, dF = 0, dC = 0;
     for (let i = r.i; i < total; i++) {
-      const d = minuteDelta(r, i, hot, drain);
-      dJ += d.dJoy; dE += d.dEn; dF += d.dFu;
+      const d = minuteDelta(r, i, hot, drain, seed.weather);
+      dJ += d.dJoy; dE += d.dEn; dF += d.dFu; dC += d.dCf;
     }
     setT((x) => x + (total - r.i));
     setJoy((j) => happy(j + dJ));
     setEnergy((e) => clamp(e + dE));
     setFuel((f) => clamp(f + dF));
+    setComfort((c) => clamp(c + dC));
     if (!r.paid && r.a.cost) setWallet((w) => w - r.a.cost);
     finishRun(r, r.net + dJ);
   }
@@ -1142,7 +1181,8 @@ function HappiestPlace() {
       a: { ...pos, id: "break:" + b.id, name: b.name, kind: "break", runLabel: b.name,
            dur: b.mins, cost: b.cost, en: b.en, fuel: b.fuel, landName: pos.landName, park: pos.park },
       useLL: false, walk: 0, wait: 0, dur: Math.max(1, b.mins),
-      painRate: 0, gain: b.joy, reps: 0, i: 0, net: 0, paid: false, from: { ...pos },
+      painRate: 0, gain: b.joy, reps: 0, comfort: b.comfort || 0,
+      i: 0, net: 0, paid: false, from: { ...pos },
     });
   }
 
@@ -1165,7 +1205,7 @@ function HappiestPlace() {
     return <Title ready={mapReady} mode={mode} setMode={setMode}
       onStart={() => (mapReady ? start() : setScreen("setup"))} />;
   if (screen === "end")
-    return <End joy={joy} t={t} wallet={wallet} energy={energy} visited={visited} seed={seed} mode={mode} onAgain={start} />;
+    return <End joy={joy} t={t} wallet={wallet} energy={energy} comfort={comfort} visited={visited} seed={seed} mode={mode} onAgain={start} />;
 
   const mapProps = {
     park: mapPark, waits, pos, basemap, transforms, anchors, calib,
@@ -1246,7 +1286,7 @@ function HappiestPlace() {
 
   return (
     <Shell>
-      <StatusBar t={t} joy={joy} energy={energy} fuel={fuel} wallet={wallet} ll={ll} seed={seed} />
+      <StatusBar t={t} joy={joy} energy={energy} fuel={fuel} comfort={comfort} wallet={wallet} ll={ll} seed={seed} />
 
       {(tab === "map" || tab === "list") && !editing && !run && (
         <>
@@ -1285,7 +1325,7 @@ function HappiestPlace() {
 
       {tab === "day" && <DayLog log={log} />}
       {tab === "you" && <YouTab onBreak={beginBreak} onBuyLL={buyLightningLane} wallet={wallet} ll={ll} boughtLl={boughtLl}
-        energy={energy} fuel={fuel} joy={joy} visited={visited} t={t} />}
+        energy={energy} fuel={fuel} comfort={comfort} joy={joy} visited={visited} t={t} seedWeather={seed.weather} />}
       {tab === "setup" && (
         <div style={{ flex: 1, overflowY: "auto", background: C.gap }}>
           <Card>
@@ -1811,7 +1851,7 @@ function NavBar({ title, onBack }) {
   );
 }
 
-function StatusBar({ t, joy, energy, fuel, wallet, ll, seed }) {
+function StatusBar({ t, joy, energy, fuel, comfort, wallet, ll, seed }) {
   return (
     <div style={{ padding: "7px 14px 8px", borderBottom: `1px solid ${C.rule}`, flexShrink: 0, background: C.white }}>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
@@ -1837,20 +1877,24 @@ function StatusBar({ t, joy, energy, fuel, wallet, ll, seed }) {
             Happiness
           </span>
         </div>
-        <div style={{ flex: 1, display: "flex", gap: 10 }}>
+        <div style={{ flex: 1, display: "flex", gap: 8 }}>
           <Meter label="Energy" v={energy} c={C.amber} />
-          <Meter label="Fed" v={fuel} c={C.green} />
+          {/* Hunger reads the other way round: the bar fills as you get hungrier,
+              and turns red when it matters. */}
+          <Meter label="Hunger" v={100 - fuel} invert
+            c={fuel < 25 ? C.red : fuel < 50 ? C.amber : C.green} />
+          <Meter label="Comfort" v={comfort} c={comfort < 30 ? C.red : C.blue} />
         </div>
       </div>
     </div>
   );
 }
 
-function Meter({ label, v, c }) {
+function Meter({ label, v, c, invert }) {
   return (
     <div style={{ flex: 1 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10.5, fontWeight: 700, color: C.greyLt }}>
-        <span>{label}</span><span style={{ color: C.text }}>{Math.round(v)}</span>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, fontWeight: 700, color: C.greyLt }}>
+        <span>{label}</span><span style={{ color: invert && v > 75 ? C.red : C.text }}>{Math.round(v)}</span>
       </div>
       <div style={{ height: 4, borderRadius: 2, background: C.rule, marginTop: 2, overflow: "hidden" }}>
         <div style={{ width: `${clamp(v)}%`, height: "100%", background: c, borderRadius: 3, transition: "width .35s ease" }} />
@@ -2221,7 +2265,8 @@ function EventCard({ ev, onClose, onChoose }) {
     if (o.money) b.push(`${o.money > 0 ? "+" : "-"}$${Math.abs(o.money)}`);
     if (o.joy) b.push(`${o.joy > 0 ? "+" : ""}${o.joy} happiness`);
     if (o.energy) b.push(`${o.energy > 0 ? "+" : ""}${o.energy} energy`);
-    if (o.fuel) b.push(`+${o.fuel} fed`);
+    if (o.fuel) b.push(`-${o.fuel} hunger`);
+    if (o.comfort) b.push(`${o.comfort > 0 ? "+" : ""}${o.comfort} comfort`);
     if (o.ll) b.push(`+${o.ll} Lightning Lane`);
     if (o.waitMult) b.push(`waits ${o.waitMult < 1 ? "down" : "up"} ${Math.round(Math.abs(1 - o.waitMult) * 100)}%`);
     return b;
@@ -2417,11 +2462,14 @@ function DayLog({ log }) {
   );
 }
 
-function YouTab({ onBreak, onBuyLL, wallet, ll, boughtLl, energy, fuel, joy, visited, t }) {
+function YouTab({ onBreak, onBuyLL, wallet, ll, boughtLl, energy, fuel, comfort, joy, visited, t, seedWeather }) {
   const pace = 50 + (t / CLOSE) * 130;   // roughly where an average day sits
   const advice =
     energy < 25 ? "You're running on fumes. Sit down before you ride anything else — tired guests get almost nothing out of an E-Ticket."
     : fuel < 25 ? "You're hungry, and it's dulling everything. Eat something."
+    : comfort < 25 ? (seedWeather === "hot"
+        ? "The heat has got to you. Find air conditioning — an indoor ride or a long sit-down."
+        : "You're damp and miserable. Get indoors for a bit.")
     : joy < pace * 0.65 ? "You're behind where a good day should be by now. Go do something big."
     : "You're in good shape. Keep moving.";
   const done = Object.values(visited).reduce((s, n) => s + n, 0);
@@ -2445,7 +2493,8 @@ function YouTab({ onBreak, onBuyLL, wallet, ll, boughtLl, energy, fuel, joy, vis
           if (b.cost) bits.push(`$${b.cost}`);
           if (b.joy) bits.push(`${b.joy > 0 ? "+" : ""}${b.joy} happiness`);
           if (b.en) bits.push(`${b.en > 0 ? "+" : ""}${b.en} energy`);
-          if (b.fuel) bits.push(`+${b.fuel} fed`);
+          if (b.fuel) bits.push(`-${b.fuel} hunger`);
+          if (b.comfort) bits.push(`${b.comfort > 0 ? "+" : ""}${b.comfort} comfort`);
           return (
             <button key={b.id} disabled={off} onClick={() => onBreak(b)} style={{
               display: "block", width: "100%", textAlign: "left", cursor: off ? "default" : "pointer",
@@ -2625,7 +2674,7 @@ function Title({ onStart, ready, mode, setMode }) {
   );
 }
 
-function End({ joy, t, wallet, energy, visited, seed, mode, onAgain }) {
+function End({ joy, t, wallet, energy, comfort, visited, seed, mode, onAgain }) {
   const rides = Object.entries(visited).reduce((s, [id, n]) => {
     const a = byId[id];
     return s + (a && (a.kind === "ride" || a.kind === "night") ? n : 0);
@@ -2652,7 +2701,7 @@ function End({ joy, t, wallet, energy, visited, seed, mode, onAgain }) {
         <div style={{ background: C.gap, borderRadius: 14, padding: "6px 16px", textAlign: "left", maxWidth: 340, margin: "0 auto 26px" }}>
           {[["Difficulty", DIFFICULTY[mode].label], ["Attractions ridden", rides],
             ["Different things tried", unique], ["Both parks", both ? "Yes (+3)" : "No"],
-            ["Money left", `$${Math.max(0, Math.round(wallet))}`], ["Energy remaining", `${Math.round(energy)}%`],
+            ["Money left", `$${Math.max(0, Math.round(wallet))}`], ["Energy remaining", `${Math.round(energy)}%`], ["Comfort at close", `${Math.round(comfort)}%`],
             ["Conditions", `${WEATHERS[seed.weather].label}, ${seed.crowd > 1.25 ? "packed" : seed.crowd > 1.0 ? "busy" : seed.crowd > 0.78 ? "moderate" : "light"}`]]
             .map(([k, val]) => (
               <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: `1px solid ${C.rule}`, fontSize: 15.5 }}>
