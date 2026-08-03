@@ -438,6 +438,7 @@ function BestDayEver() {
   const [calib, setCalib] = useState(null);
   const [calibWarn, setCalibWarn] = useState(null);
   const [usedPreset, setUsedPreset] = useState(false);
+  const [saveWarn, setSaveWarn] = useState(false);
   const [showBoth, setShowBoth] = useState(false);
   const [nudges, setNudges] = useState(() => load("bde:nudges", {}));      // id -> corrected canonical {x,y}
   const [editing, setEditing] = useState(false);
@@ -445,9 +446,12 @@ function BestDayEver() {
   const setupFile = useRef(null);
 
   useEffect(() => { save("bde:anchors", anchors); }, [anchors]);
-  useEffect(() => { save("bde:basemap", basemap); }, [basemap]);
   useEffect(() => { save("bde:nudges", nudges); }, [nudges]);
   useEffect(() => { save("bde:speed", speed); }, [speed]);
+  useEffect(() => {
+    if (basemap && basemap.bundled) return;          // already shipped with the site
+    setSaveWarn(!save("bde:basemap", basemap));      // surface quota failures instead of hiding them
+  }, [basemap]);
 
   const transforms = useMemo(() => ({
     dl: solveTransform(ANCHORS.dl, anchors.dl),
@@ -471,15 +475,58 @@ function BestDayEver() {
     setEditIdx((i) => Math.min(i + 1, editList.length - 1));
   }
 
+  /* If a map image sits next to index.html in the repo, use it automatically.
+     Nothing is bundled by default — drop in map.jpg and it just appears. */
+  const [bundledMissing, setBundledMissing] = useState(false);
+  useEffect(() => {
+    if (basemap) return;
+    let dead = false;
+    (async () => {
+      for (const name of ["map.jpg", "map.jpeg", "map.png", "map.webp"]) {
+        try {
+          const res = await fetch(name, { cache: "force-cache" });
+          if (!res.ok) continue;
+          const blob = await res.blob();
+          if (!blob.type || !blob.type.startsWith("image/")) continue;
+          const url = URL.createObjectURL(blob);
+          const img = new Image();
+          await new Promise((ok, no) => { img.onload = ok; img.onerror = no; img.src = url; });
+          if (dead) return;
+          applyBasemap(url, img.width, img.height, true);
+          return;
+        } catch (e) { /* not present, try the next name */ }
+      }
+      if (!dead) setBundledMissing(true);
+    })();
+    return () => { dead = true; };
+  }, []);
+
+  function applyBasemap(src, w, h, bundled) {
+    setBasemap({ src, w, h, bundled: !!bundled });
+    const official = Math.abs(h / w - CANVAS_H / CANVAS_W) < 0.035;
+    setAnchors(official ? { dl: [...PRESET.dl], dca: [...PRESET.dca] } : { dl: [], dca: [] });
+    setUsedPreset(official);
+  }
+
   function loadBasemap(file) {
     const r = new FileReader();
     r.onload = () => {
       const img = new Image();
       img.onload = () => {
-        setBasemap({ src: r.result, w: img.width, h: img.height });
-        const official = Math.abs(img.height / img.width - CANVAS_H / CANVAS_W) < 0.035;
-        setAnchors(official ? { dl: [...PRESET.dl], dca: [...PRESET.dca] } : { dl: [], dca: [] });
-        setUsedPreset(official);
+        // shrink before storing: a full-resolution photo can blow the ~5 MB
+        // localStorage quota, and 1400px is more than the map ever needs
+        let src = r.result;
+        const MAXW = 1400;
+        if (img.width > MAXW) {
+          try {
+            const c = document.createElement("canvas");
+            c.width = MAXW;
+            c.height = Math.round(img.height * MAXW / img.width);
+            c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+            src = c.toDataURL("image/jpeg", 0.85);
+          } catch (e) { /* tainted or unsupported — keep the original */ }
+        }
+        applyBasemap(src, img.width, img.height, false);
       };
       img.src = r.result;
     };
@@ -780,8 +827,25 @@ function BestDayEver() {
         <div style={{ flex: 1, overflowY: "auto", background: C.gap }}>
           <Card>
             <div style={{ fontSize: 15.5, color: C.grey, lineHeight: 1.5, marginBottom: 12 }}>
-              {basemap ? "Playing on your own map image." : "Playing on the built-in map."}
+              {basemap && basemap.bundled
+                ? "Using the map bundled with this site — nothing to upload."
+                : basemap
+                ? "Using a map from this device. It's remembered between visits."
+                : "Playing on the built-in map."}
             </div>
+            {saveWarn && (
+              <Note tone="bad">
+                This browser wouldn't keep the image between visits (storage is full or blocked).
+                It works for now, but you'll need to load it again next time — or add it to the
+                site as map.jpg to skip that.
+              </Note>
+            )}
+            {bundledMissing && !basemap && (
+              <Note>
+                Tip: commit a file named <b>map.jpg</b> next to index.html and it will load
+                automatically every time, on every device.
+              </Note>
+            )}
             <input ref={setupFile} type="file" accept="image/*" style={{ display: "none" }}
               onChange={(e) => { const f = e.target.files && e.target.files[0]; if (f) loadBasemap(f); e.target.value = ""; }} />
             <Row>
