@@ -45,7 +45,8 @@ const DL_RAW = [
   ["pirates", "Pirates of the Caribbean", "New Orleans Sq.", "ride", "D", 15, 30, 16, 2, 0, 0, 425, 528],
   ["mansion", "Haunted Mansion", "New Orleans Sq.", "ride", "D", 12, 38, 16, 0, 0, 0, 299, 490],
   ["bayou", "Blue Bayou Restaurant", "New Orleans Sq.", "dine", "—", 75, 20, 26, 25, 55, 72, 406, 559],
-  ["julep", "Mint Julep Bar", "New Orleans Sq.", "dine", "—", 12, 12, 8, 4, 14, 9, 343, 552],
+  ["julep", "Mint Julep Bar", "New Orleans Sq.", "dine", "—", 12, 12, 12, 4, 20, 11, 343, 552],
+  ["tianas", "Tiana's Palace", "New Orleans Sq.", "dine", "—", 35, 18, 17, 14, 40, 26, 348, 538],
 
   ["tiana", "Tiana's Bayou Adventure", "Bayou Country", "ride", "E", 12, 53, 19, -6, 0, 0, 256, 429],
   ["pooh", "Winnie the Pooh", "Bayou Country", "ride", "C", 5, 15, 7, 2, 0, 0, 271, 407],
@@ -57,7 +58,7 @@ const DL_RAW = [
   ["ronto", "Ronto Roasters", "Galaxy's Edge", "dine", "—", 18, 12, 10, 8, 26, 17, 364, 199],
 
   ["thunder", "Big Thunder Mountain", "Frontierland", "ride", "E", 8, 40, 18, -7, 0, 0, 472, 413],
-  ["twain", "Mark Twain Riverboat", "Frontierland", "ride", "C", 18, 12, 10, 12, 0, 0, 442, 433],
+  ["twain", "Mark Twain Riverboat", "Frontierland", "ride", "C", 18, 12, 10, 12, 0, 0, 443, 422],
   ["horseshoe", "Golden Horseshoe Revue", "Frontierland", "show", "B", 22, 5, 11, 10, 0, 0, 476, 458],
   ["fantasmic", "Fantasmic!", "Frontierland", "night", "E", 30, 45, 30, -8, 0, 0, 387, 463],
 
@@ -65,7 +66,7 @@ const DL_RAW = [
   ["peterpan", "Peter Pan's Flight", "Fantasyland", "ride", "D", 6, 36, 14, -2, 0, 0, 606, 323],
   ["smallworld", "it's a small world", "Fantasyland", "ride", "C", 16, 20, 11, 10, 0, 0, 697, 165],
   ["alice", "Alice in Wonderland", "Fantasyland", "ride", "C", 7, 30, 9, -1, 0, 0, 646, 318],
-  ["toad", "Mr. Toad's Wild Ride", "Fantasyland", "ride", "C", 4, 25, 8, -1, 0, 0, 615, 316],
+  ["toad", "Mr. Toad's Wild Ride", "Fantasyland", "ride", "C", 4, 25, 8, -1, 0, 0, 620, 304],
   ["snow", "Snow White's Enchanted Wish", "Fantasyland", "ride", "C", 5, 25, 8, -1, 0, 0, 583, 331],
   ["teacups", "Mad Tea Party", "Fantasyland", "ride", "C", 5, 25, 9, -5, 0, 0, 660, 303],
   ["storybook", "Storybook Land Canal Boats", "Fantasyland", "ride", "B", 10, 20, 9, 6, 0, 0, 662, 278],
@@ -84,8 +85,6 @@ const DL_RAW = [
 
   ["dolewhip", "Dole Whip at Tiki Juice Bar", "Adventureland", "dine", "—", 12, 20, 17, 6, 18, 8, 535, 483],
   ["hideaway", "The Tropical Hideaway", "Adventureland", "dine", "—", 18, 12, 12, 8, 24, 14, 540, 520],
-
-  ["beignets", "Mickey Beignets", "New Orleans Sq.", "dine", "—", 12, 14, 15, 5, 20, 10, 343, 555],
   ["monte", "Café Orleans Monte Cristo", "New Orleans Sq.", "dine", "—", 50, 22, 21, 18, 46, 38, 380, 547],
   ["chowder", "Royal Street Veranda Chowder", "New Orleans Sq.", "dine", "—", 15, 10, 12, 8, 26, 14, 413, 547],
 
@@ -115,7 +114,7 @@ const DL_RAW = [
   ["royaltheatre", "Royal Theatre", "Fantasyland", "show", "B", 25, 10, 11, 10, 0, 0, 544, 410],
 
   // --- Frontierland & Bayou Country river attractions ---
-  ["columbia", "Sailing Ship Columbia", "Frontierland", "ride", "C", 15, 10, 9, 10, 0, 0, 442, 422],
+  ["columbia", "Sailing Ship Columbia", "Frontierland", "ride", "C", 15, 10, 9, 10, 0, 0, 440, 444],
   ["tomsawyer", "Pirate's Lair on Tom Sawyer Island", "Frontierland", "ride", "B", 30, 5, 9, -8, 0, 0, 385, 440],
   ["shootin", "Frontierland Shootin' Exposition", "Frontierland", "ride", "A", 6, 0, 5, -1, 0, 1, 517, 431],
   ["canoes", "Davy Crockett's Explorer Canoes", "Bayou Country", "ride", "C", 15, 20, 10, -12, 0, 0, 308, 400],
@@ -150,7 +149,7 @@ const DCA_RAW = [
   ["monsters", "Monsters, Inc. Mike & Sulley", "Hollywood Land", "ride", "C", 6, 20, 9, -1, 0, 0, 745, 880],
   ["philhar", "Mickey's PhilharMagic", "Hollywood Land", "show", "C", 14, 15, 11, 8, 0, 0, 693, 920],
   ["animation", "Animation Academy", "Hollywood Land", "show", "B", 30, 10, 12, 12, 0, 0, 716, 951],
-  ["turtletalk", "Turtle Talk with Crush", "Hollywood Land", "show", "B", 15, 15, 11, 11, 0, 0, 722, 944],
+  ["turtletalk", "Turtle Talk with Crush", "Hollywood Land", "show", "B", 15, 15, 11, 11, 0, 0, 707, 953],
 
   ["webslingers", "WEB SLINGERS", "Avengers Campus", "ride", "D", 6, 45, 14, -3, 0, 0, 633, 1035],
   ["guardians", "Guardians of the Galaxy", "Avengers Campus", "ride", "E", 7, 55, 21, -9, 0, 0, 792, 1028],
@@ -205,7 +204,7 @@ const DCA_RAW = [
 ];
 
 // positions confirmed by hand against the real map
-const REVIEWED = new Set(["alice", "auntcass", "autopia", "bakery", "bayou", "bear", "beignets", "bengal", "bluey", "boardwalk", "buzz", "candy", "canoes", "carnation", "carrousel", "caseyjr", "castlewalk", "chiptree", "chowder", "cinema", "cocina", "columbia", "corndog", "corndogcastle", "critter", "daisy", "djunior", "dolewhip", "duckpond", "dumbo", "edelweiss", "falcon", "fantasmic", "fireworks", "funnel", "gadget", "gibson", "goofyyard", "grill", "guardians", "harbour", "hideaway", "hollywoodlounge", "horseshoe", "indy", "jellyfish", "jolly", "julep", "jungle", "launchbay", "lincoln", "mansion", "matterhorn", "maurice", "mickeyhouse", "milkstand", "minniehouse", "monorail", "monte", "nemo", "oga", "orbitor", "parade", "peterpan", "pinocchio", "pirates", "pixiehollow", "pizzaplanet", "plazainn", "pooh", "popcorn", "pym", "railroad", "railway", "rancho", "redrose", "rise", "roger", "ronto", "royaltheatre", "rr_nos", "rr_tom", "rr_toon", "shootin", "smallworld", "snow", "space", "startours", "storybook", "teacups", "thunder", "tiana", "tiki", "toad", "tomsawyer", "treehouse", "trolley", "turkeyleg", "twain", "vehicles", "webslingers"]);
+const REVIEWED = new Set(["alice", "auntcass", "autopia", "bakery", "bayou", "bear", "bengal", "bluey", "boardwalk", "buzz", "candy", "canoes", "carnation", "carrousel", "caseyjr", "castlewalk", "chiptree", "chowder", "cinema", "cocina", "columbia", "corndog", "corndogcastle", "critter", "daisy", "djunior", "dolewhip", "duckpond", "dumbo", "edelweiss", "falcon", "fantasmic", "fireworks", "funnel", "gadget", "gibson", "goofyyard", "grill", "guardians", "harbour", "hideaway", "hollywoodlounge", "horseshoe", "indy", "jellyfish", "jolly", "julep", "jungle", "launchbay", "lincoln", "mansion", "matterhorn", "maurice", "mickeyhouse", "milkstand", "minniehouse", "monorail", "monte", "nemo", "oga", "orbitor", "parade", "peterpan", "pinocchio", "pirates", "pixiehollow", "pizzaplanet", "plazainn", "pooh", "popcorn", "pym", "railroad", "railway", "rancho", "redrose", "rise", "roger", "ronto", "royaltheatre", "rr_nos", "rr_tom", "rr_toon", "shootin", "smallworld", "snow", "space", "startours", "storybook", "teacups", "thunder", "tiana", "tiki", "toad", "tomsawyer", "treehouse", "trolley", "turkeyleg", "turtletalk", "twain", "vehicles", "webslingers"]);
 
 /* The Disneyland Railroad runs a one-way grand circle. These are the minutes
    between consecutive stops; a full loop is about twenty minutes. */
@@ -270,7 +269,7 @@ const INDOOR = new Set([
   "pirates", "mansion", "smallworld", "peterpan", "snow", "toad", "pinocchio", "alice",
   "space", "startours", "buzz", "nemo", "indy", "tiki", "lincoln", "cinema", "rise",
   "falcon", "railway", "roger", "bluey", "launchbay", "mickeyhouse", "minniehouse",
-  "oga", "bayou", "monte", "plazainn", "carnation", "gibson", "jolly", "redrose",
+  "oga", "bayou", "monte", "tianas", "julep", "plazainn", "carnation", "gibson", "jolly", "redrose",
   "rancho", "bear", "harbour", "grill", "pizzaplanet", "daisy", "chowder",
   // California Adventure
   "guardians", "webslingers", "midway", "soarin", "monsters", "philhar", "animation",
@@ -761,7 +760,7 @@ export default function HappiestPlace() {
   const [pos, setPos] = useState({ park: "dl", x: 592, y: 675, landName: "Main Street" });
   const [mapPark, setMapPark] = useState("dl");
   const [visited, setVisited] = useState({});
-  const [ll, setLl] = useState(0);
+  const [llUsed, setLlUsed] = useState({});   // one redemption per eligible ride
   const [boughtLl, setBoughtLl] = useState(false);
   const [log, setLog] = useState([]);
   const [tab, setTab] = useState("map");
@@ -868,16 +867,17 @@ export default function HappiestPlace() {
     setEditIdx(i);
   }
 
-  /* If a map image sits next to index.html in the repo, use it automatically.
-     Nothing is bundled by default — drop in map.jpg and it just appears. */
-  const [bundledMissing, setBundledMissing] = useState(false);
+  /* The repo is the source of truth. Always look for a bundled map, even when a
+     copy is already saved locally — otherwise one browser uses a stale upload
+     while another asks you to upload again. */
+  const [bundleState, setBundleState] = useState("looking");
   useEffect(() => {
-    if (basemap) return;
     let dead = false;
     (async () => {
-      for (const name of ["map.jpg", "map.jpeg", "map.png", "map.webp"]) {
+      const names = ["map.jpg", "map.jpeg", "map.png", "map.webp", "map.JPG", "map.JPEG", "map.PNG"];
+      for (const name of names) {
         try {
-          const res = await fetch(name, { cache: "force-cache" });
+          const res = await fetch(name, { cache: "no-cache" });
           if (!res.ok) continue;
           const blob = await res.blob();
           if (!blob.type || !blob.type.startsWith("image/")) continue;
@@ -886,10 +886,11 @@ export default function HappiestPlace() {
           await new Promise((ok, no) => { img.onload = ok; img.onerror = no; img.src = url; });
           if (dead) return;
           applyBasemap(url, img.width, img.height, true);
+          setBundleState(name);
           return;
-        } catch (e) { /* not present, try the next name */ }
+        } catch (e) { /* try the next filename */ }
       }
-      if (!dead) setBundledMissing(true);
+      if (!dead) setBundleState("missing");
     })();
     return () => { dead = true; };
   }, []);
@@ -975,7 +976,7 @@ export default function HappiestPlace() {
     setSeed(rollConditions(mode));
     setScreen("play"); setT(OPEN); setJoy(50); setEnergy(100); setFuel(72); setComfort(100); setWallet(DIFFICULTY[mode].budget);
     setPos({ park: "dl", x: 592, y: 675, landName: "Main Street" }); setMapPark("dl"); setVisited({});
-    setLl(0); setBoughtLl(false); setLog([]); setTab("map"); setSel(null); setCat("ride");
+    setLlUsed({}); setBoughtLl(false); setLog([]); setTab("map"); setSel(null); setCat("ride");
     setGoingHome(false);
     setMods({ mult: 1, until: 0, closures: {} });
     setEventCard(null); setEventLog([]);
@@ -1062,7 +1063,7 @@ export default function HappiestPlace() {
   function beginAttraction(raw, opt) {
     const a = place(raw);
     if (run || a.cost > wallet || waits[a.id] < 0) return;
-    const useLL = opt === true || opt === "ll";
+    const useLL = (opt === true || opt === "ll") && llReady(a.id);
     const single = opt === "single" && singleRiderOpen(a.id, t);
     const walk = walkMinutes(pos, a);
     const wait = useLL ? 5
@@ -1097,7 +1098,7 @@ export default function HappiestPlace() {
     if (e.fuel) setFuel((f) => clamp(f + e.fuel));
     if (e.comfort) setComfort((c) => clamp(c + e.comfort));
     if (e.money) setWallet((w) => Math.max(0, w + e.money));
-    if (e.ll) setLl((n) => n + e.ll);
+    if (e.ll) { setBoughtLl(true); grantLL(); }
     if (e.timeShift) setT((x) => x + e.timeShift);
     if (e.minutesLost) setT((x) => x + e.minutesLost);
   }
@@ -1142,7 +1143,7 @@ export default function HappiestPlace() {
     if (ev.fuel) setFuel((f) => clamp(f + ev.fuel));
     if (ev.comfort) setComfort((c) => clamp(c + ev.comfort));
     if (ev.money) setWallet((w) => Math.max(0, w + ev.money));
-    if (ev.ll) setLl((n) => n + ev.ll);
+    if (ev.ll) { setBoughtLl(true); grantLL(); }
     if (ev.timeShift) setT((x) => x + ev.timeShift);
     if (ev.minutesLost) setT((x) => x + ev.minutesLost);
 
@@ -1158,7 +1159,7 @@ export default function HappiestPlace() {
     setPos({ park: a.park, x: a.x, y: a.y, landName: a.landName });
     setMapPark(a.park);
     setVisited((v) => ({ ...v, [a.id]: (v[a.id] || 0) + 1 }));
-    if (r.useLL) setLl((n) => n - 1);
+    if (r.useLL) setLlUsed((u) => ({ ...u, [r.a.id]: true }));
     const bits = [`${r.walk} min walk`];
     if (r.wait) bits.push(`${r.wait} min ${r.single ? "single rider" : "line"}`);
     if (a.cost) bits.push(`$${a.cost}`);
@@ -1244,12 +1245,23 @@ export default function HappiestPlace() {
   }
 
   // the only non-break action left: buying line skips
+  /* Multi Pass: one redemption per eligible attraction across the day, not a
+     pool of interchangeable skips. */
   const buyLightningLane = () => {
     if (wallet < 32 || boughtLl) return;
-    setWallet((w) => w - 32); setLl(5); setBoughtLl(true);
+    setWallet((w) => w - 32); setBoughtLl(true);
     setJoy((j) => happy(j - 2));
-    push("Bought Lightning Lane Multi Pass — 5 skips, $32", "ok");
+    push(`Bought Lightning Lane Multi Pass — $32, one skip on each of ${LL_OK.size} attractions`, "ok");
   };
+  // a gifted pass clears the skip on one ride you haven't used yet
+  const grantLL = () => setLlUsed((u) => {
+    const open = [...LL_OK].filter((id) => u[id]);
+    if (!open.length) { setBoughtLl(true); return u; }
+    const pick = open[Math.floor(Math.random() * open.length)];
+    const next = { ...u }; delete next[pick]; return next;
+  });
+  const llReady = (id) => boughtLl && LL_OK.has(id) && !llUsed[id];
+  const llLeft = boughtLl ? [...LL_OK].filter((id) => !llUsed[id]).length : 0;
 
 
   useEffect(() => {
@@ -1302,10 +1314,9 @@ export default function HappiestPlace() {
               two anchor points below and the whole set corrects at once.
             </Note>
             <div style={{ fontSize: 15.5, color: C.grey, lineHeight: 1.5, marginBottom: 12, marginTop: 10 }}>
-              {basemap && basemap.bundled
-                ? "Using the map bundled with this site — nothing to upload."
-                : basemap
-                ? "Using a map from this device. It's remembered between visits."
+              {bundleState === "looking" ? "Checking the site for a map file…"
+                : basemap && basemap.bundled ? `Using ${bundleState} from the site — nothing to upload, on any device.`
+                : basemap ? "Using a map from this device. Put the file in the repo as map.jpg and every browser will pick it up automatically."
                 : "Playing on the built-in map."}
             </div>
             {saveWarn && (
@@ -1315,10 +1326,11 @@ export default function HappiestPlace() {
                 site as map.jpg to skip that.
               </Note>
             )}
-            {bundledMissing && !basemap && (
-              <Note>
-                Tip: commit a file named <b>map.jpg</b> next to index.html and it will load
-                automatically every time, on every device.
+            {bundleState === "missing" && (
+              <Note tone="bad">
+                No map file was found next to index.html. That is why this browser asks you to
+                upload one while another remembers an old copy. Commit the image to the repo as
+                <b> map.jpg</b> and every browser will load it on its own.
               </Note>
             )}
             <input ref={setupFile} type="file" accept="image/*" style={{ display: "none" }}
@@ -1572,7 +1584,7 @@ export default function HappiestPlace() {
 
   return (
     <Shell>
-      <StatusBar t={t} joy={joy} energy={energy} fuel={fuel} comfort={comfort} wallet={wallet} ll={ll} seed={seed} />
+      <StatusBar t={t} joy={joy} energy={energy} fuel={fuel} comfort={comfort} wallet={wallet} ll={llLeft} seed={seed} />
 
       {(tab === "map" || tab === "list") && !editing && !run && (
         <>
@@ -1602,7 +1614,7 @@ export default function HappiestPlace() {
           {listed.length === 0 && <Empty>Nothing matches those filters right now.</Empty>}
           {listed.map(({ a, w }) => (
             <AttractionCard key={a.id} a={a} wait={waits[a.id]} walk={w} reps={visited[a.id] || 0}
-              ll={ll} llOk={LL_OK.has(a.id)} t={t} wallet={wallet}
+              llOk={llReady(a.id)} t={t} wallet={wallet}
               onOpen={() => setSel(a.id)} onGo={beginAttraction} />
           ))}
           <div style={{ height: 12 }} />
@@ -1610,7 +1622,7 @@ export default function HappiestPlace() {
       )}
 
       {tab === "day" && <DayLog log={log} />}
-      {tab === "you" && <YouTab onBreak={beginBreak} onBuyLL={buyLightningLane} wallet={wallet} ll={ll} boughtLl={boughtLl}
+      {tab === "you" && <YouTab onBreak={beginBreak} onBuyLL={buyLightningLane} wallet={wallet} ll={llLeft} boughtLl={boughtLl}
         energy={energy} fuel={fuel} comfort={comfort} joy={joy} visited={visited} t={t} seedWeather={seed.weather} />}
       {goingHome && (
         <>
@@ -1648,7 +1660,7 @@ export default function HappiestPlace() {
       {selA && !calib && !editing && !run && (
         <Sheet a={selA} wait={waits[selA.id]} walk={walkMinutes(pos, place(selA))}
           hop={pos.park !== selA.park} reps={visited[selA.id] || 0}
-          wallet={wallet} ll={ll} llOk={LL_OK.has(selA.id)} t={t}
+          wallet={wallet} llOk={llReady(selA.id)} t={t}
           onClose={() => setSel(null)} onGo={beginAttraction} onTrain={beginTrain} />
       )}
 
@@ -2164,9 +2176,9 @@ function ShowListButton({ onClick }) {
 }
 
 /* ---------------- attraction card (list) ---------------- */
-function AttractionCard({ a, wait, walk, reps, ll, llOk, t, wallet, onOpen, onGo }) {
+function AttractionCard({ a, wait, walk, reps, llOk, t, wallet, onOpen, onGo }) {
   const isRide = a.kind === "ride" || a.kind === "night";
-  const canLL = ll > 0 && llOk && wait > 15;
+  const canLL = llOk && wait > 15;
   const singleOk = singleRiderOpen(a.id, t) && wait > 15;
   const singleWait = Math.max(5, Math.round((wait * SINGLE_WAIT) / 5) * 5);
   const broke = a.cost > wallet;
@@ -2260,8 +2272,8 @@ const InfoBox = ({ children }) => (
 );
 
 /* ---------------- detail sheet ---------------- */
-function Sheet({ a, wait, walk, hop, reps, wallet, ll, llOk, t, onClose, onGo, onTrain }) {
-  const canLL = ll > 0 && llOk && wait > 15;
+function Sheet({ a, wait, walk, hop, reps, wallet, llOk, t, onClose, onGo, onTrain }) {
+  const canLL = llOk && wait > 15;
   const singleOk = singleRiderOpen(a.id, t) && wait > 15;
   const singleWait = Math.max(5, Math.round((wait * SINGLE_WAIT) / 5) * 5);
   const broke = a.cost > wallet;
@@ -2679,12 +2691,14 @@ function YouTab({ onBreak, onBuyLL, wallet, ll, boughtLl, energy, fuel, comfort,
         </div>
         {boughtLl ? (
           <div style={{ fontSize: 15.5, color: C.text }}>
-            {ll > 0 ? `${ll} skips left. They appear on rides with a real line.` : "All five skips used. That's it for today."}
+            {ll > 0 ? `${ll} eligible attractions still unused. One skip each — they appear on rides with a real line.`
+              : "You've used your skip on every eligible attraction."}
           </div>
         ) : (
           <>
             <div style={{ fontSize: 15.5, color: C.text, lineHeight: 1.5, marginBottom: 12 }}>
-              Five skips for $32. Cuts any eligible line to five minutes — but the money stings, and it's gone once spent.
+              $32 for the day. One line skip on each eligible attraction — not a pool of skips,
+              so it rewards spreading them across the headliners rather than repeating one ride.
             </div>
             <BigButton disabled={wallet < 32} onClick={onBuyLL}>Buy for $32</BigButton>
           </>
