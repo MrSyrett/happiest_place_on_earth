@@ -58,117 +58,117 @@ const F = "'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-se
 
 /* ---------------- game model (unchanged) ---------------- */
 const DL_RAW = [
-  ["railroad", "Disneyland Railroad", "Main Street", "ride", "B", 20, 10, 7, -2, 0, 0, 594, 689],
+  ["railroad", "Disneyland Railroad", "Main Street", "ride", "B", 20, 10, 7, -2, 0, 0, 592, 675],
   ["cinema", "Main Street Cinema", "Main Street", "show", "A", 10, 0, 4, 2, 0, 0, 597, 601],
   ["jolly", "Jolly Holiday Bakery", "Main Street", "dine", "—", 25, 12, 9, 10, 30, 16, 549, 482],
   ["emporium", "The Emporium", "Main Street", "shop", "—", 15, 0, 12, -2, 0, 48, 609, 644],
   ["parade", "Electrical Parade", "Main Street", "night", "E", 25, 20, 18, -2, 0, 0, 589, 470],
   ["fireworks", "Fireworks over the Castle", "Central Plaza", "night", "E", 25, 30, 28, -4, 0, 0, 593, 358],
 
-  ["indy", "Indiana Jones Adventure", "Adventureland", "ride", "E", 5, 45, 20, -8, 0, 0, 454, 528],
-  ["jungle", "Jungle Cruise", "Adventureland", "ride", "D", 12, 35, 13, -3, 0, 0, 481, 520],
-  ["treehouse", "Adventureland Treehouse", "Adventureland", "ride", "B", 12, 5, 7, -6, 0, 0, 445, 535],
+  ["indy", "Indiana Jones Adventure", "Adventureland", "ride", "E", 5, 45, 20, -8, 0, 0, 472, 530],
+  ["jungle", "Jungle Cruise", "Adventureland", "ride", "D", 12, 35, 13, -3, 0, 0, 497, 523],
+  ["treehouse", "Adventureland Treehouse", "Adventureland", "ride", "B", 12, 5, 7, -6, 0, 0, 454, 532],
   ["tiki", "Enchanted Tiki Room", "Adventureland", "show", "B", 17, 10, 9, 8, 0, 0, 531, 489],
-  ["bengal", "Bengal Barbecue", "Adventureland", "dine", "—", 20, 10, 10, 8, 28, 14, 455, 504],
+  ["bengal", "Bengal Barbecue", "Adventureland", "dine", "—", 20, 10, 10, 8, 28, 14, 468, 515],
 
-  ["pirates", "Pirates of the Caribbean", "New Orleans Sq.", "ride", "D", 15, 30, 16, 2, 0, 0, 405, 533],
-  ["mansion", "Haunted Mansion", "New Orleans Sq.", "ride", "D", 12, 38, 16, 0, 0, 0, 265, 469],
-  ["bayou", "Blue Bayou Restaurant", "New Orleans Sq.", "dine", "—", 75, 20, 26, 25, 55, 72, 406, 546],
-  ["julep", "Mint Julep Bar", "New Orleans Sq.", "dine", "—", 12, 12, 8, 4, 14, 9, 314, 550],
+  ["pirates", "Pirates of the Caribbean", "New Orleans Sq.", "ride", "D", 15, 30, 16, 2, 0, 0, 425, 522],
+  ["mansion", "Haunted Mansion", "New Orleans Sq.", "ride", "D", 12, 38, 16, 0, 0, 0, 299, 488],
+  ["bayou", "Blue Bayou Restaurant", "New Orleans Sq.", "dine", "—", 75, 20, 26, 25, 55, 72, 403, 559],
+  ["julep", "Mint Julep Bar", "New Orleans Sq.", "dine", "—", 12, 12, 8, 4, 14, 9, 342, 552],
 
-  ["tiana", "Tiana's Bayou Adventure", "Bayou Country", "ride", "E", 12, 53, 19, -6, 0, 0, 213, 414],
-  ["pooh", "Winnie the Pooh", "Bayou Country", "ride", "C", 5, 15, 7, 2, 0, 0, 240, 389],
-  ["bear", "Hungry Bear Restaurant", "Bayou Country", "dine", "—", 25, 12, 11, 10, 30, 19, 226, 370],
+  ["tiana", "Tiana's Bayou Adventure", "Bayou Country", "ride", "E", 12, 53, 19, -6, 0, 0, 256, 431],
+  ["pooh", "Winnie the Pooh", "Bayou Country", "ride", "C", 5, 15, 7, 2, 0, 0, 249, 415],
+  ["bear", "Hungry Bear Restaurant", "Bayou Country", "dine", "—", 25, 12, 11, 10, 30, 19, 266, 397],
 
-  ["rise", "Rise of the Resistance", "Galaxy's Edge", "ride", "E", 18, 64, 24, -10, 0, 0, 208, 201],
-  ["falcon", "Smugglers Run", "Galaxy's Edge", "ride", "E", 8, 36, 16, -4, 0, 0, 356, 93],
-  ["oga", "Oga's Cantina", "Galaxy's Edge", "dine", "—", 30, 25, 18, 6, 10, 34, 393, 111],
-  ["ronto", "Ronto Roasters", "Galaxy's Edge", "dine", "—", 18, 12, 10, 8, 26, 17, 342, 149],
+  ["rise", "Rise of the Resistance", "Galaxy's Edge", "ride", "E", 18, 64, 24, -10, 0, 0, 240, 238],
+  ["falcon", "Smugglers Run", "Galaxy's Edge", "ride", "E", 8, 36, 16, -4, 0, 0, 371, 138],
+  ["oga", "Oga's Cantina", "Galaxy's Edge", "dine", "—", 30, 25, 18, 6, 10, 34, 411, 160],
+  ["ronto", "Ronto Roasters", "Galaxy's Edge", "dine", "—", 18, 12, 10, 8, 26, 17, 367, 196],
 
-  ["thunder", "Big Thunder Mountain", "Frontierland", "ride", "E", 8, 40, 18, -7, 0, 0, 477, 386],
-  ["twain", "Mark Twain Riverboat", "Frontierland", "ride", "C", 18, 12, 10, 12, 0, 0, 430, 423],
-  ["horseshoe", "Golden Horseshoe Revue", "Frontierland", "show", "B", 22, 5, 11, 10, 0, 0, 459, 447],
-  ["fantasmic", "Fantasmic!", "Frontierland", "night", "E", 30, 45, 30, -8, 0, 0, 362, 461],
+  ["thunder", "Big Thunder Mountain", "Frontierland", "ride", "E", 8, 40, 18, -7, 0, 0, 477, 408],
+  ["twain", "Mark Twain Riverboat", "Frontierland", "ride", "C", 18, 12, 10, 12, 0, 0, 441, 432],
+  ["horseshoe", "Golden Horseshoe Revue", "Frontierland", "show", "B", 22, 5, 11, 10, 0, 0, 472, 457],
+  ["fantasmic", "Fantasmic!", "Frontierland", "night", "E", 30, 45, 30, -8, 0, 0, 391, 475],
 
-  ["matterhorn", "Matterhorn Bobsleds", "Fantasyland", "ride", "E", 8, 45, 16, -9, 0, 0, 708, 271],
-  ["peterpan", "Peter Pan's Flight", "Fantasyland", "ride", "D", 6, 36, 14, -2, 0, 0, 611, 307],
-  ["smallworld", "it's a small world", "Fantasyland", "ride", "C", 16, 20, 11, 10, 0, 0, 714, 123],
-  ["alice", "Alice in Wonderland", "Fantasyland", "ride", "C", 7, 30, 9, -1, 0, 0, 657, 296],
-  ["toad", "Mr. Toad's Wild Ride", "Fantasyland", "ride", "C", 4, 25, 8, -1, 0, 0, 625, 287],
-  ["snow", "Snow White's Enchanted Wish", "Fantasyland", "ride", "C", 5, 25, 8, -1, 0, 0, 576, 310],
-  ["teacups", "Mad Tea Party", "Fantasyland", "ride", "C", 5, 25, 9, -5, 0, 0, 668, 270],
-  ["storybook", "Storybook Land Canal Boats", "Fantasyland", "ride", "B", 10, 20, 9, 6, 0, 0, 642, 243],
+  ["matterhorn", "Matterhorn Bobsleds", "Fantasyland", "ride", "E", 8, 45, 16, -9, 0, 0, 692, 309],
+  ["peterpan", "Peter Pan's Flight", "Fantasyland", "ride", "D", 6, 36, 14, -2, 0, 0, 605, 331],
+  ["smallworld", "it's a small world", "Fantasyland", "ride", "C", 16, 20, 11, 10, 0, 0, 695, 164],
+  ["alice", "Alice in Wonderland", "Fantasyland", "ride", "C", 7, 30, 9, -1, 0, 0, 651, 321],
+  ["toad", "Mr. Toad's Wild Ride", "Fantasyland", "ride", "C", 4, 25, 8, -1, 0, 0, 618, 308],
+  ["snow", "Snow White's Enchanted Wish", "Fantasyland", "ride", "C", 5, 25, 8, -1, 0, 0, 577, 330],
+  ["teacups", "Mad Tea Party", "Fantasyland", "ride", "C", 5, 25, 9, -5, 0, 0, 658, 297],
+  ["storybook", "Storybook Land Canal Boats", "Fantasyland", "ride", "B", 10, 20, 9, 6, 0, 0, 659, 274],
 
-  ["railway", "Mickey & Minnie's Runaway Railway", "Toontown", "ride", "E", 10, 40, 19, -3, 0, 0, 651, 27],
-  ["roger", "Roger Rabbit's Car Toon Spin", "Toontown", "ride", "D", 6, 30, 11, -3, 0, 0, 690, 56],
-  ["gadget", "Gadget's Go Coaster", "Toontown", "ride", "B", 3, 20, 6, -2, 0, 0, 548, 55],
+  ["railway", "Mickey & Minnie's Runaway Railway", "Toontown", "ride", "E", 10, 40, 19, -3, 0, 0, 644, 76],
+  ["roger", "Roger Rabbit's Car Toon Spin", "Toontown", "ride", "D", 6, 30, 11, -3, 0, 0, 676, 106],
+  ["gadget", "Gadget's Go Coaster", "Toontown", "ride", "B", 3, 20, 6, -2, 0, 0, 546, 105],
 
   // --- classic Disneyland food & treats ---
   ["corndog", "Little Red Wagon Corn Dog", "Main Street", "dine", "—", 15, 25, 15, 6, 26, 13, 624, 527],
   ["gibson", "Gibson Girl Ice Cream Parlor", "Main Street", "dine", "—", 12, 15, 11, 4, 16, 9, 585, 550],
   ["candy", "Candy Palace Candy Apple", "Main Street", "dine", "—", 8, 8, 9, 2, 12, 11, 581, 540],
   ["plazainn", "Plaza Inn Fried Chicken", "Main Street", "dine", "—", 45, 18, 20, 18, 48, 34, 643, 494],
-  ["carnation", "Carnation Café", "Main Street", "dine", "—", 40, 20, 17, 16, 42, 30, 583, 574],
+  ["carnation", "Carnation Café", "Main Street", "dine", "—", 40, 20, 17, 16, 42, 30, 580, 568],
   ["popcorn", "Popcorn Cart", "Main Street", "dine", "—", 6, 5, 7, 2, 10, 7, 581, 645],
 
   ["dolewhip", "Dole Whip at Tiki Juice Bar", "Adventureland", "dine", "—", 12, 20, 17, 6, 18, 8, 532, 487],
   ["hideaway", "The Tropical Hideaway", "Adventureland", "dine", "—", 18, 12, 12, 8, 24, 14, 523, 511],
 
-  ["beignets", "Mickey Beignets", "New Orleans Sq.", "dine", "—", 12, 14, 15, 5, 20, 10, 317, 552],
-  ["monte", "Café Orleans Monte Cristo", "New Orleans Sq.", "dine", "—", 50, 22, 21, 18, 46, 38, 361, 548],
-  ["chowder", "Royal Street Veranda Chowder", "New Orleans Sq.", "dine", "—", 15, 10, 12, 8, 26, 14, 394, 536],
+  ["beignets", "Mickey Beignets", "New Orleans Sq.", "dine", "—", 12, 14, 15, 5, 20, 10, 343, 553],
+  ["monte", "Café Orleans Monte Cristo", "New Orleans Sq.", "dine", "—", 50, 22, 21, 18, 46, 38, 380, 546],
+  ["chowder", "Royal Street Veranda Chowder", "New Orleans Sq.", "dine", "—", 15, 10, 12, 8, 26, 14, 414, 545],
 
-  ["harbour", "Harbour Galley Lobster Roll", "Bayou Country", "dine", "—", 18, 12, 13, 8, 26, 18, 286, 438],
+  ["harbour", "Harbour Galley Lobster Roll", "Bayou Country", "dine", "—", 18, 12, 13, 8, 26, 18, 317, 456],
 
-  ["rancho", "Rancho del Zocalo", "Frontierland", "dine", "—", 30, 14, 14, 12, 36, 22, 480, 397],
-  ["funnel", "Stage Door Café Funnel Cake", "Frontierland", "dine", "—", 12, 12, 13, 4, 20, 11, 455, 478],
+  ["rancho", "Rancho del Zocalo", "Frontierland", "dine", "—", 30, 14, 14, 12, 36, 22, 502, 413],
+  ["funnel", "Stage Door Café Funnel Cake", "Frontierland", "dine", "—", 12, 12, 13, 4, 20, 11, 474, 484],
   ["turkeyleg", "Turkey Leg Cart", "Frontierland", "dine", "—", 10, 8, 13, 6, 30, 15, 445, 423],
 
-  ["maurice", "Maurice's Treats", "Fantasyland", "dine", "—", 10, 12, 11, 4, 18, 10, 561, 395],
-  ["redrose", "Red Rose Taverne", "Fantasyland", "dine", "—", 25, 15, 13, 10, 32, 20, 541, 273],
-  ["edelweiss", "Edelweiss Snacks", "Fantasyland", "dine", "—", 8, 8, 10, 4, 22, 12, 724, 256],
+  ["maurice", "Maurice's Treats", "Fantasyland", "dine", "—", 10, 12, 11, 4, 18, 10, 564, 412],
+  ["redrose", "Red Rose Taverne", "Fantasyland", "dine", "—", 25, 15, 13, 10, 32, 20, 548, 296],
+  ["edelweiss", "Edelweiss Snacks", "Fantasyland", "dine", "—", 8, 8, 10, 4, 22, 12, 714, 275],
 
-  ["milkstand", "Blue Milk at the Milk Stand", "Galaxy's Edge", "dine", "—", 10, 16, 13, 4, 12, 9, 426, 160],
+  ["milkstand", "Blue Milk at the Milk Stand", "Galaxy's Edge", "dine", "—", 10, 16, 13, 4, 12, 9, 439, 196],
 
-  ["pizzaplanet", "Alien Pizza Planet", "Tomorrowland", "dine", "—", 25, 14, 12, 10, 34, 19, 790, 502],
-  ["daisy", "Café Daisy", "Toontown", "dine", "—", 15, 10, 9, 8, 24, 14, 621, 24],
+  ["pizzaplanet", "Alien Pizza Planet", "Tomorrowland", "dine", "—", 25, 14, 12, 10, 34, 19, 775, 499],
+  ["daisy", "Café Daisy", "Toontown", "dine", "—", 15, 10, 9, 8, 24, 14, 621, 69],
 
   // --- Fantasyland classics that were missing ---
-  ["dumbo", "Dumbo the Flying Elephant", "Fantasyland", "ride", "C", 2, 35, 10, -2, 0, 0, 620, 210],
-  ["carrousel", "King Arthur Carrousel", "Fantasyland", "ride", "B", 3, 15, 7, 0, 0, 0, 630, 320],
-  ["pinocchio", "Pinocchio's Daring Journey", "Fantasyland", "ride", "C", 4, 20, 8, -1, 0, 0, 592, 296],
-  ["caseyjr", "Casey Jr. Circus Train", "Fantasyland", "ride", "B", 4, 15, 7, 2, 0, 0, 610, 235],
-  ["castlewalk", "Sleeping Beauty Castle Walkthrough", "Fantasyland", "ride", "A", 8, 5, 6, -2, 0, 0, 593, 350],
-  ["pixiehollow", "Pixie Hollow", "Fantasyland", "show", "A", 10, 20, 7, 0, 0, 0, 700, 330],
-  ["bluey", "Bluey's Best Day Ever!", "Fantasyland", "show", "C", 25, 15, 12, 8, 0, 0, 660, 175],
-  ["royaltheatre", "Royal Theatre", "Fantasyland", "show", "B", 25, 10, 11, 10, 0, 0, 548, 290],
+  ["dumbo", "Dumbo the Flying Elephant", "Fantasyland", "ride", "C", 2, 35, 10, -2, 0, 0, 598, 274],
+  ["carrousel", "King Arthur Carrousel", "Fantasyland", "ride", "B", 3, 15, 7, 0, 0, 0, 593, 307],
+  ["pinocchio", "Pinocchio's Daring Journey", "Fantasyland", "ride", "C", 4, 20, 8, -1, 0, 0, 568, 315],
+  ["caseyjr", "Casey Jr. Circus Train", "Fantasyland", "ride", "B", 4, 15, 7, 2, 0, 0, 570, 272],
+  ["castlewalk", "Sleeping Beauty Castle Walkthrough", "Fantasyland", "ride", "A", 8, 5, 6, -2, 0, 0, 574, 362],
+  ["pixiehollow", "Pixie Hollow", "Fantasyland", "show", "A", 10, 20, 7, 0, 0, 0, 667, 407],
+  ["bluey", "Bluey's Best Day Ever!", "Fantasyland", "show", "C", 25, 15, 12, 8, 0, 0, 592, 177],
+  ["royaltheatre", "Royal Theatre", "Fantasyland", "show", "B", 25, 10, 11, 10, 0, 0, 549, 413],
 
   // --- Frontierland & Bayou Country river attractions ---
-  ["columbia", "Sailing Ship Columbia", "Frontierland", "ride", "C", 15, 10, 9, 10, 0, 0, 420, 440],
+  ["columbia", "Sailing Ship Columbia", "Frontierland", "ride", "C", 15, 10, 9, 10, 0, 0, 441, 425],
   ["tomsawyer", "Pirate's Lair on Tom Sawyer Island", "Frontierland", "ride", "B", 30, 5, 9, -8, 0, 0, 370, 420],
-  ["shootin", "Frontierland Shootin' Exposition", "Frontierland", "ride", "A", 6, 0, 5, -1, 0, 1, 470, 455],
+  ["shootin", "Frontierland Shootin' Exposition", "Frontierland", "ride", "A", 6, 0, 5, -1, 0, 1, 515, 436],
   ["canoes", "Davy Crockett's Explorer Canoes", "Bayou Country", "ride", "C", 15, 20, 10, -12, 0, 0, 300, 400],
 
   // --- Main Street & Tomorrowland ---
-  ["lincoln", "Great Moments with Mr. Lincoln", "Main Street", "show", "A", 18, 5, 7, 8, 0, 0, 615, 660],
-  ["vehicles", "Main Street Vehicles", "Main Street", "ride", "A", 5, 10, 6, 3, 0, 0, 590, 600],
-  ["monorail", "Disneyland Monorail", "Tomorrowland", "ride", "B", 12, 15, 8, 6, 0, 0, 680, 470],
-  ["launchbay", "Star Wars Launch Bay", "Tomorrowland", "show", "B", 15, 5, 7, 2, 0, 0, 710, 490],
+  ["lincoln", "Great Moments with Mr. Lincoln", "Main Street", "show", "A", 18, 5, 7, 8, 0, 0, 630, 651],
+  ["vehicles", "Main Street Vehicles", "Main Street", "ride", "A", 5, 10, 6, 3, 0, 0, 611, 649],
+  ["monorail", "Disneyland Monorail", "Tomorrowland", "ride", "B", 12, 15, 8, 6, 0, 0, 828, 364],
+  ["launchbay", "Star Wars Launch Bay", "Tomorrowland", "show", "B", 15, 5, 7, 2, 0, 0, 792, 439],
 
   // --- Toontown ---
-  ["mickeyhouse", "Mickey's House and Meet Mickey", "Toontown", "show", "B", 15, 30, 11, -1, 0, 0, 700, 30],
-  ["minniehouse", "Minnie's House", "Toontown", "ride", "A", 8, 15, 6, -1, 0, 0, 715, 45],
-  ["goofyyard", "Goofy's How-to-Play Yard", "Toontown", "ride", "A", 12, 5, 6, -4, 0, 0, 580, 70],
-  ["duckpond", "Donald's Duck Pond", "Toontown", "ride", "A", 10, 5, 5, -3, 0, 0, 600, 85],
-  ["chiptree", "Chip 'n' Dale's Treehouse", "Toontown", "ride", "A", 6, 5, 5, -3, 0, 0, 560, 40],
+  ["mickeyhouse", "Mickey's House and Meet Mickey", "Toontown", "show", "B", 15, 30, 11, -1, 0, 0, 572, 76],
+  ["minniehouse", "Minnie's House", "Toontown", "ride", "A", 8, 15, 6, -1, 0, 0, 588, 64],
+  ["goofyyard", "Goofy's How-to-Play Yard", "Toontown", "ride", "A", 12, 5, 6, -4, 0, 0, 605, 109],
+  ["duckpond", "Donald's Duck Pond", "Toontown", "ride", "A", 10, 5, 5, -3, 0, 0, 582, 110],
+  ["chiptree", "Chip 'n' Dale's Treehouse", "Toontown", "ride", "A", 6, 5, 5, -3, 0, 0, 547, 82],
 
   ["space", "Space Mountain", "Tomorrowland", "ride", "E", 8, 58, 21, -8, 0, 0, 742, 535],
-  ["startours", "Star Tours", "Tomorrowland", "ride", "D", 12, 35, 14, -5, 0, 0, 691, 452],
-  ["buzz", "Buzz Lightyear Astro Blasters", "Tomorrowland", "ride", "C", 8, 25, 10, -2, 0, 0, 725, 428],
-  ["nemo", "Finding Nemo Submarines", "Tomorrowland", "ride", "C", 15, 35, 10, 4, 0, 0, 807, 367],
-  ["autopia", "Autopia", "Tomorrowland", "ride", "C", 10, 40, 8, -2, 0, 0, 846, 404],
-  ["orbitor", "Astro Orbitor", "Tomorrowland", "ride", "B", 5, 25, 7, -3, 0, 0, 660, 437],
-  ["grill", "Galactic Grill", "Tomorrowland", "dine", "—", 20, 10, 9, 8, 28, 16, 745, 410],
+  ["startours", "Star Tours", "Tomorrowland", "ride", "D", 12, 35, 14, -5, 0, 0, 682, 459],
+  ["buzz", "Buzz Lightyear Astro Blasters", "Tomorrowland", "ride", "C", 8, 25, 10, -2, 0, 0, 701, 438],
+  ["nemo", "Finding Nemo Submarines", "Tomorrowland", "ride", "C", 15, 35, 10, 4, 0, 0, 787, 376],
+  ["autopia", "Autopia", "Tomorrowland", "ride", "C", 10, 40, 8, -2, 0, 0, 816, 416],
+  ["orbitor", "Astro Orbitor", "Tomorrowland", "ride", "B", 5, 25, 7, -3, 0, 0, 653, 448],
+  ["grill", "Galactic Grill", "Tomorrowland", "dine", "—", 20, 10, 9, 8, 28, 16, 744, 421],
 ];
 
 const DCA_RAW = [
@@ -181,7 +181,7 @@ const DCA_RAW = [
   ["animation", "Animation Academy", "Hollywood Land", "show", "B", 30, 10, 12, 12, 0, 0, 716, 951],
 
   ["webslingers", "WEB SLINGERS", "Avengers Campus", "ride", "D", 6, 45, 14, -3, 0, 0, 633, 1035],
-  ["guardians", "Guardians of the Galaxy", "Avengers Campus", "ride", "E", 7, 55, 21, -9, 0, 0, 811, 1043],
+  ["guardians", "Guardians of the Galaxy", "Avengers Campus", "ride", "E", 7, 55, 21, -9, 0, 0, 788, 1028],
   ["pym", "Pym Test Kitchen", "Avengers Campus", "dine", "—", 25, 15, 13, 10, 32, 24, 713, 1035],
 
   ["racers", "Radiator Springs Racers", "Cars Land", "ride", "E", 8, 75, 25, -6, 0, 0, 633, 1230],
@@ -196,7 +196,7 @@ const DCA_RAW = [
   ["incredicoaster", "Incredicoaster", "Pixar Pier", "ride", "E", 5, 40, 19, -9, 0, 0, 433, 1284],
   ["palaround", "Pixar Pal-A-Round", "Pixar Pier", "ride", "D", 12, 40, 13, -1, 0, 0, 301, 1208],
   ["midway", "Toy Story Midway Mania", "Pixar Pier", "ride", "D", 7, 40, 14, -2, 0, 0, 342, 1269],
-  ["critter", "Jessie's Critter Carousel", "Pixar Pier", "ride", "B", 4, 15, 6, 0, 0, 0, 385, 1284],
+  ["critter", "Jessie's Critter Carousel", "Pixar Pier", "ride", "B", 4, 15, 6, 0, 0, 0, 396, 1288],
   ["whirlwind", "Inside Out Emotional Whirlwind", "Pixar Pier", "ride", "C", 5, 20, 8, -2, 0, 0, 240, 1210],
 
   ["mermaid", "Little Mermaid", "Paradise Gardens", "ride", "C", 6, 15, 9, 4, 0, 0, 402, 1093],
@@ -221,15 +221,15 @@ const DCA_RAW = [
   ["lucky", "Lucky Fortune Cookery", "San Fransokyo", "dine", "—", 18, 12, 11, 8, 26, 16, 515, 1158],
   ["poultry", "Poultry Palace", "Pixar Pier", "dine", "—", 14, 10, 10, 6, 26, 14, 374, 1261],
 
-  ["boardwalk", "Games of the Boardwalk", "Pixar Pier", "ride", "A", 8, 5, 6, -2, 0, 10, 360, 1250],
-  ["djunior", "Disney Junior Dream Factory", "Hollywood Land", "show", "B", 22, 10, 9, 8, 0, 0, 730, 900],
-  ["bakery", "The Bakery Tour", "San Fransokyo", "dine", "—", 15, 5, 8, 4, 14, 7, 520, 1140],
+  ["boardwalk", "Games of the Boardwalk", "Pixar Pier", "ride", "A", 8, 5, 6, -2, 0, 10, 269, 1240],
+  ["djunior", "Disney Junior Dream Factory", "Hollywood Land", "show", "B", 22, 10, 9, 8, 0, 0, 650, 956],
+  ["bakery", "The Bakery Tour", "San Fransokyo", "dine", "—", 15, 5, 8, 4, 14, 7, 523, 1121],
 
   ["woc", "World of Color", "Paradise Bay", "night", "E", 25, 45, 29, -6, 0, 0, 340, 1179],
 ];
 
 // positions confirmed by hand against the real map
-const REVIEWED = new Set(["alice", "autopia", "bear", "beignets", "bengal", "buzz", "carnation", "chowder", "cinema", "daisy", "edelweiss", "falcon", "fantasmic", "funnel", "gadget", "guardians", "harbour", "hideaway", "horseshoe", "indy", "jellyfish", "jolly", "julep", "jungle", "mansion", "matterhorn", "maurice", "milkstand", "monte", "nemo", "oga", "orbitor", "parade", "peterpan", "pirates", "pizzaplanet", "pooh", "pym", "railroad", "railway", "rancho", "redrose", "rise", "roger", "ronto", "smallworld", "snow", "startours", "storybook", "teacups", "tiana", "toad", "treehouse", "trolley", "twain", "webslingers"]);
+const REVIEWED = new Set(["alice", "autopia", "bakery", "bayou", "bear", "beignets", "bengal", "bluey", "boardwalk", "buzz", "canoes", "carnation", "carrousel", "caseyjr", "castlewalk", "chiptree", "chowder", "cinema", "columbia", "critter", "daisy", "djunior", "duckpond", "dumbo", "edelweiss", "falcon", "fantasmic", "fireworks", "funnel", "gadget", "goofyyard", "grill", "guardians", "harbour", "hideaway", "horseshoe", "indy", "jellyfish", "jolly", "julep", "jungle", "launchbay", "lincoln", "mansion", "matterhorn", "maurice", "mickeyhouse", "milkstand", "minniehouse", "monorail", "monte", "nemo", "oga", "orbitor", "parade", "peterpan", "pinocchio", "pirates", "pixiehollow", "pizzaplanet", "pooh", "pym", "railroad", "railway", "rancho", "redrose", "rise", "roger", "ronto", "royaltheatre", "shootin", "smallworld", "snow", "startours", "storybook", "teacups", "thunder", "tiana", "toad", "tomsawyer", "treehouse", "trolley", "twain", "vehicles", "webslingers"]);
 
 const LAST_CALL = { rise: 840, twain: 660, columbia: 660, tomsawyer: 660, canoes: 600, redwood: 720 };  // minutes from 8 AM
 
@@ -351,9 +351,22 @@ function waitFor(a, t, crowd, weather, mods) {
    geographic. The Disneyland berm spans ~752 units and is ~3,000 ft across,
    giving ~4 ft per unit; a guest covers ~250 ft/min through crowds. */
 const UNITS_PER_MIN = 54;   // detour factor: real paths wind, they are not straight lines
+
+/* Straight-line distance can't see the park's topology. Toontown is a
+   cul-de-sac reached only through Fantasyland, and Galaxy's Edge has just two
+   narrow entrances, so walks in or out of them take noticeably longer than the
+   crow-flies distance suggests. */
+const CUL_DE_SAC = { "Toontown": 3, "Galaxy's Edge": 2 };
 function walkMinutes(pos, a) {
   const d = Math.hypot(pos.x - a.x, pos.y - a.y);
-  const base = Math.max(2, Math.round(d / UNITS_PER_MIN) + 2);
+  // round once, at the end - rounding the distance first then adding a flat
+  // overhead made neighbouring attractions read as 3 minutes apart
+  let detour = 0;
+  for (const land of Object.keys(CUL_DE_SAC)) {
+    // only when crossing the boundary, not for walks inside the land
+    if ((pos.landName === land) !== (a.landName === land)) detour += CUL_DE_SAC[land];
+  }
+  const base = Math.max(2, Math.round(d / UNITS_PER_MIN + 1.5)) + detour;
   // crossing between parks means bag check and turnstiles at the far gate
   return base + (pos.park !== a.park ? HOP_MINUTES : 0);
 }
@@ -531,7 +544,7 @@ function HappiestPlace() {
   const [energy, setEnergy] = useState(100);
   const [fuel, setFuel] = useState(72);
   const [wallet, setWallet] = useState(300);
-  const [pos, setPos] = useState({ park: "dl", x: 584, y: 780 });
+  const [pos, setPos] = useState({ park: "dl", x: 592, y: 675, landName: "Main Street" });
   const [mapPark, setMapPark] = useState("dl");
   const [visited, setVisited] = useState({});
   const [ll, setLl] = useState(0);
@@ -558,7 +571,7 @@ function HappiestPlace() {
   const [usedPreset, setUsedPreset] = useState(false);
   const [saveWarn, setSaveWarn] = useState(false);
   const [showBoth, setShowBoth] = useState(false);
-  const [nudges, setNudges] = useState(() => load("bde:nudges:v3", {}));      // id -> corrected canonical {x,y}
+  const [nudges, setNudges] = useState(() => load("bde:nudges:v5", {}));      // id -> corrected canonical {x,y}
   const [editing, setEditing] = useState(false);
   const [editIdx, setEditIdx] = useState(0);
   const [placeOk, setPlaceOk] = useState(null);
@@ -566,9 +579,9 @@ function HappiestPlace() {
   const setupFile = useRef(null);
 
   useEffect(() => { save("bde:anchors", anchors); }, [anchors]);
-  useEffect(() => { save("bde:nudges:v3", nudges); }, [nudges]);
+  useEffect(() => { save("bde:nudges:v5", nudges); }, [nudges]);
   useEffect(() => { save("bde:speed", speed); }, [speed]);
-  useEffect(() => { try { STORE && (STORE.removeItem("bde:nudges"), STORE.removeItem("bde:nudges:v2")); } catch (e) {} }, []);
+  useEffect(() => { try { STORE && ["bde:nudges","bde:nudges:v2","bde:nudges:v3","bde:nudges:v4"].forEach((k) => STORE.removeItem(k)); } catch (e) {} }, []);
   useEffect(() => {
     if (basemap && basemap.bundled) return;
     setSaveWarn(!save("bde:basemap", basemap));
@@ -689,7 +702,7 @@ function HappiestPlace() {
     const rolls = ["clear", "clear", "hot", "drizzle"];
     setSeed({ crowd: 0.8 + Math.random() * 0.55, weather: rolls[Math.floor(Math.random() * rolls.length)] });
     setScreen("play"); setT(OPEN); setJoy(50); setEnergy(100); setFuel(72); setWallet(300);
-    setPos({ park: "dl", x: 584, y: 780 }); setMapPark("dl"); setVisited({});
+    setPos({ park: "dl", x: 592, y: 675, landName: "Main Street" }); setMapPark("dl"); setVisited({});
     setLl(0); setBoughtLl(false); setLog([]); setTab("map"); setSel(null); setCat("ride");
     setMods({ mult: 1, until: 0, closures: {} });
     setEventCard(null); setEventLog([]);
@@ -804,7 +817,7 @@ function HappiestPlace() {
 
   function finishRun(r, net) {
     const { a } = r;
-    setPos({ park: a.park, x: a.x, y: a.y });
+    setPos({ park: a.park, x: a.x, y: a.y, landName: a.landName });
     setMapPark(a.park);
     setVisited((v) => ({ ...v, [a.id]: (v[a.id] || 0) + 1 }));
     if (r.useLL) setLl((n) => n - 1);
@@ -836,7 +849,8 @@ function HappiestPlace() {
 
     if (phase === "walk" && r.walk > 0) {
       const p = (r.i + 1) / r.walk;
-      setPos({ park: p > 0.5 ? r.a.park : r.from.park, x: r.from.x + (r.a.x - r.from.x) * p, y: r.from.y + (r.a.y - r.from.y) * p });
+      setPos({ park: p > 0.5 ? r.a.park : r.from.park, landName: p > 0.5 ? r.a.landName : r.from.landName,
+        x: r.from.x + (r.a.x - r.from.x) * p, y: r.from.y + (r.a.y - r.from.y) * p });
     }
     if (phase === "do" && !r.paid && r.a.cost) setWallet((w) => w - r.a.cost);
 
@@ -2144,7 +2158,6 @@ function End({ joy, t, wallet, energy, visited, seed, onAgain }) {
     </Shell>
   );
 }
-
 
 ReactDOM.createRoot(document.getElementById("root")).render(<HappiestPlace />);
 </script>
