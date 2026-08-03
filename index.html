@@ -657,7 +657,6 @@ function HappiestPlace() {
   useEffect(() => { save("bde:speed", speed); }, [speed]);
   useEffect(() => { save("bde:mode", mode); }, [mode]);
   useEffect(() => {
-    // clear calibrations and nudges saved under the old skewed anchors
     try { STORE && ["bde:anchors","bde:nudges","bde:nudges:v2","bde:nudges:v3","bde:nudges:v4",
                     "bde:nudges:v5","bde:nudges:v6","bde:nudges:v7"].forEach((k) => STORE.removeItem(k)); } catch (e) {}
   }, []);
@@ -686,6 +685,29 @@ function HappiestPlace() {
   useEffect(() => {
     if (editing && editTarget && editTarget.park !== mapPark) setMapPark(editTarget.park);
   }, [editing, editTarget && editTarget.id]);
+
+  // build a walkthrough queue: whole resort, one park, and optionally only the
+  // positions that have never been confirmed
+  function startWalk(parkId) {
+    const list = ATTRACTIONS
+      .filter((a) => a.kind !== "shop")
+      .filter((a) => !parkId || a.park === parkId)
+      .filter((a) => !editUnchecked || !REVIEWED.has(a.id))
+      .slice()
+      .sort((p, q) => (p.park === q.park
+        ? p.landName.localeCompare(q.landName) || p.name.localeCompare(q.name)
+        : p.park < q.park ? -1 : 1))
+      .map((a) => a.id);
+    if (!list.length) return;
+    setEditQueue(list);
+    setEditIdx(0);
+    setEditing(true);
+    if (parkId) setMapPark(parkId);
+    setTab("map");
+  }
+  const walkCount = (parkId) => ATTRACTIONS.filter((a) => a.kind !== "shop"
+    && (!parkId || a.park === parkId)
+    && (!editUnchecked || !REVIEWED.has(a.id))).length;
 
   function placePin(pt) {
     if (!editTarget || !pt) return;
@@ -1272,10 +1294,21 @@ function HappiestPlace() {
               )}
             </div>
 
+            <div style={{ fontSize: 12, letterSpacing: ".08em", fontWeight: 800, color: C.blue, textTransform: "uppercase", marginBottom: 8 }}>
+              Walk through a set
+            </div>
             <Row>
-              <Pill solid onClick={() => { setEditQueue(null); setEditing(true); setEditIdx(0); setTab("map"); }}>
-                {Object.keys(nudges).length ? "Continue adjusting" : "Start adjusting"}
+              <Pill solid onClick={() => startWalk(null)}>
+                Whole resort · {walkCount(null)}
               </Pill>
+              {Object.values(PARKS).map((p) => (
+                <Pill key={p.id} onClick={() => walkCount(p.id) && startWalk(p.id)}>
+                  {p.short} · {walkCount(p.id)}
+                </Pill>
+              ))}
+            </Row>
+            <div style={{ height: 10 }} />
+            <Row>
               <Pill onClick={() => {
                 if (!confirmReset) { setConfirmReset(true); return; }
                 setNudges({});
