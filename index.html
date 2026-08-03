@@ -448,9 +448,12 @@ const WEATHERS = {
    Conditions are rolled from the chosen mode, and `drain` scales how fast
    energy and happiness bleed away per minute. */
 const DIFFICULTY = {
-  easy:   { label: "Easy",   drain: 0.85, blurb: "Clear skies and thin crowds. A forgiving day." },
-  medium: { label: "Medium", drain: 1.00, blurb: "Either the weather turns or the park is packed — not both." },
-  hard:   { label: "Hard",   drain: 1.30, blurb: "Bad weather and a packed park. Everything costs you more." },
+  easy:   { label: "Easy",   drain: 0.85, budget: 300,
+            blurb: "Clear skies, thin crowds and $300 to spend. A forgiving day." },
+  medium: { label: "Medium", drain: 1.00, budget: 150,
+            blurb: "Either the weather turns or the park is packed — not both. $150 to spend." },
+  hard:   { label: "Hard",   drain: 1.30, budget: 75,
+            blurb: "Bad weather, a packed park and only $75. Everything costs you more." },
 };
 function rollConditions(mode) {
   const bad = ["hot", "drizzle"];
@@ -733,7 +736,7 @@ function HappiestPlace() {
   const [energy, setEnergy] = useState(100);
   const [fuel, setFuel] = useState(72);
   const [comfort, setComfort] = useState(100);
-  const [wallet, setWallet] = useState(300);
+  const [wallet, setWallet] = useState(DIFFICULTY.medium.budget);
   const [pos, setPos] = useState({ park: "dl", x: 592, y: 675, landName: "Main Street" });
   const [mapPark, setMapPark] = useState("dl");
   const [visited, setVisited] = useState({});
@@ -917,7 +920,7 @@ function HappiestPlace() {
 
   function start() {
     setSeed(rollConditions(mode));
-    setScreen("play"); setT(OPEN); setJoy(50); setEnergy(100); setFuel(72); setComfort(100); setWallet(300);
+    setScreen("play"); setT(OPEN); setJoy(50); setEnergy(100); setFuel(72); setComfort(100); setWallet(DIFFICULTY[mode].budget);
     setPos({ park: "dl", x: 592, y: 675, landName: "Main Street" }); setMapPark("dl"); setVisited({});
     setLl(0); setBoughtLl(false); setLog([]); setTab("map"); setSel(null); setCat("ride");
     setGoingHome(false);
@@ -1021,7 +1024,7 @@ function HappiestPlace() {
     if (seed.weather === "drizzle" && a.kind === "ride") gain -= 1.5;
     if (single) gain *= SINGLE_JOY;
     gain -= a.cost > 20 ? (a.cost - 20) * 0.09 : 0;
-    gain -= wallet - a.cost < 30 ? 3 : 0;
+    gain -= wallet - a.cost < DIFFICULTY[mode].budget * 0.15 ? 3 : 0;   // scales with your budget
     const painRate = a.kind === "dine" || a.kind === "night" ? 0.05 : energy < 30 ? 0.2 : 0.11;
     setSel(null);
     setTab("map");
@@ -2620,6 +2623,7 @@ function ResortArt() {
 
 /* ---------------- title & end ---------------- */
 function Title({ onStart, onSetup, ready, mode, setMode }) {
+  const budget = DIFFICULTY[mode].budget;
   return (
     <Shell>
       <div style={{ flex: 1, overflowY: "auto", padding: "52px 24px 30px", textAlign: "center" }}>
@@ -2634,7 +2638,7 @@ function Title({ onStart, onSetup, ready, mode, setMode }) {
           Happiest Place<br />on Earth
         </h1>
         <p style={{ fontSize: 16.5, lineHeight: 1.55, color: C.text, maxWidth: 330, margin: "0 auto 22px" }}>
-          The gates open at 8:00 AM with $300 in your pocket. Tap a pin to walk there and get in line.
+          Rope drop is at 8:00 AM and you have ${budget} in your pocket. Tap a pin to walk there and get in line.
           Rides, food and shows raise your happiness. Long lines, dead time, sore feet and sticker shock pull it back down. There is no cap — a great day just keeps climbing.
         </p>
         <div style={{ background: C.gap, borderRadius: 14, padding: 16, textAlign: "left", maxWidth: 340, margin: "0 auto 26px" }}>
