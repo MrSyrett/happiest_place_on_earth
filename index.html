@@ -474,37 +474,52 @@ const happy = (v) => Math.max(0, Math.round(v * 10) / 10);
    Two landmarks per park are enough to solve a similarity transform
    (uniform scale + rotation + translation) from my canonical park
    coordinates onto whatever map image you load. */
-/* Calibration landmarks. These MUST be derived from the live attraction data,
-   not hard-coded: they were hard-coded once, the coordinates were refined over
-   several passes, and the anchors silently went stale. Recalibrating then mapped
-   old anchor positions onto correct taps, which injected an 8-degree rotation
-   into every Disneyland pin. Deriving them means that can't happen again. */
-const ANCHOR_REFS = {
+/* ---------------- coordinate frame ----------------
+   THE PROBLEM THIS SOLVES
+
+   Pin positions live in a "canonical" space; a calibration transform maps that
+   space onto whatever map image you loaded. That is two coupled layers, and it
+   kept breaking in two different ways:
+
+     1. Anchors hard-coded  -> a bulk coordinate remap left them stale, and
+                               recalibrating injected an 8-degree rotation.
+     2. Anchors derived     -> adjusting the castle or Space Mountain moved the
+                               anchors, and every saved calibration silently
+                               re-solved with a 10-degree rotation.
+
+   The fix is to stop needing two layers. FRAME_DEFAULT names where the two
+   landmarks sit in canonical space. Once you "lock in" a calibration, every pin
+   AND the frame itself are rewritten through the transform, so the canonical
+   space becomes your map's space and the calibration collapses to the identity.
+   After that nothing can shift: what you see is exactly what is stored. */
+const FRAME_DEFAULT = {
   dl: [
-    { ref: "castlewalk", label: "Sleeping Beauty Castle", hint: "the blue castle at the centre of the park" },
-    { ref: "space", label: "Space Mountain", hint: "the big white ribbed dome in Tomorrowland" },
+    { label: "Sleeping Beauty Castle", hint: "the blue castle at the centre of the park", x: 563, y: 326 },
+    { label: "Space Mountain", hint: "the big white ribbed dome in Tomorrowland", x: 756, y: 481 },
   ],
   dca: [
-    { ref: "palaround", label: "Pixar Pal-A-Round", hint: "the Ferris wheel at Pixar Pier" },
-    { ref: "carthay", label: "Carthay Circle", hint: "the domed tower at the top of Buena Vista Street" },
+    { label: "Pixar Pal-A-Round", hint: "the Ferris wheel at Pixar Pier", x: 301, y: 1208 },
+    { label: "Carthay Circle", hint: "the domed tower at the top of Buena Vista Street", x: 595, y: 962 },
   ],
 };
-const ANCHORS = Object.fromEntries(Object.entries(ANCHOR_REFS).map(([park, list]) => [
-  park, list.map((a) => ({ label: a.label, hint: a.hint, x: byId[a.ref].x, y: byId[a.ref].y })),
-]));
+/* iOS keeps a home-screen web app's storage completely separate from Safari's.
+   Calibrate in one and the other sees nothing and falls back to defaults, which
+   draws every pin through a different transform. Detect it and say so. */
+const RUNTIME = (() => {
+  try {
+    const ua = navigator.userAgent || "";
+    const standalone = navigator.standalone === true
+      || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+    if (standalone) return "Home screen app";
+    if (/CriOS/.test(ua)) return "Chrome on iOS";
+    if (/FxiOS/.test(ua)) return "Firefox on iOS";
+    if (/EdgiOS/.test(ua)) return "Edge on iOS";
+    if (/iPhone|iPad|iPod/.test(ua)) return "Safari on iOS";
+    return "Browser tab";
+  } catch (e) { return "Browser tab"; }
+})();
 
-/* Pin positions are already expressed in this map's coordinates, so the default
-   calibration is the identity transform. */
-const PRESET = Object.fromEntries(Object.entries(ANCHORS).map(([park, list]) => [
-  park, list.map((a) => ({ x: a.x, y: a.y })),
-]));
-
-/* A saved calibration is only meaningful against the anchor positions it was
-   solved from. Adjusting the castle or Space Mountain moves those anchors, which
-   silently re-solved old calibrations into a 10-degree rotation. Fingerprinting
-   means a stale calibration is thrown away instead. */
-const ANCHOR_FINGERPRINT = Object.values(PRESET)
-  .flat().map((p) => `${p.x},${p.y}`).join("|");
+const frameKey = (f) => Object.values(f).flat().map((p) => `${Math.round(p.x)},${Math.round(p.y)}`).join("|");
 
 function solveTransform(defs, taps) {
   if (!taps || taps.length < 2) return null;
@@ -768,19 +783,28 @@ function HappiestPlace() {
 
   const [basemap, setBasemap] = useState(() => load("bde:basemap", null));
   const [anchors, setAnchors] = useState(() => {
-    const saved = load("bde:calib", null);
-    if (!saved || saved.fp !== ANCHOR_FINGERPRINT) return { dl: [], dca: [] };
-    return { dl: saved.dl || [], dca: saved.dca || [] };
+    const v = load("bde:map", null);
+    return v && v.anchors ? v.anchors : { dl: [], dca: [] };
   });
   const [calib, setCalib] = useState(null);
   const [calibWarn, setCalibWarn] = useState(null);
   const [usedPreset, setUsedPreset] = useState(false);
-  const [anchorFp, setAnchorFp] = useState(ANCHOR_FINGERPRINT);
-  const staleCalib = (() => { const v = load("bde:calib", null); return !!(v && v.fp !== ANCHOR_FINGERPRINT); })();
-  const [calibReset, setCalibReset] = useState(staleCalib);
+  const [frame, setFrame] = useState(() => {
+    const v = load("bde:map", null);
+    if (!v || !v.frame) return FRAME_DEFAULT;
+    return {
+      dl: FRAME_DEFAULT.dl.map((p, i) => ({ ...p, x: v.frame.dl[i][0], y: v.frame.dl[i][1] })),
+      dca: FRAME_DEFAULT.dca.map((p, i) => ({ ...p, x: v.frame.dca[i][0], y: v.frame.dca[i][1] })),
+    };
+  });
+  const [lockedMsg, setLockedMsg] = useState(null);
   const [saveWarn, setSaveWarn] = useState(false);
   const [showBoth, setShowBoth] = useState(false);
-  const [nudges, setNudges] = useState(() => load("bde:nudges:v9", {}));      // id -> corrected canonical {x,y}
+  const [nudges, setNudges] = useState(() => {
+    const v = load("bde:map", null);
+    // pin overrides are only valid against the frame they were captured in
+    return v && v.nudges && v.baseFrame === frameKey(FRAME_DEFAULT) ? v.nudges : {};
+  });      // id -> corrected canonical {x,y}
   const [editing, setEditing] = useState(false);
   const [editIdx, setEditIdx] = useState(0);
   const [placeOk, setPlaceOk] = useState(null);
@@ -788,17 +812,29 @@ function HappiestPlace() {
   const [goingHome, setGoingHome] = useState(false);
   const setupFile = useRef(null);
 
-  useEffect(() => { save("bde:calib", { fp: ANCHOR_FINGERPRINT, dl: anchors.dl, dca: anchors.dca }); }, [anchors]);
-  useEffect(() => { save("bde:nudges:v9", nudges); }, [nudges]);
+  useEffect(() => {
+    save("bde:map", {
+      baseFrame: frameKey(FRAME_DEFAULT),
+      frame: { dl: frame.dl.map((p) => [p.x, p.y]), dca: frame.dca.map((p) => [p.x, p.y]) },
+      anchors, nudges,
+    });
+  }, [frame, anchors, nudges]);
   useEffect(() => { save("bde:speed", speed); }, [speed]);
   useEffect(() => { save("bde:mode", mode); }, [mode]);
-  useEffect(() => { try { STORE && ["bde:anchors", "bde:anchors:v2"].forEach((k) => STORE.removeItem(k)); } catch (e) {} }, []);
+  useEffect(() => {
+    try { STORE && ["bde:anchors","bde:anchors:v2","bde:calib","bde:nudges","bde:nudges:v2","bde:nudges:v3",
+      "bde:nudges:v4","bde:nudges:v5","bde:nudges:v6","bde:nudges:v7","bde:nudges:v8","bde:nudges:v9"]
+      .forEach((k) => STORE.removeItem(k)); } catch (e) {}
+  }, []);
   useEffect(() => { if (basemap && basemap.bundled) return; setSaveWarn(!save("bde:basemap", basemap)); }, [basemap]);
 
+  const ANCHORS = frame;
+  const PRESET = useMemo(() => Object.fromEntries(
+    Object.entries(frame).map(([k, v]) => [k, v.map((p) => ({ x: p.x, y: p.y }))])), [frame]);
   const transforms = useMemo(() => ({
-    dl: solveTransform(ANCHORS.dl, anchors.dl),
-    dca: solveTransform(ANCHORS.dca, anchors.dca),
-  }), [anchors]);
+    dl: solveTransform(frame.dl, anchors.dl),
+    dca: solveTransform(frame.dca, anchors.dca),
+  }), [anchors, frame]);
 
   // corrected positions win over my estimates
   const place = (a) => (nudges[a.id] ? { ...a, ...nudges[a.id] } : a);
@@ -807,6 +843,7 @@ function HappiestPlace() {
   const [editUnchecked, setEditUnchecked] = useState(true);
   const [editQueue, setEditQueue] = useState(null);   // specific ids chosen by hand
   const [pickSearch, setPickSearch] = useState("");
+  const [pasteBox, setPasteBox] = useState("");
   const editList = useMemo(() => (editQueue
     ? editQueue.map((id) => byId[id]).filter(Boolean)
     : ATTRACTIONS
@@ -895,15 +932,37 @@ function HappiestPlace() {
     setUsedPreset(official);
   }
 
-  // if the anchors have moved since a calibration was saved, fall back to default
-  useEffect(() => {
-    const both = anchors.dl.length === 2 && anchors.dca.length === 2;
-    if (both && anchorFp && anchorFp !== ANCHOR_FINGERPRINT) {
-      setAnchors({ dl: [...PRESET.dl], dca: [...PRESET.dca] });
-      setAnchorFp(ANCHOR_FINGERPRINT);
-      setCalibReset(true);
+  /* Rewrite every pin AND the frame through the current calibration, then reset
+     the calibration to identity. Afterwards the stored coordinates ARE the map's
+     coordinates, so no future edit or rebuild can shift anything. */
+  function lockInCalibration() {
+    const next = { ...nudges };
+    let moved = 0;
+    for (const a of ATTRACTIONS) {
+      if (a.kind === "shop") continue;
+      const T = transforms[a.park];
+      if (!T) continue;
+      const cur = nudges[a.id] || { x: a.x, y: a.y };
+      const p = applyT(T, cur.x, cur.y);
+      if (!isFinite(p.x) || !isFinite(p.y)) continue;
+      next[a.id] = { x: Math.round(p.x), y: Math.round(p.y) };
+      moved++;
     }
-  }, []);
+    const newFrame = Object.fromEntries(Object.entries(frame).map(([park, list]) => {
+      const T = transforms[park];
+      return [park, list.map((pt) => {
+        const q = T ? applyT(T, pt.x, pt.y) : pt;
+        return { ...pt, x: Math.round(q.x), y: Math.round(q.y) };
+      })];
+    }));
+    setNudges(next);
+    setFrame(newFrame);
+    setAnchors({
+      dl: newFrame.dl.map((p) => ({ x: p.x, y: p.y })),
+      dca: newFrame.dca.map((p) => ({ x: p.x, y: p.y })),
+    });
+    setLockedMsg(`Locked in. ${moved} pins and both calibration landmarks were rewritten into your map's coordinates — the calibration is now the identity, so nothing can shift again.`);
+  }
 
   function loadBasemap(file) {
     const r = new FileReader();
@@ -1281,13 +1340,6 @@ function HappiestPlace() {
                 ? "Using a map from this device. It's remembered between visits."
                 : "Playing on the built-in map."}
             </div>
-            {calibReset && (
-              <Note tone="good">
-                The calibration landmarks moved when you last adjusted pins, so the saved
-                calibration was out of date and has been reset to default. Redo it only if the
-                pins look wrong.
-              </Note>
-            )}
             {saveWarn && (
               <Note tone="bad">
                 This browser wouldn't keep the image between visits (storage is full or blocked).
@@ -1349,6 +1401,82 @@ function HappiestPlace() {
                 <Toggle on={showBoth} onClick={() => setShowBoth(!showBoth)} label="Show both parks at once" />
               </div>
             )}
+
+            <div style={{ marginTop: 18, paddingTop: 16, borderTop: `1px solid ${C.rule}` }}>
+              <div style={{ fontSize: 12, letterSpacing: ".08em", fontWeight: 800, color: C.blue, textTransform: "uppercase", marginBottom: 6 }}>
+                Where you're running
+              </div>
+              <div style={{ fontSize: 15.5, color: C.navy, fontWeight: 700, lineHeight: 1.45 }}>
+                {RUNTIME}
+              </div>
+              <div style={{ fontSize: 14.5, color: C.grey, lineHeight: 1.45, marginTop: 4 }}>
+                On iOS, Chrome, Safari and a home screen app each get their own separate storage.
+                A calibration saved in one is invisible to the others, so they fall back to
+                defaults and draw the pins differently. That is almost certainly why the map keeps
+                looking wrong in one place and right in another.
+              </div>
+              <div style={{ fontSize: 14.5, color: C.grey, lineHeight: 1.45, marginTop: 8 }}>
+                Copy the text below and paste it into the others to match them up — or send it to
+                me and I will build it in, after which none of them need saved settings at all.
+              </div>
+              <textarea readOnly onFocus={(e) => e.target.select()}
+                value={JSON.stringify({
+                  frame: { dl: frame.dl.map((p) => [p.x, p.y]), dca: frame.dca.map((p) => [p.x, p.y]) },
+                  anchors, nudges,
+                })}
+                style={{
+                  width: "100%", height: 70, marginTop: 8, padding: 9, boxSizing: "border-box",
+                  border: `1px solid ${C.border}`, borderRadius: 10, background: C.gap,
+                  fontFamily: "ui-monospace, Menlo, monospace", fontSize: 11.5, color: C.text, resize: "vertical",
+                }} />
+              <input value={pasteBox} onChange={(e) => setPasteBox(e.target.value)}
+                placeholder="Paste settings from the other one here…"
+                style={{
+                  width: "100%", boxSizing: "border-box", marginTop: 8, padding: "10px 12px",
+                  borderRadius: 10, border: `1.5px solid ${C.border}`, fontFamily: F, fontSize: 14.5, outline: "none",
+                }} />
+              {pasteBox.trim() && (
+                <div style={{ marginTop: 8 }}>
+                  <Pill solid onClick={() => {
+                    try {
+                      const v = JSON.parse(pasteBox);
+                      if (v.frame) setFrame({
+                        dl: FRAME_DEFAULT.dl.map((p, i) => ({ ...p, x: v.frame.dl[i][0], y: v.frame.dl[i][1] })),
+                        dca: FRAME_DEFAULT.dca.map((p, i) => ({ ...p, x: v.frame.dca[i][0], y: v.frame.dca[i][1] })),
+                      });
+                      if (v.anchors) setAnchors(v.anchors);
+                      if (v.nudges) setNudges(v.nudges);
+                      setPasteBox("");
+                      setLockedMsg("Settings applied from the other instance.");
+                    } catch (err) { setLockedMsg("That doesn't look like settings text."); }
+                  }}>Apply pasted settings</Pill>
+                </div>
+              )}
+            </div>
+
+            {(() => {
+              const identity = transforms.dl && transforms.dca
+                && Math.abs(transforms.dl.scale - 1) < 1e-6 && Math.abs(transforms.dl.b) < 1e-6
+                && Math.abs(transforms.dca.scale - 1) < 1e-6 && Math.abs(transforms.dca.b) < 1e-6;
+              return (
+                <div style={{ marginTop: 18, paddingTop: 16, borderTop: `1px solid ${C.rule}` }}>
+                  <div style={{ fontSize: 12, letterSpacing: ".08em", fontWeight: 800, color: C.blue, textTransform: "uppercase", marginBottom: 6 }}>
+                    Coordinate frame
+                  </div>
+                  <div style={{ fontSize: 15, color: identity ? C.green : C.text, fontWeight: identity ? 700 : 400, lineHeight: 1.45 }}>
+                    {identity
+                      ? "Locked. Pin positions are stored exactly as drawn — no transform is being applied."
+                      : "A calibration transform is being applied on top of the stored positions. Lock it in and the two collapse into one, so nothing can drift."}
+                  </div>
+                  {!identity && transforms.dl && transforms.dca && (
+                    <div style={{ marginTop: 10 }}>
+                      <Pill solid onClick={lockInCalibration}>Lock these positions in</Pill>
+                    </div>
+                  )}
+                  {lockedMsg && <Note tone="good">{lockedMsg}</Note>}
+                </div>
+              );
+            })()}
           </Card>
 
           <Card>
@@ -1442,7 +1570,9 @@ function HappiestPlace() {
                   so a partial pass is still safe to send:
                 </div>
                 <textarea readOnly onFocus={(e) => e.target.select()}
-                  value={"const FIXED = {\n" + ATTRACTIONS.filter((a) => a.kind !== "shop").map((a) => {
+                  value={"const FRAME = " + JSON.stringify({
+                    dl: frame.dl.map((p) => [p.x, p.y]), dca: frame.dca.map((p) => [p.x, p.y]),
+                  }) + ";\n\nconst FIXED = {\n" + ATTRACTIONS.filter((a) => a.kind !== "shop").map((a) => {
                     const p = nudges[a.id] || { x: a.x, y: a.y };
                     return `  "${a.id}": [${p.x}, ${p.y}],${nudges[a.id] ? "" : "   // not re-checked"}`;
                   }).join("\n") + "\n};"}
