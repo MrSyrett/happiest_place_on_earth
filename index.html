@@ -5,12 +5,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="Best Day Ever" />
+<meta name="apple-mobile-web-app-title" content="Happiest Place" />
 <meta name="theme-color" content="#FFFFFF" />
 <link rel="manifest" href="manifest.json" />
 <link rel="apple-touch-icon" href="icon-180.png" />
 <link rel="icon" type="image/png" href="icon-192.png" />
-<title>Best Day Ever</title>
+<title>Happiest Place on Earth</title>
 <style>
   html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#0E1B26;overscroll-behavior:none;}
   body{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;}
@@ -29,7 +29,7 @@ const { useState, useEffect, useMemo, useRef } = React;
 
 
 /* ==========================================================
-   BEST DAY EVER — styled after the Disneyland app
+   HAPPIEST PLACE ON EARTH — styled after the Disneyland app
    ========================================================== */
 
 const STORE = (() => { try { localStorage.setItem("__t","1"); localStorage.removeItem("__t"); return localStorage; } catch (e) { return null; } })();
@@ -76,9 +76,9 @@ const DL_RAW = [
   ["bayou", "Blue Bayou Restaurant", "New Orleans Sq.", "dine", "—", 75, 20, 26, 25, 55, 72, 406, 546],
   ["julep", "Mint Julep Bar", "New Orleans Sq.", "dine", "—", 12, 12, 8, 4, 14, 9, 314, 550],
 
-  ["tiana", "Tiana's Bayou Adventure", "Critter Country", "ride", "E", 12, 53, 19, -6, 0, 0, 213, 414],
-  ["pooh", "Winnie the Pooh", "Critter Country", "ride", "C", 5, 15, 7, 2, 0, 0, 240, 389],
-  ["bear", "Hungry Bear Restaurant", "Critter Country", "dine", "—", 25, 12, 11, 10, 30, 19, 226, 370],
+  ["tiana", "Tiana's Bayou Adventure", "Bayou Country", "ride", "E", 12, 53, 19, -6, 0, 0, 213, 414],
+  ["pooh", "Winnie the Pooh", "Bayou Country", "ride", "C", 5, 15, 7, 2, 0, 0, 240, 389],
+  ["bear", "Hungry Bear Restaurant", "Bayou Country", "dine", "—", 25, 12, 11, 10, 30, 19, 226, 370],
 
   ["rise", "Rise of the Resistance", "Galaxy's Edge", "ride", "E", 18, 64, 24, -10, 0, 0, 208, 201],
   ["falcon", "Smugglers Run", "Galaxy's Edge", "ride", "E", 8, 36, 16, -4, 0, 0, 356, 93],
@@ -132,6 +132,35 @@ const DL_RAW = [
 
   ["pizzaplanet", "Alien Pizza Planet", "Tomorrowland", "dine", "—", 25, 14, 12, 10, 34, 19, 790, 502],
   ["daisy", "Café Daisy", "Toontown", "dine", "—", 15, 10, 9, 8, 24, 14, 621, 24],
+
+  // --- Fantasyland classics that were missing ---
+  ["dumbo", "Dumbo the Flying Elephant", "Fantasyland", "ride", "C", 2, 35, 10, -2, 0, 0, 620, 210],
+  ["carrousel", "King Arthur Carrousel", "Fantasyland", "ride", "B", 3, 15, 7, 0, 0, 0, 630, 320],
+  ["pinocchio", "Pinocchio's Daring Journey", "Fantasyland", "ride", "C", 4, 20, 8, -1, 0, 0, 592, 296],
+  ["caseyjr", "Casey Jr. Circus Train", "Fantasyland", "ride", "B", 4, 15, 7, 2, 0, 0, 610, 235],
+  ["castlewalk", "Sleeping Beauty Castle Walkthrough", "Fantasyland", "ride", "A", 8, 5, 6, -2, 0, 0, 593, 350],
+  ["pixiehollow", "Pixie Hollow", "Fantasyland", "show", "A", 10, 20, 7, 0, 0, 0, 700, 330],
+  ["bluey", "Bluey's Best Day Ever!", "Fantasyland", "show", "C", 25, 15, 12, 8, 0, 0, 660, 175],
+  ["royaltheatre", "Royal Theatre", "Fantasyland", "show", "B", 25, 10, 11, 10, 0, 0, 548, 290],
+
+  // --- Frontierland & Bayou Country river attractions ---
+  ["columbia", "Sailing Ship Columbia", "Frontierland", "ride", "C", 15, 10, 9, 10, 0, 0, 420, 440],
+  ["tomsawyer", "Pirate's Lair on Tom Sawyer Island", "Frontierland", "ride", "B", 30, 5, 9, -8, 0, 0, 370, 420],
+  ["shootin", "Frontierland Shootin' Exposition", "Frontierland", "ride", "A", 6, 0, 5, -1, 0, 1, 470, 455],
+  ["canoes", "Davy Crockett's Explorer Canoes", "Bayou Country", "ride", "C", 15, 20, 10, -12, 0, 0, 300, 400],
+
+  // --- Main Street & Tomorrowland ---
+  ["lincoln", "Great Moments with Mr. Lincoln", "Main Street", "show", "A", 18, 5, 7, 8, 0, 0, 615, 660],
+  ["vehicles", "Main Street Vehicles", "Main Street", "ride", "A", 5, 10, 6, 3, 0, 0, 590, 600],
+  ["monorail", "Disneyland Monorail", "Tomorrowland", "ride", "B", 12, 15, 8, 6, 0, 0, 680, 470],
+  ["launchbay", "Star Wars Launch Bay", "Tomorrowland", "show", "B", 15, 5, 7, 2, 0, 0, 710, 490],
+
+  // --- Toontown ---
+  ["mickeyhouse", "Mickey's House and Meet Mickey", "Toontown", "show", "B", 15, 30, 11, -1, 0, 0, 700, 30],
+  ["minniehouse", "Minnie's House", "Toontown", "ride", "A", 8, 15, 6, -1, 0, 0, 715, 45],
+  ["goofyyard", "Goofy's How-to-Play Yard", "Toontown", "ride", "A", 12, 5, 6, -4, 0, 0, 580, 70],
+  ["duckpond", "Donald's Duck Pond", "Toontown", "ride", "A", 10, 5, 5, -3, 0, 0, 600, 85],
+  ["chiptree", "Chip 'n' Dale's Treehouse", "Toontown", "ride", "A", 6, 5, 5, -3, 0, 0, 560, 40],
 
   ["space", "Space Mountain", "Tomorrowland", "ride", "E", 8, 58, 21, -8, 0, 0, 742, 535],
   ["startours", "Star Tours", "Tomorrowland", "ride", "D", 12, 35, 14, -5, 0, 0, 691, 452],
@@ -192,13 +221,17 @@ const DCA_RAW = [
   ["lucky", "Lucky Fortune Cookery", "San Fransokyo", "dine", "—", 18, 12, 11, 8, 26, 16, 515, 1158],
   ["poultry", "Poultry Palace", "Pixar Pier", "dine", "—", 14, 10, 10, 6, 26, 14, 374, 1261],
 
+  ["boardwalk", "Games of the Boardwalk", "Pixar Pier", "ride", "A", 8, 5, 6, -2, 0, 10, 360, 1250],
+  ["djunior", "Disney Junior Dream Factory", "Hollywood Land", "show", "B", 22, 10, 9, 8, 0, 0, 730, 900],
+  ["bakery", "The Bakery Tour", "San Fransokyo", "dine", "—", 15, 5, 8, 4, 14, 7, 520, 1140],
+
   ["woc", "World of Color", "Paradise Bay", "night", "E", 25, 45, 29, -6, 0, 0, 340, 1179],
 ];
 
 // positions confirmed by hand against the real map
 const REVIEWED = new Set(["alice", "autopia", "bear", "beignets", "bengal", "buzz", "carnation", "chowder", "cinema", "daisy", "edelweiss", "falcon", "fantasmic", "funnel", "gadget", "guardians", "harbour", "hideaway", "horseshoe", "indy", "jellyfish", "jolly", "julep", "jungle", "mansion", "matterhorn", "maurice", "milkstand", "monte", "nemo", "oga", "orbitor", "parade", "peterpan", "pirates", "pizzaplanet", "pooh", "pym", "railroad", "railway", "rancho", "redrose", "rise", "roger", "ronto", "smallworld", "snow", "startours", "storybook", "teacups", "tiana", "toad", "treehouse", "trolley", "twain", "webslingers"]);
 
-const LAST_CALL = { rise: 840, twain: 660, redwood: 720 };  // minutes from 8 AM
+const LAST_CALL = { rise: 840, twain: 660, columbia: 660, tomsawyer: 660, canoes: 600, redwood: 720 };  // minutes from 8 AM
 
 const NIGHT = {
   parade: [700, 800],
@@ -269,6 +302,8 @@ const CURVE = {
   midway: "classic", startours: "classic", jungle: "classic", nemo: "classic",
   autopia: "classic", roger: "classic", skyschool: "classic",
   peterpan: "flat", rise: "flat",
+  dumbo: "family", carrousel: "family", pinocchio: "family", caseyjr: "family",
+  minniehouse: "family", goofyyard: "family", duckpond: "family", chiptree: "family",
   toad: "family", snow: "family", alice: "family", teacups: "family",
   storybook: "family", gadget: "family", pooh: "family", mermaid: "family",
   critter: "family", whirlwind: "family", jellyfish: "family", zephyr: "family",
@@ -330,6 +365,9 @@ const WEATHERS = {
 };
 
 const clamp = (v, lo = 0, hi = 100) => Math.max(lo, Math.min(hi, v));
+// Happiness is a running score: it has a floor but no ceiling, so a great day
+// keeps climbing rather than pinning at 100.
+const happy = (v) => Math.max(0, Math.round(v * 10) / 10);
 
 /* ---------- basemap calibration ----------
    Two landmarks per park are enough to solve a similarity transform
@@ -478,7 +516,7 @@ const CATS = [
 ];
 
 /* ================= root ================= */
-function BestDayEver() {
+function HappiestPlace() {
   useEffect(() => {
     const l = document.createElement("link");
     l.rel = "stylesheet";
@@ -489,7 +527,7 @@ function BestDayEver() {
 
   const [screen, setScreen] = useState("title");
   const [t, setT] = useState(OPEN);
-  const [joy, setJoy] = useState(58);
+  const [joy, setJoy] = useState(50);
   const [energy, setEnergy] = useState(100);
   const [fuel, setFuel] = useState(72);
   const [wallet, setWallet] = useState(300);
@@ -650,7 +688,7 @@ function BestDayEver() {
   function start() {
     const rolls = ["clear", "clear", "hot", "drizzle"];
     setSeed({ crowd: 0.8 + Math.random() * 0.55, weather: rolls[Math.floor(Math.random() * rolls.length)] });
-    setScreen("play"); setT(OPEN); setJoy(58); setEnergy(100); setFuel(72); setWallet(300);
+    setScreen("play"); setT(OPEN); setJoy(50); setEnergy(100); setFuel(72); setWallet(300);
     setPos({ park: "dl", x: 584, y: 780 }); setMapPark("dl"); setVisited({});
     setLl(0); setBoughtLl(false); setLog([]); setTab("map"); setSel(null); setCat("ride");
     setMods({ mult: 1, until: 0, closures: {} });
@@ -686,7 +724,7 @@ function BestDayEver() {
     const hot = seed.weather === "hot" ? 1.5 : 1;
     setEnergy((e) => clamp(e - (mins / 10) * 0.3 * hot));
     setFuel((f) => clamp(f - (mins / 10) * 0.95));
-    setJoy((j) => clamp(j - (mins / 10) * 0.35));
+    setJoy((j) => happy(j - (mins / 10) * 0.35));
     setT((x) => x + mins);
   }
 
@@ -749,7 +787,7 @@ function BestDayEver() {
       setMods((m) => ({ ...m, closures: { ...m.closures, [ride.id]: atTime + (ev.minutes || 45) } }));
     }
     if (ev.waitMult) setMods((m) => ({ ...m, mult: ev.waitMult, until: atTime + (ev.minutes || 60) }));
-    if (ev.joy) setJoy((j) => clamp(j + ev.joy));
+    if (ev.joy) setJoy((j) => happy(j + ev.joy));
     if (ev.energy) setEnergy((e) => clamp(e + ev.energy));
     if (ev.fuel) setFuel((f) => clamp(f + ev.fuel));
     if (ev.money) setWallet((w) => Math.max(0, w + ev.money));
@@ -792,7 +830,7 @@ function BestDayEver() {
     const { dJoy, dEn, dFu, phase } = minuteDelta(r, r.i, hot);
 
     setT((x) => x + 1);
-    setJoy((j) => clamp(j + dJoy));
+    setJoy((j) => happy(j + dJoy));
     setEnergy((e) => clamp(e + dEn));
     setFuel((f) => clamp(f + dFu));
 
@@ -819,7 +857,7 @@ function BestDayEver() {
       dJ += d.dJoy; dE += d.dEn; dF += d.dFu;
     }
     setT((x) => x + (total - r.i));
-    setJoy((j) => clamp(j + dJ));
+    setJoy((j) => happy(j + dJ));
     setEnergy((e) => clamp(e + dE));
     setFuel((f) => clamp(f + dF));
     if (!r.paid && r.a.cost) setWallet((w) => w - r.a.cost);
@@ -834,11 +872,11 @@ function BestDayEver() {
   }, [run, speed, screen]);
 
   const rest = {
-    bench: () => { passTime(20); setEnergy((e) => clamp(e + 20)); setJoy((j) => clamp(j - (energy < 40 ? 0 : 3))); push("Found a bench. Watched the crowd go by.", "ok"); },
-    churro: () => { if (wallet < 7) return; passTime(10); setWallet((w) => w - 7); setFuel((f) => clamp(f + 12)); setEnergy((e) => clamp(e + 4)); setJoy((j) => clamp(j + 5)); push("Churro. $7. Worth it.", "good"); },
-    coffee: () => { if (wallet < 6) return; passTime(12); setWallet((w) => w - 6); setEnergy((e) => clamp(e + 12)); setFuel((f) => clamp(f + 5)); setJoy((j) => clamp(j + 2)); push("Cold brew. Second wind.", "ok"); },
-    wander: () => { passTime(25); setEnergy((e) => clamp(e - 5)); setJoy((j) => clamp(j - 4)); push("Wandered around not doing much. The day is slipping by.", "bad"); },
-    ll: () => { if (wallet < 32 || boughtLl) return; setWallet((w) => w - 32); setLl(5); setBoughtLl(true); setJoy((j) => clamp(j - 2)); push("Bought Lightning Lane Multi Pass — 5 skips, $32", "ok"); },
+    bench: () => { passTime(20); setEnergy((e) => clamp(e + 20)); setJoy((j) => happy(j - (energy < 40 ? 0 : 3))); push("Found a bench. Watched the crowd go by.", "ok"); },
+    churro: () => { if (wallet < 7) return; passTime(10); setWallet((w) => w - 7); setFuel((f) => clamp(f + 12)); setEnergy((e) => clamp(e + 4)); setJoy((j) => happy(j + 5)); push("Churro. $7. Worth it.", "good"); },
+    coffee: () => { if (wallet < 6) return; passTime(12); setWallet((w) => w - 6); setEnergy((e) => clamp(e + 12)); setFuel((f) => clamp(f + 5)); setJoy((j) => happy(j + 2)); push("Cold brew. Second wind.", "ok"); },
+    wander: () => { passTime(25); setEnergy((e) => clamp(e - 5)); setJoy((j) => happy(j - 4)); push("Wandered around not doing much. The day is slipping by.", "bad"); },
+    ll: () => { if (wallet < 32 || boughtLl) return; setWallet((w) => w - 32); setLl(5); setBoughtLl(true); setJoy((j) => happy(j - 2)); push("Bought Lightning Lane Multi Pass — 5 skips, $32", "ok"); },
   };
 
   useEffect(() => {
@@ -846,7 +884,9 @@ function BestDayEver() {
     if (t >= CLOSE || energy <= 0) setScreen("end");
   }, [t, energy, screen]);
 
-  if (screen === "title") return <Title onStart={() => setScreen("setup")} />;
+  const mapReady = !!(basemap && transforms.dl && transforms.dca);
+  if (screen === "title")
+    return <Title ready={mapReady} onStart={() => (mapReady ? start() : setScreen("setup"))} />;
   if (screen === "end")
     return <End joy={joy} t={t} wallet={wallet} energy={energy} visited={visited} seed={seed} onAgain={start} />;
 
@@ -968,7 +1008,7 @@ function BestDayEver() {
 
       {tab === "day" && <DayLog log={log} />}
       {tab === "you" && <YouTab rest={rest} wallet={wallet} ll={ll} boughtLl={boughtLl}
-        energy={energy} fuel={fuel} joy={joy} visited={visited} />}
+        energy={energy} fuel={fuel} joy={joy} visited={visited} t={t} />}
       {tab === "setup" && (
         <div style={{ flex: 1, overflowY: "auto", background: C.gap }}>
           <Card>
@@ -1434,10 +1474,17 @@ function StatusBar({ t, joy, energy, fuel, wallet, ll, seed }) {
           <span style={{ fontSize: 17.5, fontWeight: 800, color: C.green }}>${Math.max(0, Math.round(wallet))}</span>
         </div>
       </div>
-      <div style={{ display: "flex", gap: 10, marginTop: 5 }}>
-        <Meter label="Joy" v={joy} c={C.pink} />
-        <Meter label="Energy" v={energy} c={C.amber} />
-        <Meter label="Fed" v={fuel} c={C.green} />
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 6 }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+          <span style={{ fontSize: 27, fontWeight: 800, color: C.pink, lineHeight: 1 }}>{Math.round(joy)}</span>
+          <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: ".1em", color: C.greyLt, textTransform: "uppercase" }}>
+            Happiness
+          </span>
+        </div>
+        <div style={{ flex: 1, display: "flex", gap: 10 }}>
+          <Meter label="Energy" v={energy} c={C.amber} />
+          <Meter label="Fed" v={fuel} c={C.green} />
+        </div>
       </div>
     </div>
   );
@@ -1742,7 +1789,7 @@ function Sheet({ a, wait, walk, hop, reps, wallet, ll, llOk, t, onClose, onGo })
 function EventCard({ ev, onClose }) {
   const good = ev.kind === "good";
   const bits = [];
-  if (ev.joy) bits.push(`${ev.joy > 0 ? "+" : ""}${ev.joy} joy`);
+  if (ev.joy) bits.push(`${ev.joy > 0 ? "+" : ""}${ev.joy} happiness`);
   if (ev.energy) bits.push(`${ev.energy > 0 ? "+" : ""}${ev.energy} energy`);
   if (ev.money) bits.push(`${ev.money > 0 ? "+" : "-"}$${Math.abs(ev.money)}`);
   if (ev.ll) bits.push(`+${ev.ll} Lightning Lane`);
@@ -1846,7 +1893,7 @@ function ActivityRunner({ run, speed, setSpeed, onSkip }) {
 
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 13 }}>
         <div style={{ flex: 1, fontSize: 15, fontWeight: 800, color: net >= 0 ? C.green : C.red }}>
-          {net >= 0 ? "+" : ""}{net.toFixed(1)} joy so far
+          {net >= 0 ? "+" : ""}{net.toFixed(1)} happiness so far
         </div>
         {[1, 2, 4, 8].map((sp) => (
           <button key={sp} onClick={() => setSpeed(sp)} style={{
@@ -1874,7 +1921,7 @@ function Flash({ name, net }) {
         {bad ? "That cost you" : good ? "Worth it" : "Done"}
       </div>
       <div style={{ fontSize: 16, fontWeight: 800, color: C.navy, marginTop: 1 }}>
-        {name} <span style={{ color: bad ? C.red : C.green }}>{net >= 0 ? "+" : ""}{net.toFixed(1)} joy</span>
+        {name} <span style={{ color: bad ? C.red : C.green }}>{net >= 0 ? "+" : ""}{net.toFixed(1)} happiness</span>
       </div>
     </div>
   );
@@ -1898,11 +1945,12 @@ function DayLog({ log }) {
   );
 }
 
-function YouTab({ rest, wallet, ll, boughtLl, energy, fuel, joy, visited }) {
+function YouTab({ rest, wallet, ll, boughtLl, energy, fuel, joy, visited, t }) {
+  const pace = 50 + (t / CLOSE) * 130;   // roughly where an average day sits
   const advice =
     energy < 25 ? "You're running on fumes. Sit down before you ride anything else — tired guests get almost nothing out of an E-Ticket."
     : fuel < 25 ? "You're hungry, and it's dulling everything. Eat something."
-    : joy < 40 ? "The day's gotten away from you. Go do something big."
+    : joy < pace * 0.65 ? "You're behind where a good day should be by now. Go do something big."
     : "You're in good shape. Keep moving.";
   const done = Object.values(visited).reduce((s, n) => s + n, 0);
   return (
@@ -2017,7 +2065,7 @@ function ResortArt() {
 }
 
 /* ---------------- title & end ---------------- */
-function Title({ onStart }) {
+function Title({ onStart, ready }) {
   return (
     <Shell>
       <div style={{ flex: 1, overflowY: "auto", padding: "52px 24px 30px", textAlign: "center" }}>
@@ -2029,11 +2077,11 @@ function Title({ onStart }) {
           One day · Two parks
         </div>
         <h1 style={{ fontSize: 38, fontWeight: 800, color: C.navy, margin: "8px 0 14px", lineHeight: 1.1 }}>
-          Best Day Ever
+          Happiest Place<br />on Earth
         </h1>
         <p style={{ fontSize: 16.5, lineHeight: 1.55, color: C.text, maxWidth: 330, margin: "0 auto 22px" }}>
           The gates open at 8:00 AM with $300 in your pocket. Tap a pin to walk there and get in line.
-          Rides, food and shows lift your joy. Long lines, dead time, sore feet and sticker shock pull it back down.
+          Rides, food and shows raise your happiness. Long lines, dead time, sore feet and sticker shock pull it back down. There is no cap — a great day just keeps climbing.
         </p>
         <div style={{ background: C.gap, borderRadius: 14, padding: 16, textAlign: "left", maxWidth: 340, margin: "0 auto 26px" }}>
           <div style={{ fontSize: 12, letterSpacing: ".08em", fontWeight: 800, color: C.blue, textTransform: "uppercase", marginBottom: 7 }}>
@@ -2042,10 +2090,15 @@ function Title({ onStart }) {
           <div style={{ fontSize: 15.5, lineHeight: 1.55, color: C.text }}>
             Each bubble shows the current standby wait. Every walk across the map costs minutes you
             don't get back, so the shortest line isn't always the best move. Repeat rides pay less
-            each time.
+            each time, and a tired or hungry guest gets far less out of an E-Ticket.
           </div>
         </div>
-        <BigButton onClick={onStart}>Plan the Day</BigButton>
+        <BigButton onClick={onStart}>{ready ? "Start the Day" : "Set Up & Play"}</BigButton>
+        {ready && (
+          <div style={{ fontSize: 14, color: C.greyLt, marginTop: 10 }}>
+            Your map is loaded and calibrated. Change it any time from Map Setup.
+          </div>
+        )}
       </div>
     </Shell>
   );
@@ -2058,18 +2111,22 @@ function End({ joy, t, wallet, energy, visited, seed, onAgain }) {
   }, 0);
   const unique = Object.keys(visited).length;
   const both = new Set(Object.keys(visited).map((id) => byId[id].park)).size === 2;
-  const final = clamp(joy + Math.min(8, unique * 0.4) + (wallet > 0 ? 2 : 0) + (both ? 3 : 0));
+  const final = Math.round(joy + Math.min(8, unique * 0.4) + (wallet > 0 ? 2 : 0) + (both ? 3 : 0));
   const rank =
-    final >= 92 ? ["Best Day Ever", C.pink] : final >= 80 ? ["A truly magical day", C.blue] :
-    final >= 66 ? ["A great day", C.blue] : final >= 50 ? ["A good day", C.navy] :
-    final >= 34 ? ["A perfectly fine day", C.navy] : ["You should've stayed at the hotel", C.grey];
+    final >= 320 ? ["The Happiest Place on Earth", C.pink] :
+    final >= 250 ? ["A truly magical day", C.blue] :
+    final >= 190 ? ["A great day", C.blue] :
+    final >= 140 ? ["A good day", C.navy] :
+    final >= 95 ? ["A perfectly fine day", C.navy] :
+    ["You should've stayed at the hotel", C.grey];
   return (
     <Shell>
       <div style={{ flex: 1, overflowY: "auto", padding: "44px 24px 30px", textAlign: "center" }}>
         <div style={{ fontSize: 12.5, letterSpacing: ".14em", fontWeight: 800, color: C.blue, textTransform: "uppercase" }}>
           {energy <= 0 ? "You're wiped out" : "Park closed"} · {clock(Math.min(t, CLOSE))}
         </div>
-        <div style={{ fontSize: 78, fontWeight: 800, color: rank[1], lineHeight: 1.05, margin: "10px 0 2px" }}>{Math.round(final)}</div>
+        <div style={{ fontSize: 72, fontWeight: 800, color: rank[1], lineHeight: 1.05, margin: "10px 0 0" }}>{final}</div>
+        <div style={{ fontSize: 11.5, letterSpacing: ".14em", fontWeight: 800, color: C.greyLt, textTransform: "uppercase", marginBottom: 8 }}>Happiness</div>
         <div style={{ fontSize: 21, fontWeight: 800, color: C.navy, marginBottom: 24 }}>{rank[0]}</div>
         <div style={{ background: C.gap, borderRadius: 14, padding: "6px 16px", textAlign: "left", maxWidth: 340, margin: "0 auto 26px" }}>
           {[["Attractions ridden", rides], ["Different things tried", unique], ["Both parks", both ? "Yes (+3)" : "No"],
@@ -2088,6 +2145,7 @@ function End({ joy, t, wallet, energy, visited, seed, onAgain }) {
   );
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<BestDayEver />);
+
+ReactDOM.createRoot(document.getElementById("root")).render(<HappiestPlace />);
 </script>
 </body></html>

@@ -1,7 +1,7 @@
 {
-  "name": "Best Day Ever",
-  "short_name": "Best Day",
-  "description": "A day at the Disneyland Resort, scored on your happiness meter.",
+  "name": "Happiest Place on Earth",
+  "short_name": "Happiest Place",
+  "description": "A day at the Disneyland Resort, scored on your happiness.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
