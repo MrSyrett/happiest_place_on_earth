@@ -630,8 +630,18 @@ const BREAKS = [
     desc: "Free cup of ice water and ten minutes out of the sun." },
   { id: "people", name: "People watching on Main Street", mins: 30, cost: 0, joy: 5, en: 14, fuel: 0, comfort: 8,
     desc: "Park yourself by the hub and watch the world go by. Costs nothing but time." },
-  { id: "churro", name: "Churro from a cart", mins: 10, cost: 7, joy: 6, en: 4, fuel: 12, comfort: 3,
-    desc: "Cinnamon sugar, still warm. Non-negotiable." },
+  { id: "snack", name: "Grab a snack", mins: 10, cost: 0, joy: 0, en: 0, fuel: 0, comfort: 0,
+    desc: "Something from a cart. It's never really about the hunger.",
+    options: [
+      { id: "churro", name: "Churro", mins: 10, cost: 7, joy: 6, en: 4, fuel: 12, comfort: 3,
+        desc: "Cinnamon sugar, still warm. Non-negotiable." },
+      { id: "popcorn", name: "Popcorn", mins: 8, cost: 6, joy: 5, en: 2, fuel: 10, comfort: 2,
+        desc: "A box you'll carry around for the next two hours." },
+      { id: "pickle", name: "Giant Pickle", mins: 5, cost: 3, joy: 4, en: 3, fuel: 14, comfort: 5,
+        desc: "Cheapest thing in the park and weirdly the most filling." },
+      { id: "pineapple", name: "Pineapple Spear", mins: 6, cost: 5, joy: 6, en: 5, fuel: 8, comfort: 11,
+        desc: "Cold, sharp and exactly right when the heat is winning." },
+    ] },
   { id: "coffee", name: "Cold brew", mins: 12, cost: 6, joy: 2, en: 14, fuel: 5, comfort: 6,
     desc: "The afternoon wall is real. This helps." },
   { id: "pins", name: "Pin trading", mins: 20, cost: 14, joy: 9, en: -2, fuel: 0, comfort: 4,
@@ -754,6 +764,7 @@ function HappiestPlace() {
 
   const savedMap = (() => {
     const v = load("bde:map", null);
+    // all-or-nothing: a blob stamped with an older frame is stale in every part
     return v && v.baseFrame === frameKey(FRAME_DEFAULT) ? v : null;
   })();
   const [screen, setScreen] = useState("title");
@@ -2624,6 +2635,7 @@ function DayLog({ log }) {
 }
 
 function YouTab({ onBreak, onBuyLL, wallet, ll, boughtLl, energy, fuel, comfort, joy, visited, t, seedWeather }) {
+  const [openSnack, setOpenSnack] = useState(null);
   const pace = 50 + (t / CLOSE) * 130;   // roughly where an average day sits
   const advice =
     energy < 25 ? "You're running on fumes. Sit down before you ride anything else — tired guests get almost nothing out of an E-Ticket."
@@ -2648,16 +2660,13 @@ function YouTab({ onBreak, onBuyLL, wallet, ll, boughtLl, energy, fuel, comfort,
         </div>
         {BREAKS.map((b) => {
           const shut = b.window && (t < b.window[0] || t > b.window[1]);
-          const broke = b.cost > wallet;
+          const broke = !b.options && b.cost > wallet;
           const off = shut || broke;
-          const bits = [`${b.mins >= 60 ? (b.mins / 60) + " hr" : b.mins + " min"}`];
+          const bits = [b.mins >= 60 ? `${b.mins / 60} hr` : `${b.mins} min`];
           if (b.cost) bits.push(`$${b.cost}`);
-          if (b.joy) bits.push(`${b.joy > 0 ? "+" : ""}${b.joy} happiness`);
-          if (b.en) bits.push(`${b.en > 0 ? "+" : ""}${b.en} energy`);
-          if (b.fuel) bits.push(`-${b.fuel} hunger`);
-          if (b.comfort) bits.push(`${b.comfort > 0 ? "+" : ""}${b.comfort} comfort`);
           return (
-            <button key={b.id} disabled={off} onClick={() => onBreak(b)} style={{
+            <div key={b.id}>
+            <button disabled={off} onClick={() => (b.options ? setOpenSnack(openSnack === b.id ? null : b.id) : onBreak(b))} style={{
               display: "block", width: "100%", textAlign: "left", cursor: off ? "default" : "pointer",
               border: `1.5px solid ${off ? C.rule : C.border}`, borderRadius: 12,
               padding: "12px 14px", marginBottom: 8, background: off ? C.gap : C.white,
@@ -2680,6 +2689,27 @@ function YouTab({ onBreak, onBuyLL, wallet, ll, boughtLl, energy, fuel, comfort,
                 Not enough money
               </span>}
             </button>
+            {b.options && openSnack === b.id && (
+              <div style={{ margin: "-2px 0 8px 14px", paddingLeft: 12, borderLeft: `2px solid ${C.border}` }}>
+                {b.options.map((o) => (
+                  <button key={o.id} disabled={o.cost > wallet}
+                    onClick={() => { setOpenSnack(null); onBreak(o); }} style={{
+                      display: "block", width: "100%", textAlign: "left",
+                      cursor: o.cost > wallet ? "default" : "pointer", opacity: o.cost > wallet ? 0.55 : 1,
+                      border: `1.5px solid ${C.border}`, borderRadius: 12, padding: "10px 13px",
+                      marginBottom: 7, background: C.white, fontFamily: F,
+                    }}>
+                    <span style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                      <span style={{ flex: 1, fontSize: 15.5, fontWeight: 800, color: C.navy }}>{o.name}</span>
+                      <span style={{ fontSize: 13.5, fontWeight: 700, color: C.blueDeep }}>{o.mins} min</span>
+                      <span style={{ fontSize: 13.5, fontWeight: 700, color: C.green }}>${o.cost}</span>
+                    </span>
+                    <span style={{ display: "block", fontSize: 14, color: C.grey, lineHeight: 1.4, marginTop: 2 }}>{o.desc}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            </div>
           );
         })}
       </Card>
