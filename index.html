@@ -422,23 +422,30 @@ const happy = (v) => Math.max(0, Math.round(v * 10) / 10);
    Two landmarks per park are enough to solve a similarity transform
    (uniform scale + rotation + translation) from my canonical park
    coordinates onto whatever map image you load. */
-const ANCHORS = {
+/* Calibration landmarks. These MUST be derived from the live attraction data,
+   not hard-coded: they were hard-coded once, the coordinates were refined over
+   several passes, and the anchors silently went stale. Recalibrating then mapped
+   old anchor positions onto correct taps, which injected an 8-degree rotation
+   into every Disneyland pin. Deriving them means that can't happen again. */
+const ANCHOR_REFS = {
   dl: [
-    { label: "Sleeping Beauty Castle", hint: "the blue castle at the centre of the park", x: 595, y: 356 },
-    { label: "Space Mountain", hint: "the big white ribbed dome in Tomorrowland", x: 736, y: 571 },
+    { ref: "castlewalk", label: "Sleeping Beauty Castle", hint: "the blue castle at the centre of the park" },
+    { ref: "space", label: "Space Mountain", hint: "the big white ribbed dome in Tomorrowland" },
   ],
   dca: [
-    { label: "Pixar Pal-A-Round", hint: "the Ferris wheel at Pixar Pier", x: 254, y: 1203 },
-    { label: "Carthay Circle", hint: "the domed tower at the top of Buena Vista Street", x: 590, y: 953 },
+    { ref: "palaround", label: "Pixar Pal-A-Round", hint: "the Ferris wheel at Pixar Pier" },
+    { ref: "carthay", label: "Carthay Circle", hint: "the domed tower at the top of Buena Vista Street" },
   ],
 };
+const ANCHORS = Object.fromEntries(Object.entries(ANCHOR_REFS).map(([park, list]) => [
+  park, list.map((a) => ({ label: a.label, hint: a.hint, x: byId[a.ref].x, y: byId[a.ref].y })),
+]));
 
-/* Pin positions were measured directly off the official resort map, so if you
-   load that same image no calibration is needed — these anchors are identity. */
-const PRESET = {
-  dl: [{ x: 595, y: 356 }, { x: 736, y: 571 }],
-  dca: [{ x: 254, y: 1203 }, { x: 590, y: 953 }],
-};
+/* Pin positions are already expressed in this map's coordinates, so the default
+   calibration is the identity transform. */
+const PRESET = Object.fromEntries(Object.entries(ANCHORS).map(([park, list]) => [
+  park, list.map((a) => ({ x: a.x, y: a.y })),
+]));
 
 function solveTransform(defs, taps) {
   if (!taps || taps.length < 2) return null;
@@ -632,23 +639,28 @@ function HappiestPlace() {
   const lastEvent = useRef(-999);
 
   const [basemap, setBasemap] = useState(() => load("bde:basemap", null));
-  const [anchors, setAnchors] = useState(() => load("bde:anchors", { dl: [], dca: [] }));
+  const [anchors, setAnchors] = useState(() => load("bde:anchors:v2", { dl: [], dca: [] }));
   const [calib, setCalib] = useState(null);
   const [calibWarn, setCalibWarn] = useState(null);
   const [usedPreset, setUsedPreset] = useState(false);
   const [saveWarn, setSaveWarn] = useState(false);
   const [showBoth, setShowBoth] = useState(false);
-  const [nudges, setNudges] = useState(() => load("bde:nudges:v7", {}));      // id -> corrected canonical {x,y}
+  const [nudges, setNudges] = useState(() => load("bde:nudges:v8", {}));      // id -> corrected canonical {x,y}
   const [editing, setEditing] = useState(false);
   const [editIdx, setEditIdx] = useState(0);
   const [placeOk, setPlaceOk] = useState(null);
   const [confirmReset, setConfirmReset] = useState(false);
   const setupFile = useRef(null);
 
-  useEffect(() => { save("bde:anchors", anchors); }, [anchors]);
-  useEffect(() => { save("bde:nudges:v7", nudges); }, [nudges]);
+  useEffect(() => { save("bde:anchors:v2", anchors); }, [anchors]);
+  useEffect(() => { save("bde:nudges:v8", nudges); }, [nudges]);
   useEffect(() => { save("bde:speed", speed); }, [speed]);
   useEffect(() => { save("bde:mode", mode); }, [mode]);
+  useEffect(() => {
+    // clear calibrations and nudges saved under the old skewed anchors
+    try { STORE && ["bde:anchors","bde:nudges","bde:nudges:v2","bde:nudges:v3","bde:nudges:v4",
+                    "bde:nudges:v5","bde:nudges:v6","bde:nudges:v7"].forEach((k) => STORE.removeItem(k)); } catch (e) {}
+  }, []);
   useEffect(() => { if (basemap && basemap.bundled) return; setSaveWarn(!save("bde:basemap", basemap)); }, [basemap]);
 
   const transforms = useMemo(() => ({
@@ -1173,19 +1185,39 @@ function HappiestPlace() {
               </Pill>
               {basemap && <Pill onClick={() => { setBasemap(null); setAnchors({ dl: [], dca: [] }); setShowBoth(false); }}>Remove</Pill>}
             </Row>
-            {basemap && Object.values(PARKS).map((p) => (
-              <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 14 }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 700, color: C.navy, fontSize: 15.5 }}>{p.name}</div>
-                  <div style={{ fontSize: 14, color: transforms[p.id] ? C.green : C.red, fontWeight: 600 }}>
-                    {transforms[p.id] ? "Calibrated" : `${anchors[p.id].length}/2 points placed`}
+            {basemap && Object.values(PARKS).map((p) => {
+              const T = transforms[p.id];
+              const skew = T ? Math.abs(Math.atan2(T.b, T.a) * 180 / Math.PI) : 0;
+              const scl = T ? T.scale : 1;
+              const odd = T && (skew > 3 || Math.abs(scl - 1) > 0.06);
+              return (
+              <div key={p.id} style={{ marginTop: 14 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, color: C.navy, fontSize: 15.5 }}>{p.name}</div>
+                    <div style={{ fontSize: 14, color: T ? (odd ? C.red : C.green) : C.red, fontWeight: 600 }}>
+                      {T ? `Calibrated · scale ${scl.toFixed(2)}, tilt ${skew.toFixed(1)}°` : `${anchors[p.id].length}/2 points placed`}
+                    </div>
                   </div>
+                  <Pill onClick={() => { setAnchors((A) => ({ ...A, [p.id]: [] })); setCalib(p.id); setTab("map"); }}>
+                    {T ? "Redo" : "Start"}
+                  </Pill>
                 </div>
-                <Pill onClick={() => { setAnchors((A) => ({ ...A, [p.id]: [] })); setCalib(p.id); setTab("map"); }}>
-                  {transforms[p.id] ? "Redo" : "Start"}
-                </Pill>
+                {odd && (
+                  <div style={{ marginTop: 7 }}>
+                    <Note tone="bad">
+                      This calibration is skewing the pins. If they look wrong, reset it.
+                    </Note>
+                    <div style={{ marginTop: 6 }}>
+                      <Pill onClick={() => setAnchors((A) => ({ ...A, [p.id]: [...PRESET[p.id]] }))}>
+                        Reset to default
+                      </Pill>
+                    </div>
+                  </div>
+                )}
               </div>
-            ))}
+              );
+            })}
             {basemap && transforms.dl && transforms.dca && (
               <div style={{ marginTop: 16 }}>
                 <Toggle on={showBoth} onClick={() => setShowBoth(!showBoth)} label="Show both parks at once" />
