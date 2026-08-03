@@ -12,9 +12,9 @@
 <link rel="icon" type="image/png" href="icon-192.png" />
 <title>Best Day Ever</title>
 <style>
-  html,body{margin:0;padding:0;background:#0E1B26;overscroll-behavior:none;}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#0E1B26;overscroll-behavior:none;}
   body{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;}
-  #root{min-height:100vh;min-height:100dvh;}
+  #root{height:100%;}
   button{font-family:inherit}
   textarea{-webkit-user-select:text;user-select:text}
   @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
@@ -298,7 +298,8 @@ function hash(s) {
   return ((h >>> 0) % 1000) / 1000;
 }
 
-function waitFor(a, t, crowd, weather) {
+function waitFor(a, t, crowd, weather, mods) {
+  if (mods && mods.closures && mods.closures[a.id] > t) return -1;   // temporarily closed
   if (a.kind === "night") return a.wait;
   if (!a.wait) return 0;
   if (a.last !== undefined && t > a.last) return 0;
@@ -306,7 +307,8 @@ function waitFor(a, t, crowd, weather) {
   const wx = weather === "drizzle" ? 0.82 : weather === "hot" ? 1.04 : 1;
   // the fireworks pull people off the queues for about forty minutes
   const fw = t >= 780 && t <= 820 ? 0.9 : 1;
-  const w = a.wait * dayCurve(a.id, a.ticket, t) * crowd * jitter * wx * fw;
+  const mult = mods && mods.until > t ? mods.mult : 1;
+  const w = a.wait * dayCurve(a.id, a.ticket, t) * crowd * jitter * wx * fw * mult;
   return Math.max(0, Math.round(w / 5) * 5);   // Disney posts in 5-minute steps
 }
 
@@ -378,6 +380,77 @@ const invT = (T, x, y) => {
 };
 const applyT = (T, x, y) => (T ? { x: T.a * x - T.b * y + T.tx, y: T.b * x + T.a * y + T.ty } : { x, y });
 
+
+/* ---------------- random events ----------------
+   `when`: start = rolled once as the day begins; day = between activities.
+   Effects are all optional and applied together. */
+const EVENTS = [
+  // --- good ---
+  { id: "pixie", kind: "good", when: "day", w: 10, title: "You got pixie dusted",
+    text: "A cast member sprinkles a little pixie dust on you on your way past. Small thing. Made your morning.", joy: 8 },
+  { id: "face", kind: "good", when: "day", w: 8, title: "A face character stopped to talk",
+    text: "No line, no photographer rushing you along — just a proper conversation in character.", joy: 11, energy: -2 },
+  { id: "frontrow", kind: "good", when: "day", w: 8, title: "Front row, no extra wait",
+    text: "The cast member waves your group straight into the front car.", joy: 7 },
+  { id: "llgift", kind: "good", when: "day", w: 6, title: "A family gave you their Lightning Lane",
+    text: "They're heading out early and had one left on their pass. You'll take it.", ll: 1, joy: 4 },
+  { id: "reride", kind: "good", when: "day", w: 5, title: "Re-ride pass",
+    text: "The ride stopped briefly while you were on it, so a cast member hands you a pass to come back.", ll: 1, joy: 3 },
+  { id: "lull", kind: "good", when: "day", w: 8, title: "The park suddenly empties",
+    text: "A tour group left and half the park went with them. Lines are unusually short for a while.",
+    waitMult: 0.7, minutes: 70 },
+  { id: "comped", kind: "good", when: "day", w: 5, title: "Your snack was comped",
+    text: "The register wouldn't take the card, so the cast member just waved you through.", money: 14, joy: 5 },
+  { id: "bench", kind: "good", when: "day", w: 7, title: "Perfect shady bench",
+    text: "Empty, shaded, and right by a snack cart. You sit for a bit longer than planned.",
+    energy: 12, minutesLost: 10, joy: 3 },
+  { id: "breeze", kind: "good", when: "day", w: 6, title: "The weather turns lovely",
+    text: "The heat breaks and a breeze comes through. Everything feels easier.", energy: 10, joy: 5 },
+  { id: "birthday", kind: "good", when: "day", w: 4, title: "Free celebration button",
+    text: "City Hall hands you a button. Cast members wish you a happy day for the rest of the afternoon.", joy: 9 },
+
+  // --- good, at the start ---
+  { id: "ropedrop", kind: "good", when: "start", w: 8, title: "Perfect rope drop position",
+    text: "You got to the turnstiles early and ended up at the front of the pack. The first hour is wide open.",
+    waitMult: 0.45, minutes: 75 },
+  { id: "earlyentry", kind: "good", when: "start", w: 6, title: "Early entry",
+    text: "Your hotel gets you in half an hour before everyone else.", timeShift: -30, joy: 6 },
+  { id: "closepark", kind: "good", when: "start", w: 5, title: "Front-row parking",
+    text: "You land a spot near the tram and glide straight in, legs fresh.", energy: 6, joy: 3 },
+
+  // --- bad, at the start ---
+  { id: "traffic", kind: "bad", when: "start", w: 9, title: "Traffic on the 5",
+    text: "Forty-five minutes of brake lights. The park has been open a while by the time you're through the gate.",
+    timeShift: 45, joy: -6, energy: -4 },
+  { id: "parking", kind: "bad", when: "start", w: 6, title: "Parking structure chaos",
+    text: "Level six, far end, and a long wait for the tram. You start the day already footsore.",
+    timeShift: 25, energy: -10, joy: -4 },
+  { id: "forgot", kind: "bad", when: "start", w: 5, title: "You forgot the sunscreen",
+    text: "Thirty dollars at the Emporium for the small bottle. It stings.", money: -30, joy: -4 },
+
+  // --- bad ---
+  { id: "breakdown", kind: "bad", when: "day", w: 12, title: "{ride} has gone down",
+    text: "Cast members are turning people away at the entrance. No word on how long.",
+    closeRide: true, minutes: 45, joy: -3 },
+  { id: "surge", kind: "bad", when: "day", w: 9, title: "A tour group descends",
+    text: "Forty matching lanyards just walked into the land. Every queue in sight jumps.",
+    waitMult: 1.3, minutes: 60, joy: -3 },
+  { id: "rain", kind: "bad", when: "day", w: 7, title: "Sudden downpour",
+    text: "It comes down hard for a while. Lines shrink, but so does everyone's patience.",
+    waitMult: 0.8, minutes: 50, energy: -8, joy: -6 },
+  { id: "spill", kind: "bad", when: "day", w: 7, title: "You dropped it",
+    text: "The churro made it about four steps. A bird got there before you did.", money: -8, joy: -5 },
+  { id: "lost", kind: "bad", when: "day", w: 5, title: "Lost something",
+    text: "A trip to Lost and Found eats a chunk of the afternoon. You do get it back.",
+    minutesLost: 25, joy: -5 },
+  { id: "cutline", kind: "bad", when: "day", w: 6, title: "A group cut in front of you",
+    text: "Six people 'meeting friends' who were somehow already at the merge point.", joy: -6 },
+  { id: "blister", kind: "bad", when: "day", w: 6, title: "Your feet have had enough",
+    text: "That specific hot spot on your heel has become the main character.", energy: -14, joy: -4 },
+  { id: "phone", kind: "bad", when: "day", w: 5, title: "Phone at 4%",
+    text: "You'll be rationing it from here. Checking wait times suddenly feels expensive.", joy: -5 },
+];
+
 /* ---------------- icons ---------------- */
 const I = {
   star: (c, f) => <path d="M12 2.6l2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95z" fill={f ? c : "none"} stroke={c} strokeWidth="1.8" strokeLinejoin="round" />,
@@ -435,6 +508,10 @@ function BestDayEver() {
   const [flash, setFlash] = useState(null);
   const [run, setRun] = useState(null);      // the activity playing out in real time
   const [speed, setSpeed] = useState(() => load("bde:speed", 1));
+  const [mods, setMods] = useState({ mult: 1, until: 0, closures: {} });
+  const [eventCard, setEventCard] = useState(null);
+  const [eventLog, setEventLog] = useState([]);
+  const lastEvent = useRef(-999);
 
   const [basemap, setBasemap] = useState(() => load("bde:basemap", null));
   const [anchors, setAnchors] = useState(() => load("bde:anchors", { dl: [], dca: [] }));
@@ -565,13 +642,17 @@ function BestDayEver() {
     setScreen("play"); setT(OPEN); setJoy(58); setEnergy(100); setFuel(72); setWallet(300);
     setPos({ park: "dl", x: 584, y: 780 }); setMapPark("dl"); setVisited({});
     setLl(0); setBoughtLl(false); setLog([]); setTab("map"); setSel(null); setCat("ride");
+    setMods({ mult: 1, until: 0, closures: {} });
+    setEventCard(null); setEventLog([]);
+    lastEvent.current = 0;
+    setTimeout(() => fireEvent("start", OPEN), 450);
   }
 
   const waits = useMemo(() => {
     const w = {};
-    for (const a of ATTRACTIONS) w[a.id] = waitFor(a, t, seed.crowd, seed.weather);
+    for (const a of ATTRACTIONS) w[a.id] = waitFor(a, t, seed.crowd, seed.weather, mods);
     return w;
-  }, [t, seed]);
+  }, [t, seed, mods]);
 
   const isOpen = (a) => a.open === undefined || (t >= a.open && t <= a.close);
 
@@ -616,7 +697,7 @@ function BestDayEver() {
 
   function beginAttraction(raw, useLL) {
     const a = place(raw);
-    if (run || a.cost > wallet) return;
+    if (run || a.cost > wallet || waits[a.id] < 0) return;
     const walk = walkMinutes(pos, a);
     const wait = useLL ? 5 : waits[a.id];
     const reps = visited[a.id] || 0;
@@ -638,6 +719,40 @@ function BestDayEver() {
     });
   }
 
+  function fireEvent(when, atTime) {
+    const pool = EVENTS.filter((e) => e.when === when);
+    const total = pool.reduce((x, e) => x + e.w, 0);
+    let roll = Math.random() * total;
+    const ev = pool.find((e) => (roll -= e.w) <= 0) || pool[0];
+    if (!ev) return;
+
+    let title = ev.title, ride = null;
+    if (ev.closeRide) {
+      // pick something with a real line — closing a walk-on is not a story
+      const open = ATTRACTIONS.filter((a) => a.kind === "ride" && a.wait >= 25 &&
+        (a.open === undefined || (atTime >= a.open && atTime <= a.close)) &&
+        (a.last === undefined || atTime <= a.last));
+      ride = open[Math.floor(Math.random() * open.length)];
+      if (!ride) return;
+      title = title.replace("{ride}", ride.name);
+      setMods((m) => ({ ...m, closures: { ...m.closures, [ride.id]: atTime + (ev.minutes || 45) } }));
+    }
+    if (ev.waitMult) setMods((m) => ({ ...m, mult: ev.waitMult, until: atTime + (ev.minutes || 60) }));
+    if (ev.joy) setJoy((j) => clamp(j + ev.joy));
+    if (ev.energy) setEnergy((e) => clamp(e + ev.energy));
+    if (ev.fuel) setFuel((f) => clamp(f + ev.fuel));
+    if (ev.money) setWallet((w) => Math.max(0, w + ev.money));
+    if (ev.ll) setLl((n) => n + ev.ll);
+    if (ev.timeShift) setT((x) => x + ev.timeShift);
+    if (ev.minutesLost) setT((x) => x + ev.minutesLost);
+
+    lastEvent.current = atTime;
+    const card = { ...ev, title, key: Math.random() };
+    setEventCard(card);
+    setEventLog((L) => [{ title, kind: ev.kind, at: clock(atTime), key: card.key }, ...L].slice(0, 40));
+    push(`${ev.kind === "good" ? "✦" : "!"} ${title}`, ev.kind === "good" ? "good" : "bad");
+  }
+
   function finishRun(r, net) {
     const { a } = r;
     setPos({ park: a.park, x: a.x, y: a.y });
@@ -651,6 +766,11 @@ function BestDayEver() {
     setFlash({ name: a.name, net, key: Math.random() });
     setTimeout(() => setFlash(null), 2600);
     setRun(null);
+    // roughly one event every couple of activities, never twice inside an hour
+    const now = t;
+    if (now - lastEvent.current > 55 && Math.random() < 0.34) {
+      setTimeout(() => fireEvent("day", now), 700);
+    }
   }
 
   function stepMinute() {
@@ -723,6 +843,7 @@ function BestDayEver() {
     park: mapPark, waits, pos, basemap, transforms, anchors, calib,
     onAnchor: placeAnchor, calibWarn, showBoth,
     onCancelCalib: () => { setCalib(null); setCalibWarn(null); },
+    moving: !!run && run.i < run.walk, closures,
     editing, editTarget, onPlacePin: placePin,
     editIdx, editCount: editList.length, nudged: Object.keys(nudges).length,
     onEditStep: (d) => setEditIdx((i) => Math.max(0, Math.min(editList.length - 1, i + d))),
@@ -926,6 +1047,8 @@ function BestDayEver() {
         </div>
       )}
 
+      {eventCard && <EventCard ev={eventCard} onClose={() => setEventCard(null)} />}
+
       {selA && !calib && !editing && !run && (
         <Sheet a={selA} wait={waits[selA.id]} walk={walkMinutes(pos, place(selA))}
           hop={pos.park !== selA.park} reps={visited[selA.id] || 0}
@@ -940,7 +1063,8 @@ function BestDayEver() {
 
 /* ================= map ================= */
 function ParkMap({ park, items, waits, pos, sel, onSelect, visited, basemap, transforms, calib, anchors, onAnchor, calibWarn, onCancelCalib, showBoth,
-                  editing, editTarget, onPlacePin, editIdx, editCount, nudged, onEditStep, onEditDone, onEditUndo }) {
+                  editing, editTarget, onPlacePin, editIdx, editCount, nudged, onEditStep, onEditDone, onEditUndo,
+                  moving, closures }) {
   const H = basemap ? Math.round(CANVAS_W * basemap.h / basemap.w) : CANVAS_H;
   const T = transforms[park];
   const fitted = !!(basemap && T);
@@ -951,13 +1075,13 @@ function ParkMap({ park, items, waits, pos, sel, onSelect, visited, basemap, tra
 
   useEffect(() => {
     if (fitted && !showBoth) {
-      const c = applyT(T, 500, park === "dl" ? 470 : 1150);
-      const raw = 1 / (T.scale * 1.35);
+      const c = applyT(T, 500, park === "dl" ? 420 : 1120);
+      const raw = 1 / (T.scale * 1.02);
       setView({ cx: safe(c.x, 500), cy: safe(c.y, H / 2), k: isFinite(raw) ? Math.max(0.35, Math.min(9, raw)) : 1 });
     } else if (basemap) {
       setView({ cx: 500, cy: H / 2, k: 1 });
     } else {
-      setView({ cx: 500, cy: park === "dl" ? 470 : 1150, k: 1.55 });
+      setView({ cx: 500, cy: park === "dl" ? 420 : 1120, k: 1.5 });
     }
   }, [park, fitted, showBoth, basemap && basemap.src, T && T.scale, T && T.tx]);
 
@@ -1082,9 +1206,15 @@ function ParkMap({ park, items, waits, pos, sel, onSelect, visited, basemap, tra
             const p = fitted ? applyT(transforms[pos.park], pos.x, pos.y) : pos;
             if (!isFinite(p.x)) return null;
             return (
-              <g transform={`translate(${p.x} ${p.y}) scale(${pinK})`} style={{ pointerEvents: "none" }}>
-                <circle r="19" fill={C.blue} opacity=".18" />
-                <circle r="9" fill={C.blue} stroke={C.white} strokeWidth="3.5" />
+              <g transform={`translate(${p.x} ${p.y}) scale(${pinK})`}
+                style={{ pointerEvents: "none", transition: moving ? "transform .95s linear" : "none" }}>
+                <ellipse cy="3" rx="11" ry="3.5" fill="rgba(18,40,63,.28)" />
+                {moving && <circle r="21" fill={C.blue} opacity=".16" />}
+                {/* teardrop marker with a little figure inside */}
+                <path d="M0 2 C -14 -10 -14 -27 0 -27 C 14 -27 14 -10 0 2 Z"
+                  fill={C.blue} stroke={C.white} strokeWidth="3" strokeLinejoin="round" />
+                <circle cx="0" cy="-20" r="4.2" fill={C.white} />
+                <path d="M-5.4 -7.5 C -5.4 -14, 5.4 -14, 5.4 -7.5 Z" fill={C.white} />
               </g>
             );
           })()}
@@ -1163,12 +1293,13 @@ function ParkMap({ park, items, waits, pos, sel, onSelect, visited, basemap, tra
 /* the Disney-app style wait bubble */
 function MapPin({ a, px, py, w, pinK, selected, done, dim, nameLabel, inert, onTap }) {
   const isRide = a.kind === "ride" || a.kind === "night";
+  const closed = w < 0;
   const showNum = isRide && w > 0;
   const label = showNum ? String(w) : null;
   const bw = showNum ? 74 : 46;
   const bh = showNum ? 56 : 46;
-  const bg = selected ? C.blue : C.white;
-  const fg = selected ? C.white : C.navy;
+  const bg = selected ? C.blue : closed ? "#F0F2F4" : C.white;
+  const fg = selected ? C.white : closed ? C.greyLt : C.navy;
   return (
     <g transform={`translate(${px} ${py}) scale(${pinK})`} onClick={(e) => { e.stopPropagation(); onTap(); }}
       opacity={dim ? 0.42 : 1}
@@ -1182,7 +1313,9 @@ function MapPin({ a, px, py, w, pinK, selected, done, dim, nameLabel, inert, onT
       )}
       <path d={`M${-bw / 2} ${-bh - 12} h${bw} a8 8 0 018 8 v${bh - 16} a8 8 0 01-8 8 h${-bw / 2 + 7} l-7 12 l-7 -12 h${-bw / 2 + 7} a8 8 0 01-8 -8 v${-bh + 16} a8 8 0 018 -8 z`}
         transform={`translate(0 ${-2})`} fill={bg} stroke={done ? C.border : "rgba(18,40,63,.14)"} strokeWidth="1.5" />
-      {showNum ? (
+      {closed ? (
+        <text x="0" y={-bh + 26} textAnchor="middle" style={{ fontFamily: F, fontSize: 24, fontWeight: 800, fill: C.greyLt }}>✕</text>
+      ) : showNum ? (
         <>
           <text x="0" y={-bh + 20} textAnchor="middle" style={{ fontFamily: F, fontSize: 27, fontWeight: 800, fill: done ? C.greyLt : fg }}>{label}</text>
           <text x="0" y={-bh + 38} textAnchor="middle" style={{ fontFamily: F, fontSize: 13, fontWeight: 600, fill: selected ? C.white : C.grey }}>Min Wait</text>
@@ -1201,9 +1334,14 @@ function MapPin({ a, px, py, w, pinK, selected, done, dim, nameLabel, inert, onT
 /* ================= chrome ================= */
 function Shell({ children }) {
   return (
-    <div style={{ background: "#0E1B26", display: "flex", justifyContent: "center", minHeight: "100vh" }}>
+    // position:fixed beats 100vh on iOS, where 100vh includes browser chrome
+    // and pushes the tab bar below the fold
+    <div style={{
+      position: "fixed", inset: 0, background: "#0E1B26",
+      display: "flex", justifyContent: "center", overflow: "hidden",
+    }}>
       <div style={{
-        width: "100%", maxWidth: 440, background: C.white, height: "100vh",
+        width: "100%", maxWidth: 440, background: C.white, height: "100%",
         display: "flex", flexDirection: "column", position: "relative", overflow: "hidden",
         fontFamily: F, color: C.text, WebkitFontSmoothing: "antialiased",
       }}>{children}</div>
@@ -1226,10 +1364,10 @@ function NavBar({ title, onBack }) {
 
 function StatusBar({ t, joy, energy, fuel, wallet, ll, seed }) {
   return (
-    <div style={{ padding: "10px 16px 11px", borderBottom: `1px solid ${C.rule}`, flexShrink: 0, background: C.white }}>
+    <div style={{ padding: "7px 14px 8px", borderBottom: `1px solid ${C.rule}`, flexShrink: 0, background: C.white }}>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 9 }}>
-          <span style={{ fontSize: 21, fontWeight: 800, color: C.navy }}>{clock(t)}</span>
+          <span style={{ fontSize: 18.5, fontWeight: 800, color: C.navy }}>{clock(t)}</span>
           <span style={{ fontSize: 13.5, color: C.greyLt, fontWeight: 600 }}>
             {WEATHERS[seed.weather].label} · {seed.crowd > 1.15 ? "Packed" : seed.crowd > 0.95 ? "Busy" : "Light"}
           </span>
@@ -1240,10 +1378,10 @@ function StatusBar({ t, joy, energy, fuel, wallet, ll, seed }) {
               <svg width="13" height="13" viewBox="0 0 24 24">{I.ll(C.blue)}</svg>{ll}
             </span>
           )}
-          <span style={{ fontSize: 19, fontWeight: 800, color: C.green }}>${Math.max(0, Math.round(wallet))}</span>
+          <span style={{ fontSize: 17.5, fontWeight: 800, color: C.green }}>${Math.max(0, Math.round(wallet))}</span>
         </div>
       </div>
-      <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
+      <div style={{ display: "flex", gap: 10, marginTop: 5 }}>
         <Meter label="Joy" v={joy} c={C.pink} />
         <Meter label="Energy" v={energy} c={C.amber} />
         <Meter label="Fed" v={fuel} c={C.green} />
@@ -1255,10 +1393,10 @@ function StatusBar({ t, joy, energy, fuel, wallet, ll, seed }) {
 function Meter({ label, v, c }) {
   return (
     <div style={{ flex: 1 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, fontWeight: 700, color: C.greyLt }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10.5, fontWeight: 700, color: C.greyLt }}>
         <span>{label}</span><span style={{ color: C.text }}>{Math.round(v)}</span>
       </div>
-      <div style={{ height: 5, borderRadius: 3, background: C.rule, marginTop: 3, overflow: "hidden" }}>
+      <div style={{ height: 4, borderRadius: 2, background: C.rule, marginTop: 2, overflow: "hidden" }}>
         <div style={{ width: `${clamp(v)}%`, height: "100%", background: c, borderRadius: 3, transition: "width .35s ease" }} />
       </div>
     </div>
@@ -1267,19 +1405,19 @@ function Meter({ label, v, c }) {
 
 function CatTabs({ cat, setCat }) {
   return (
-    <div style={{ display: "flex", padding: "10px 4px 8px", borderBottom: `1px solid ${C.rule}`, flexShrink: 0, background: C.white }}>
+    <div style={{ display: "flex", padding: "6px 4px 5px", borderBottom: `1px solid ${C.rule}`, flexShrink: 0, background: C.white }}>
       {CATS.map((c) => {
         const on = cat === c.id;
         return (
           <button key={c.id} onClick={() => setCat(c.id)} style={{
             flex: 1, background: "none", border: "none", cursor: "pointer", padding: "2px 0",
-            display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
           }}>
             <span style={{
-              width: 40, height: 40, borderRadius: 20, background: on ? C.blueTint : "transparent",
+              width: 33, height: 33, borderRadius: 17, background: on ? C.blueTint : "transparent",
               display: "flex", alignItems: "center", justifyContent: "center",
-            }}><Icon d={c.icon} c={on ? C.blue : C.navy} f={c.icon === "star" && on} s={23} /></span>
-            <span style={{ fontSize: 12.5, fontWeight: on ? 800 : 600, color: on ? C.blue : C.navy }}>{c.label}</span>
+            }}><Icon d={c.icon} c={on ? C.blue : C.navy} f={c.icon === "star" && on} s={20} /></span>
+            <span style={{ fontSize: 11.5, fontWeight: on ? 800 : 600, color: on ? C.blue : C.navy }}>{c.label}</span>
           </button>
         );
       })}
@@ -1290,7 +1428,7 @@ function CatTabs({ cat, setCat }) {
 function FilterRow({ mapPark, setMapPark, eOnly, setEOnly, hideDone, setHideDone, onReset }) {
   return (
     <div style={{
-      display: "flex", gap: 8, padding: "10px 12px", overflowX: "auto", flexShrink: 0,
+      display: "flex", gap: 7, padding: "7px 12px", overflowX: "auto", flexShrink: 0,
       background: C.white, borderBottom: `1px solid ${C.rule}`, alignItems: "center",
     }}>
       <Chip on={mapPark === "dl"} onClick={() => setMapPark("dl")}>Disneyland</Chip>
@@ -1304,9 +1442,9 @@ function FilterRow({ mapPark, setMapPark, eOnly, setEOnly, hideDone, setHideDone
 
 const Chip = ({ on, onClick, children }) => (
   <button onClick={onClick} style={{
-    padding: "7px 15px", borderRadius: 20, whiteSpace: "nowrap", cursor: "pointer",
+    padding: "5px 13px", borderRadius: 18, whiteSpace: "nowrap", cursor: "pointer",
     border: `1.5px solid ${on ? C.blue : C.border}`, background: on ? C.blue : C.white,
-    color: on ? C.white : C.navy, fontFamily: F, fontSize: 14.5, fontWeight: 700,
+    color: on ? C.white : C.navy, fontFamily: F, fontSize: 13.5, fontWeight: 700,
   }}>{children}</button>
 );
 
@@ -1421,8 +1559,14 @@ function AttractionCard({ a, wait, walk, reps, ll, llOk, t, wallet, onOpen, onGo
             {a.kind === "dine" ? "Table Wait" : isRide ? "Standby Line" : "Next Show"}
           </div>
           <div style={{ marginTop: 3 }}>
-            <span style={{ fontSize: 23, fontWeight: 800, color: wait > 45 ? C.red : C.navy }}>{wait || "—"}</span>
-            <span style={{ fontSize: 15.5, color: C.text, marginLeft: 5 }}>Minutes</span>
+            {wait < 0 ? (
+              <span style={{ fontSize: 17, fontWeight: 800, color: C.red }}>Temporarily Closed</span>
+            ) : (
+              <>
+                <span style={{ fontSize: 23, fontWeight: 800, color: wait > 45 ? C.red : C.navy }}>{wait || "—"}</span>
+                <span style={{ fontSize: 15.5, color: C.text, marginLeft: 5 }}>Minutes</span>
+              </>
+            )}
             <span style={{ fontSize: 15, color: C.grey, marginLeft: 10 }}>· {walk} min walk</span>
           </div>
         </div>
@@ -1445,8 +1589,8 @@ function AttractionCard({ a, wait, walk, reps, ll, llOk, t, wallet, onOpen, onGo
       )}
 
       <div style={{ marginTop: 12 }}>
-        <BigButton disabled={broke} onClick={() => onGo(a, false)}>
-          {broke ? "Not enough money" : a.kind === "dine" ? `Eat Here${a.cost ? ` · $${a.cost}` : ""}` : isRide ? "Join Standby Line" : "Go Watch"}
+        <BigButton disabled={broke || wait < 0} onClick={() => onGo(a, false)}>
+          {wait < 0 ? "Temporarily Closed" : broke ? "Not enough money" : a.kind === "dine" ? `Eat Here${a.cost ? ` · $${a.cost}` : ""}` : isRide ? "Join Standby Line" : "Go Watch"}
         </BigButton>
       </div>
     </div>
@@ -1540,6 +1684,59 @@ function Sheet({ a, wait, walk, hop, reps, wallet, ll, llOk, t, onClose, onGo })
   );
 }
 
+
+
+function EventCard({ ev, onClose }) {
+  const good = ev.kind === "good";
+  const bits = [];
+  if (ev.joy) bits.push(`${ev.joy > 0 ? "+" : ""}${ev.joy} joy`);
+  if (ev.energy) bits.push(`${ev.energy > 0 ? "+" : ""}${ev.energy} energy`);
+  if (ev.money) bits.push(`${ev.money > 0 ? "+" : "-"}$${Math.abs(ev.money)}`);
+  if (ev.ll) bits.push(`+${ev.ll} Lightning Lane`);
+  if (ev.timeShift) bits.push(`${ev.timeShift > 0 ? "lost" : "gained"} ${Math.abs(ev.timeShift)} min`);
+  if (ev.minutesLost) bits.push(`lost ${ev.minutesLost} min`);
+  if (ev.waitMult) bits.push(`waits ${ev.waitMult < 1 ? "down" : "up"} ${Math.round(Math.abs(1 - ev.waitMult) * 100)}% for ${ev.minutes} min`);
+  if (ev.closeRide) bits.push(`closed for about ${ev.minutes} min`);
+  return (
+    <>
+      <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(18,40,63,.42)", zIndex: 28 }} />
+      <div style={{
+        position: "absolute", left: 16, right: 16, top: "22%", zIndex: 29, background: C.white,
+        borderRadius: 18, boxShadow: "0 8px 30px rgba(18,40,63,.3)", overflow: "hidden",
+        animation: "pop .22s ease-out",
+      }}>
+        <style>{`@keyframes pop{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
+          @media (prefers-reduced-motion:reduce){*{animation:none!important}}`}</style>
+        <div style={{ height: 6, background: good ? C.green : C.red }} />
+        <div style={{ padding: "16px 18px 18px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 6 }}>
+            <span style={{
+              width: 30, height: 30, borderRadius: 15, flexShrink: 0,
+              background: good ? "#E6F5EA" : "#FCEAEA", color: good ? C.green : C.red,
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, fontWeight: 800,
+            }}>{good ? "✦" : "!"}</span>
+            <span style={{ fontSize: 11.5, letterSpacing: ".1em", fontWeight: 800, textTransform: "uppercase", color: C.greyLt }}>
+              {good ? "That's the magic" : "Well, that happened"}
+            </span>
+          </div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: C.navy, lineHeight: 1.2 }}>{ev.title}</div>
+          <div style={{ fontSize: 15.5, color: C.text, lineHeight: 1.5, marginTop: 6 }}>{ev.text}</div>
+          {bits.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12 }}>
+              {bits.map((b) => (
+                <span key={b} style={{
+                  padding: "5px 11px", borderRadius: 14, fontSize: 13.5, fontWeight: 700,
+                  background: good ? "#E6F5EA" : "#FCEAEA", color: good ? "#1E7038" : "#9E2A26",
+                }}>{b}</span>
+              ))}
+            </div>
+          )}
+          <div style={{ marginTop: 16 }}><BigButton onClick={onClose}>Carry on</BigButton></div>
+        </div>
+      </div>
+    </>
+  );
+}
 
 function ActivityRunner({ run, speed, setSpeed, onSkip }) {
   const { a, walk, wait, dur, i, net } = run;
@@ -1705,11 +1902,11 @@ function TabBar({ tab, setTab, disabled }) {
         return (
           <button key={id} onClick={() => !disabled && setTab(id)} style={{
             flex: 1, background: "none", border: "none", cursor: disabled ? "default" : "pointer",
-            opacity: disabled && !on ? .4 : 1, padding: "9px 0 8px",
+            opacity: disabled && !on ? .4 : 1, padding: "6px 0 5px",
             display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
           }}>
-            <Icon d={ic} c={on ? C.blue : C.greyLt} f={on && (ic === "pin" || ic === "home")} s={22} />
-            <span style={{ fontSize: 11, fontWeight: on ? 800 : 600, color: on ? C.blue : C.greyLt }}>{label}</span>
+            <Icon d={ic} c={on ? C.blue : C.greyLt} f={on && (ic === "pin" || ic === "home")} s={20} />
+            <span style={{ fontSize: 10, fontWeight: on ? 800 : 600, color: on ? C.blue : C.greyLt }}>{label}</span>
           </button>
         );
       })}
