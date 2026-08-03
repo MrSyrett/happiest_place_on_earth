@@ -1,40 +1,8 @@
-<!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="Best Day Ever" />
-<meta name="theme-color" content="#FFFFFF" />
-<link rel="manifest" href="manifest.json" />
-<link rel="apple-touch-icon" href="icon-180.png" />
-<link rel="icon" type="image/png" href="icon-192.png" />
-<title>Best Day Ever</title>
-<style>
-  html,body{margin:0;padding:0;background:#0E1B26;overscroll-behavior:none;}
-  body{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;}
-  #root{min-height:100vh;min-height:100dvh;}
-  button{font-family:inherit}
-  textarea{-webkit-user-select:text;user-select:text}
-  @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
-</style>
-<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
-</head><body>
-<div id="root"></div>
-<script type="text/babel" data-type="module">
-const { useState, useEffect, useMemo, useRef } = React;
-
+import React, { useState, useEffect, useMemo, useRef } from "react";
 
 /* ==========================================================
    BEST DAY EVER — styled after the Disneyland app
    ========================================================== */
-
-const STORE = (() => { try { localStorage.setItem("__t","1"); localStorage.removeItem("__t"); return localStorage; } catch (e) { return null; } })();
-const load = (k, f) => { try { const v = STORE && STORE.getItem(k); return v ? JSON.parse(v) : f; } catch (e) { return f; } };
-const save = (k, v) => { if (!STORE) return true; try { STORE.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } };
 
 const C = {
   blue: "#0578BE",
@@ -402,7 +370,7 @@ const CATS = [
 ];
 
 /* ================= root ================= */
-function BestDayEver() {
+export default function BestDayEver() {
   useEffect(() => {
     const l = document.createElement("link");
     l.rel = "stylesheet";
@@ -431,23 +399,18 @@ function BestDayEver() {
   const [seed, setSeed] = useState({ crowd: 1, weather: "clear" });
   const [flash, setFlash] = useState(null);
   const [run, setRun] = useState(null);      // the activity playing out in real time
-  const [speed, setSpeed] = useState(() => load("bde:speed", 1));
+  const [speed, setSpeed] = useState(1);
 
-  const [basemap, setBasemap] = useState(() => load("bde:basemap", null));
-  const [anchors, setAnchors] = useState(() => load("bde:anchors", { dl: [], dca: [] }));
+  const [basemap, setBasemap] = useState(null);
+  const [anchors, setAnchors] = useState({ dl: [], dca: [] });
   const [calib, setCalib] = useState(null);
   const [calibWarn, setCalibWarn] = useState(null);
   const [usedPreset, setUsedPreset] = useState(false);
   const [showBoth, setShowBoth] = useState(false);
-  const [nudges, setNudges] = useState(() => load("bde:nudges", {}));      // id -> corrected canonical {x,y}
+  const [nudges, setNudges] = useState({});      // id -> corrected canonical {x,y}
   const [editing, setEditing] = useState(false);
   const [editIdx, setEditIdx] = useState(0);
   const setupFile = useRef(null);
-
-  useEffect(() => { save("bde:anchors", anchors); }, [anchors]);
-  useEffect(() => { save("bde:basemap", basemap); }, [basemap]);
-  useEffect(() => { save("bde:nudges", nudges); }, [nudges]);
-  useEffect(() => { save("bde:speed", speed); }, [speed]);
 
   const transforms = useMemo(() => ({
     dl: solveTransform(ANCHORS.dl, anchors.dl),
@@ -1749,7 +1712,3 @@ function End({ joy, t, wallet, energy, visited, seed, onAgain }) {
     </Shell>
   );
 }
-
-ReactDOM.createRoot(document.getElementById("root")).render(<BestDayEver />);
-</script>
-</body></html>
