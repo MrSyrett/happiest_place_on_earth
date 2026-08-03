@@ -58,7 +58,10 @@ const F = "'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-se
 
 /* ---------------- game model (unchanged) ---------------- */
 const DL_RAW = [
-  ["railroad", "Disneyland Railroad", "Main Street", "ride", "B", 20, 10, 7, -2, 0, 0, 590, 685],
+  ["railroad", "Main Street Station", "Main Street", "train", "B", 0, 10, 0, 0, 0, 0, 590, 685],
+  ["rr_nos", "New Orleans Square Station", "New Orleans Sq.", "train", "B", 0, 10, 0, 0, 0, 0, 372, 512],
+  ["rr_toon", "Toontown Depot", "Toontown", "train", "B", 0, 10, 0, 0, 0, 0, 600, 62],
+  ["rr_tom", "Tomorrowland Station", "Tomorrowland", "train", "B", 0, 10, 0, 0, 0, 0, 686, 470],
   ["cinema", "Main Street Cinema", "Main Street", "show", "A", 10, 0, 4, 2, 0, 0, 597, 601],
   ["jolly", "Jolly Holiday Bakery", "Main Street", "dine", "—", 25, 12, 9, 10, 30, 16, 549, 482],
   ["emporium", "The Emporium", "Main Street", "shop", "—", 15, 0, 12, -2, 0, 48, 609, 644],
@@ -181,7 +184,7 @@ const DCA_RAW = [
   ["animation", "Animation Academy", "Hollywood Land", "show", "B", 30, 10, 12, 12, 0, 0, 716, 951],
 
   ["webslingers", "WEB SLINGERS", "Avengers Campus", "ride", "D", 6, 45, 14, -3, 0, 0, 633, 1035],
-  ["guardians", "Guardians of the Galaxy", "Avengers Campus", "ride", "E", 7, 55, 21, -9, 0, 0, 803, 1074],
+  ["guardians", "Guardians of the Galaxy", "Avengers Campus", "ride", "E", 7, 55, 21, -9, 0, 0, 788, 1028],
   ["pym", "Pym Test Kitchen", "Avengers Campus", "dine", "—", 25, 15, 13, 10, 32, 24, 713, 1035],
 
   ["racers", "Radiator Springs Racers", "Cars Land", "ride", "E", 8, 75, 25, -6, 0, 0, 633, 1230],
@@ -196,7 +199,7 @@ const DCA_RAW = [
   ["incredicoaster", "Incredicoaster", "Pixar Pier", "ride", "E", 5, 40, 19, -9, 0, 0, 433, 1284],
   ["palaround", "Pixar Pal-A-Round", "Pixar Pier", "ride", "D", 12, 40, 13, -1, 0, 0, 301, 1208],
   ["midway", "Toy Story Midway Mania", "Pixar Pier", "ride", "D", 7, 40, 14, -2, 0, 0, 342, 1269],
-  ["critter", "Jessie's Critter Carousel", "Pixar Pier", "ride", "B", 4, 15, 6, 0, 0, 0, 371, 1357],
+  ["critter", "Jessie's Critter Carousel", "Pixar Pier", "ride", "B", 4, 15, 6, 0, 0, 0, 396, 1288],
   ["whirlwind", "Inside Out Emotional Whirlwind", "Pixar Pier", "ride", "C", 5, 20, 8, -2, 0, 0, 240, 1210],
 
   ["mermaid", "Little Mermaid", "Paradise Gardens", "ride", "C", 6, 15, 9, 4, 0, 0, 402, 1093],
@@ -221,15 +224,29 @@ const DCA_RAW = [
   ["lucky", "Lucky Fortune Cookery", "San Fransokyo", "dine", "—", 18, 12, 11, 8, 26, 16, 515, 1158],
   ["poultry", "Poultry Palace", "Pixar Pier", "dine", "—", 14, 10, 10, 6, 26, 14, 374, 1261],
 
-  ["boardwalk", "Games of the Boardwalk", "Pixar Pier", "ride", "A", 8, 5, 6, -2, 0, 10, 232, 1303],
-  ["djunior", "Disney Junior Dream Factory", "Hollywood Land", "show", "B", 22, 10, 9, 8, 0, 0, 652, 994],
-  ["bakery", "The Bakery Tour", "San Fransokyo", "dine", "—", 15, 5, 8, 4, 14, 7, 511, 1174],
+  ["boardwalk", "Games of the Boardwalk", "Pixar Pier", "ride", "A", 8, 5, 6, -2, 0, 10, 269, 1240],
+  ["djunior", "Disney Junior Dream Factory", "Hollywood Land", "show", "B", 22, 10, 9, 8, 0, 0, 650, 956],
+  ["bakery", "The Bakery Tour", "San Fransokyo", "dine", "—", 15, 5, 8, 4, 14, 7, 523, 1121],
 
   ["woc", "World of Color", "Paradise Bay", "night", "E", 25, 45, 29, -6, 0, 0, 340, 1179],
 ];
 
 // positions confirmed by hand against the real map
 const REVIEWED = new Set(["alice", "autopia", "bakery", "bayou", "bear", "beignets", "bengal", "bluey", "boardwalk", "buzz", "canoes", "carnation", "carrousel", "caseyjr", "castlewalk", "chiptree", "chowder", "cinema", "columbia", "critter", "daisy", "djunior", "duckpond", "dumbo", "edelweiss", "falcon", "fantasmic", "fireworks", "funnel", "gadget", "goofyyard", "grill", "guardians", "harbour", "hideaway", "horseshoe", "indy", "jellyfish", "jolly", "julep", "jungle", "launchbay", "lincoln", "mansion", "matterhorn", "maurice", "mickeyhouse", "milkstand", "minniehouse", "monorail", "monte", "nemo", "oga", "orbitor", "parade", "peterpan", "pinocchio", "pirates", "pixiehollow", "pizzaplanet", "pooh", "pym", "railroad", "railway", "rancho", "redrose", "rise", "roger", "ronto", "royaltheatre", "shootin", "smallworld", "snow", "startours", "storybook", "teacups", "thunder", "tiana", "toad", "tomsawyer", "treehouse", "trolley", "twain", "vehicles", "webslingers"]);
+
+/* The Disneyland Railroad runs a one-way grand circle. These are the minutes
+   between consecutive stops; a full loop is about twenty minutes. */
+const RAIL_LOOP = ["railroad", "rr_nos", "rr_toon", "rr_tom"];
+const RAIL_SEG = { railroad: 4, rr_nos: 7, rr_toon: 5, rr_tom: 4 };
+function railMinutes(fromId, toId) {
+  let i = RAIL_LOOP.indexOf(fromId), mins = 0, guard = 0;
+  if (i < 0 || RAIL_LOOP.indexOf(toId) < 0 || fromId === toId) return 0;
+  while (RAIL_LOOP[i] !== toId && guard++ < 8) {
+    mins += RAIL_SEG[RAIL_LOOP[i]];
+    i = (i + 1) % RAIL_LOOP.length;
+  }
+  return mins;
+}
 
 const LAST_CALL = { rise: 840, twain: 660, columbia: 660, tomsawyer: 660, canoes: 600, redwood: 720 };  // minutes from 8 AM
 
@@ -302,6 +319,7 @@ const CURVE = {
   midway: "classic", startours: "classic", jungle: "classic", nemo: "classic",
   autopia: "classic", roger: "classic", skyschool: "classic",
   peterpan: "flat", rise: "flat",
+  railroad: "steady", rr_nos: "steady", rr_toon: "steady", rr_tom: "steady",
   dumbo: "family", carrousel: "family", pinocchio: "family", caseyjr: "family",
   minniehouse: "family", goofyyard: "family", duckpond: "family", chiptree: "family",
   toad: "family", snow: "family", alice: "family", teacups: "family",
@@ -376,6 +394,24 @@ const WEATHERS = {
   hot: { label: "Hot · 96°" },
   drizzle: { label: "Drizzle · 61°" },
 };
+
+/* ---------------- difficulty ----------------
+   Conditions are rolled from the chosen mode, and `drain` scales how fast
+   energy and happiness bleed away per minute. */
+const DIFFICULTY = {
+  easy:   { label: "Easy",   drain: 0.85, blurb: "Clear skies and thin crowds. A forgiving day." },
+  medium: { label: "Medium", drain: 1.00, blurb: "Either the weather turns or the park is packed — not both." },
+  hard:   { label: "Hard",   drain: 1.30, blurb: "Bad weather and a packed park. Everything costs you more." },
+};
+function rollConditions(mode) {
+  const bad = ["hot", "drizzle"];
+  const pick = () => bad[Math.floor(Math.random() * bad.length)];
+  if (mode === "easy") return { weather: "clear", crowd: 0.68 + Math.random() * 0.30 };
+  if (mode === "hard") return { weather: pick(), crowd: 1.22 + Math.random() * 0.30 };
+  return Math.random() < 0.5
+    ? { weather: pick(), crowd: 0.85 + Math.random() * 0.25 }
+    : { weather: "clear", crowd: 1.15 + Math.random() * 0.25 };
+}
 
 const clamp = (v, lo = 0, hi = 100) => Math.max(lo, Math.min(hi, v));
 // Happiness is a running score: it has a floor but no ceiling, so a great day
@@ -502,6 +538,34 @@ const EVENTS = [
     text: "You'll be rationing it from here. Checking wait times suddenly feels expensive.", joy: -5 },
 ];
 
+
+/* ---------------- breaks ----------------
+   Everything here trades one resource for another. `window` limits an option
+   to part of the day (minutes from 8 AM). */
+const BREAKS = [
+  { id: "bench", name: "Sit down for a bit", mins: 20, cost: 0, joy: -2, en: 22, fuel: 0,
+    desc: "Find a bench in the shade and let your feet recover." },
+  { id: "water", name: "Water and shade", mins: 10, cost: 0, joy: 2, en: 8, fuel: 4,
+    desc: "Free cup of ice water and ten minutes out of the sun." },
+  { id: "people", name: "People watching on Main Street", mins: 30, cost: 0, joy: 5, en: 14, fuel: 0,
+    desc: "Park yourself by the hub and watch the world go by. Costs nothing but time." },
+  { id: "churro", name: "Churro from a cart", mins: 10, cost: 7, joy: 6, en: 4, fuel: 12,
+    desc: "Cinnamon sugar, still warm. Non-negotiable." },
+  { id: "coffee", name: "Cold brew", mins: 12, cost: 6, joy: 2, en: 14, fuel: 5,
+    desc: "The afternoon wall is real. This helps." },
+  { id: "pins", name: "Pin trading", mins: 20, cost: 14, joy: 9, en: -2, fuel: 0,
+    desc: "Buy a starter pin and work the lanyards. Cast members always trade." },
+  { id: "photo", name: "Find a PhotoPass spot", mins: 15, cost: 0, joy: 7, en: -2, fuel: 0,
+    desc: "A proper photo of everyone, for once." },
+  { id: "shopping", name: "Browse the shops", mins: 35, cost: 45, joy: 14, en: 3, fuel: 0,
+    desc: "Air conditioning, a slow lap of the Emporium, and something you didn't plan to buy." },
+  { id: "nap", name: "Mid-day break at the hotel", mins: 240, cost: 0, joy: 12, en: 95, fuel: 16,
+    window: [120, 600],
+    desc: "Back to the room, feet up, an actual nap. You lose four hours of park time and come back a different person." },
+  { id: "wander", name: "Wander with no plan", mins: 25, cost: 0, joy: -5, en: -5, fuel: 0,
+    desc: "Drift around. Pleasant for five minutes, then the day is quietly slipping away." },
+];
+
 /* ---------------- icons ---------------- */
 const I = {
   star: (c, f) => <path d="M12 2.6l2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95z" fill={f ? c : "none"} stroke={c} strokeWidth="1.8" strokeLinejoin="round" />,
@@ -515,6 +579,7 @@ const I = {
   gear: (c, f) => <g fill="none" stroke={c} strokeWidth="1.8"><circle cx="12" cy="12" r="3.2" fill={f ? c : "none"} /><path d="M19.2 14.4a1.5 1.5 0 00.3 1.7l.1.1a1.8 1.8 0 11-2.6 2.6l-.1-.1a1.5 1.5 0 00-2.6 1.1v.2a1.8 1.8 0 11-3.6 0v-.1a1.5 1.5 0 00-2.6-1.1l-.1.1a1.8 1.8 0 11-2.6-2.6l.1-.1a1.5 1.5 0 00-1.1-2.6h-.2a1.8 1.8 0 110-3.6h.1a1.5 1.5 0 001.1-2.6l-.1-.1A1.8 1.8 0 117.9 4.7l.1.1a1.5 1.5 0 002.6-1.1V3.5a1.8 1.8 0 113.6 0v.1a1.5 1.5 0 002.6 1.1l.1-.1a1.8 1.8 0 112.6 2.6l-.1.1a1.5 1.5 0 001.1 2.6h.2a1.8 1.8 0 110 3.6h-.1a1.5 1.5 0 00-1.4.9z" /></g>,
   locate: (c) => <path d="M21 3L3 10.5l7.6 2.9L13.5 21z" fill={c} />,
   chevron: (c) => <path d="M15 5l-7 7 7 7" fill="none" stroke={c} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />,
+  train: (c) => <g fill="none" stroke={c} strokeWidth="1.8" strokeLinejoin="round"><rect x="4.5" y="3.5" width="15" height="12" rx="3" /><path d="M4.5 10h15M9 20l-1.5 2M15 20l1.5 2M7 15.5v2.5a1.5 1.5 0 003 0v-2.5M14 15.5v2.5a1.5 1.5 0 003 0v-2.5" /><circle cx="8.5" cy="12.8" r=".9" fill={c} /><circle cx="15.5" cy="12.8" r=".9" fill={c} /></g>,
   ll: (c) => <path d="M13.6 2L4 13.4h5.2L8.4 22 20 9.6h-6z" fill={c} />,
 };
 const Icon = ({ d, c = C.grey, f = false, s = 24 }) => (
@@ -556,6 +621,8 @@ function HappiestPlace() {
   const [hideDone, setHideDone] = useState(false);
   const [sel, setSel] = useState(null);
   const [seed, setSeed] = useState({ crowd: 1, weather: "clear" });
+  const [mode, setMode] = useState(() => load("bde:mode", "medium"));
+  const drain = DIFFICULTY[mode].drain;
   const [flash, setFlash] = useState(null);
   const [run, setRun] = useState(null);      // the activity playing out in real time
   const [speed, setSpeed] = useState(() => load("bde:speed", 1));
@@ -571,7 +638,7 @@ function HappiestPlace() {
   const [usedPreset, setUsedPreset] = useState(false);
   const [saveWarn, setSaveWarn] = useState(false);
   const [showBoth, setShowBoth] = useState(false);
-  const [nudges, setNudges] = useState(() => load("bde:nudges:v6", {}));      // id -> corrected canonical {x,y}
+  const [nudges, setNudges] = useState(() => load("bde:nudges:v7", {}));      // id -> corrected canonical {x,y}
   const [editing, setEditing] = useState(false);
   const [editIdx, setEditIdx] = useState(0);
   const [placeOk, setPlaceOk] = useState(null);
@@ -579,13 +646,10 @@ function HappiestPlace() {
   const setupFile = useRef(null);
 
   useEffect(() => { save("bde:anchors", anchors); }, [anchors]);
-  useEffect(() => { save("bde:nudges:v6", nudges); }, [nudges]);
+  useEffect(() => { save("bde:nudges:v7", nudges); }, [nudges]);
   useEffect(() => { save("bde:speed", speed); }, [speed]);
-  useEffect(() => { try { STORE && ["bde:nudges","bde:nudges:v2","bde:nudges:v3","bde:nudges:v4","bde:nudges:v5"].forEach((k) => STORE.removeItem(k)); } catch (e) {} }, []);
-  useEffect(() => {
-    if (basemap && basemap.bundled) return;
-    setSaveWarn(!save("bde:basemap", basemap));
-  }, [basemap]);
+  useEffect(() => { save("bde:mode", mode); }, [mode]);
+  useEffect(() => { if (basemap && basemap.bundled) return; setSaveWarn(!save("bde:basemap", basemap)); }, [basemap]);
 
   const transforms = useMemo(() => ({
     dl: solveTransform(ANCHORS.dl, anchors.dl),
@@ -597,10 +661,14 @@ function HappiestPlace() {
 
   // walkthrough order: park, then land, so corrections move across the map sensibly
   const [editUnchecked, setEditUnchecked] = useState(true);
-  const editList = useMemo(() => ATTRACTIONS
+  const [editQueue, setEditQueue] = useState(null);   // specific ids chosen by hand
+  const [pickSearch, setPickSearch] = useState("");
+  const editList = useMemo(() => (editQueue
+    ? editQueue.map((id) => byId[id]).filter(Boolean)
+    : ATTRACTIONS
     .filter((a) => a.kind !== "shop")
     .filter((a) => !editUnchecked || !REVIEWED.has(a.id))
-    .slice().sort((p, q) => (p.park === q.park ? p.landName.localeCompare(q.landName) || p.name.localeCompare(q.name) : p.park < q.park ? -1 : 1)), [editUnchecked, nudges]);
+    .slice().sort((p, q) => (p.park === q.park ? p.landName.localeCompare(q.landName) || p.name.localeCompare(q.name) : p.park < q.park ? -1 : 1))), [editUnchecked, editQueue]);
   const editTarget = editing ? editList[Math.min(editIdx, editList.length - 1)] : null;
 
   useEffect(() => {
@@ -699,8 +767,7 @@ function HappiestPlace() {
   }
 
   function start() {
-    const rolls = ["clear", "clear", "hot", "drizzle"];
-    setSeed({ crowd: 0.8 + Math.random() * 0.55, weather: rolls[Math.floor(Math.random() * rolls.length)] });
+    setSeed(rollConditions(mode));
     setScreen("play"); setT(OPEN); setJoy(50); setEnergy(100); setFuel(72); setWallet(300);
     setPos({ park: "dl", x: 592, y: 675, landName: "Main Street" }); setMapPark("dl"); setVisited({});
     setLl(0); setBoughtLl(false); setLog([]); setTab("map"); setSel(null); setCat("ride");
@@ -722,7 +789,7 @@ function HappiestPlace() {
     if (!isOpen(a) || a.kind === "shop") return false;
     if (a.last !== undefined && t > a.last) return false;
     if (!(showBoth && basemap) && a.park !== mapPark) return false;
-    if (cat === "ride" && a.kind !== "ride") return false;
+    if (cat === "ride" && a.kind !== "ride" && a.kind !== "train") return false;
     if (cat === "dine" && a.kind !== "dine") return false;
     if (cat === "show" && a.kind !== "show" && a.kind !== "night") return false;
     if (eOnly && a.ticket !== "E") return false;
@@ -735,26 +802,51 @@ function HappiestPlace() {
 
   function passTime(mins) {
     const hot = seed.weather === "hot" ? 1.5 : 1;
-    setEnergy((e) => clamp(e - (mins / 10) * 0.3 * hot));
+    setEnergy((e) => clamp(e - (mins / 10) * 0.3 * hot * drain));
     setFuel((f) => clamp(f - (mins / 10) * 0.95));
-    setJoy((j) => happy(j - (mins / 10) * 0.35));
+    setJoy((j) => happy(j - (mins / 10) * 0.35 * drain));
     setT((x) => x + mins);
   }
 
   /* One minute of an activity. Kept pure so the same maths drives both the
      live tick and the Skip button. */
-  function minuteDelta(r, i, hot) {
+  function minuteDelta(r, i, hot, dr) {
     const { a, walk, wait, dur } = r;
     const phase = i < walk ? "walk" : i < walk + wait ? "wait" : "do";
-    let dJoy = -0.035, dEn = -0.03 * hot, dFu = -0.095;
-    if (phase === "walk") { dEn -= 0.45 * hot; dJoy -= 0.05; }
-    if (phase === "wait") { dEn -= 0.06; dJoy -= r.painRate; }
+    let dJoy = -0.035 * dr, dEn = -0.03 * hot * dr, dFu = -0.095;
+    if (phase === "walk") { dEn -= 0.45 * hot * dr; dJoy -= 0.05 * dr; }
+    if (phase === "wait") { dEn -= 0.06 * dr; dJoy -= r.painRate * dr; }
     if (phase === "do") {
       dJoy += r.gain / dur;
       dEn += (a.en > 0 ? a.en : a.en * hot) / dur;
       dFu += a.fuel / dur;
     }
     return { dJoy, dEn, dFu, phase };
+  }
+
+  function beginTrain(station, destId) {
+    if (run) return;
+    const from = place(station);
+    const to = place(byId[destId]);
+    const mins = railMinutes(station.id, destId);
+    if (!mins) return;
+    const walk = walkMinutes(pos, from);
+    const wait = waits[station.id];
+    // a slow lap round the park: gentle, scenic, and a real rest for your feet
+    const synthetic = {
+      ...to, kind: "train", dur: mins, cost: 0, fuel: 0,
+      joy: 5 + mins * 0.35, en: mins * 0.45,
+      name: `Railroad to ${to.name.replace(" Station", "").replace(" Depot", "")}`,
+    };
+    const eF = energy > 60 ? 1 : energy > 35 ? 0.85 : energy > 15 ? 0.62 : 0.4;
+    setSel(null);
+    setTab("map");
+    setMapPark("dl");
+    setRun({
+      a: synthetic, useLL: false, walk, wait, dur: Math.max(1, mins),
+      painRate: 0.06, gain: synthetic.joy * eF, reps: 0,
+      i: 0, net: 0, paid: true, from: { ...pos }, board: { x: from.x, y: from.y },
+    });
   }
 
   function beginAttraction(raw, useLL) {
@@ -840,17 +932,24 @@ function HappiestPlace() {
     if (!r) return;
     const hot = seed.weather === "hot" ? 1.5 : 1;
     const total = r.walk + r.wait + r.dur;
-    const { dJoy, dEn, dFu, phase } = minuteDelta(r, r.i, hot);
+    const { dJoy, dEn, dFu, phase } = minuteDelta(r, r.i, hot, drain);
 
     setT((x) => x + 1);
     setJoy((j) => happy(j + dJoy));
     setEnergy((e) => clamp(e + dEn));
     setFuel((f) => clamp(f + dFu));
 
+    const target = r.board || r.a;   // the train is boarded at a platform, not at the destination
     if (phase === "walk" && r.walk > 0) {
       const p = (r.i + 1) / r.walk;
       setPos({ park: p > 0.5 ? r.a.park : r.from.park, landName: p > 0.5 ? r.a.landName : r.from.landName,
-        x: r.from.x + (r.a.x - r.from.x) * p, y: r.from.y + (r.a.y - r.from.y) * p });
+        x: r.from.x + (target.x - r.from.x) * p, y: r.from.y + (target.y - r.from.y) * p });
+    }
+    if (phase === "do" && r.board) {
+      // ride the loop: slide the marker from the platform to where you get off
+      const p = (r.i + 1 - r.walk - r.wait) / Math.max(1, r.dur);
+      setPos({ park: r.a.park, landName: r.a.landName,
+        x: r.board.x + (r.a.x - r.board.x) * p, y: r.board.y + (r.a.y - r.board.y) * p });
     }
     if (phase === "do" && !r.paid && r.a.cost) setWallet((w) => w - r.a.cost);
 
@@ -867,7 +966,7 @@ function HappiestPlace() {
     const total = r.walk + r.wait + r.dur;
     let dJ = 0, dE = 0, dF = 0;
     for (let i = r.i; i < total; i++) {
-      const d = minuteDelta(r, i, hot);
+      const d = minuteDelta(r, i, hot, drain);
       dJ += d.dJoy; dE += d.dEn; dF += d.dFu;
     }
     setT((x) => x + (total - r.i));
@@ -885,13 +984,27 @@ function HappiestPlace() {
     return () => clearTimeout(id);
   }, [run, speed, screen]);
 
-  const rest = {
-    bench: () => { passTime(20); setEnergy((e) => clamp(e + 20)); setJoy((j) => happy(j - (energy < 40 ? 0 : 3))); push("Found a bench. Watched the crowd go by.", "ok"); },
-    churro: () => { if (wallet < 7) return; passTime(10); setWallet((w) => w - 7); setFuel((f) => clamp(f + 12)); setEnergy((e) => clamp(e + 4)); setJoy((j) => happy(j + 5)); push("Churro. $7. Worth it.", "good"); },
-    coffee: () => { if (wallet < 6) return; passTime(12); setWallet((w) => w - 6); setEnergy((e) => clamp(e + 12)); setFuel((f) => clamp(f + 5)); setJoy((j) => happy(j + 2)); push("Cold brew. Second wind.", "ok"); },
-    wander: () => { passTime(25); setEnergy((e) => clamp(e - 5)); setJoy((j) => happy(j - 4)); push("Wandered around not doing much. The day is slipping by.", "bad"); },
-    ll: () => { if (wallet < 32 || boughtLl) return; setWallet((w) => w - 32); setLl(5); setBoughtLl(true); setJoy((j) => happy(j - 2)); push("Bought Lightning Lane Multi Pass — 5 skips, $32", "ok"); },
+  function beginBreak(b) {
+    if (run || b.cost > wallet) return;
+    if (b.window && (t < b.window[0] || t > b.window[1])) return;
+    setSel(null);
+    setTab("map");
+    setRun({
+      a: { ...pos, id: "break:" + b.id, name: b.name, kind: "break", runLabel: b.name,
+           dur: b.mins, cost: b.cost, en: b.en, fuel: b.fuel, landName: pos.landName, park: pos.park },
+      useLL: false, walk: 0, wait: 0, dur: Math.max(1, b.mins),
+      painRate: 0, gain: b.joy, reps: 0, i: 0, net: 0, paid: false, from: { ...pos },
+    });
+  }
+
+  // the only non-break action left: buying line skips
+  const buyLightningLane = () => {
+    if (wallet < 32 || boughtLl) return;
+    setWallet((w) => w - 32); setLl(5); setBoughtLl(true);
+    setJoy((j) => happy(j - 2));
+    push("Bought Lightning Lane Multi Pass — 5 skips, $32", "ok");
   };
+
 
   useEffect(() => {
     if (screen !== "play") return;
@@ -900,9 +1013,10 @@ function HappiestPlace() {
 
   const mapReady = !!(basemap && transforms.dl && transforms.dca);
   if (screen === "title")
-    return <Title ready={mapReady} onStart={() => (mapReady ? start() : setScreen("setup"))} />;
+    return <Title ready={mapReady} mode={mode} setMode={setMode}
+      onStart={() => (mapReady ? start() : setScreen("setup"))} />;
   if (screen === "end")
-    return <End joy={joy} t={t} wallet={wallet} energy={energy} visited={visited} seed={seed} onAgain={start} />;
+    return <End joy={joy} t={t} wallet={wallet} energy={energy} visited={visited} seed={seed} mode={mode} onAgain={start} />;
 
   const mapProps = {
     park: mapPark, waits, pos, basemap, transforms, anchors, calib,
@@ -913,7 +1027,7 @@ function HappiestPlace() {
     editIdx, editCount: editList.length, nudged: Object.keys(nudges).length,
     onEditStep: (d) => setEditIdx((i) => Math.max(0, Math.min(editList.length - 1, i + d))),
     onEditUndo: undoPin, placeOk,
-    onEditDone: () => setEditing(false),
+    onEditDone: () => { setEditing(false); setEditQueue(null); },
   };
 
   /* ---------- setup ---------- */
@@ -1021,7 +1135,7 @@ function HappiestPlace() {
       )}
 
       {tab === "day" && <DayLog log={log} />}
-      {tab === "you" && <YouTab rest={rest} wallet={wallet} ll={ll} boughtLl={boughtLl}
+      {tab === "you" && <YouTab onBreak={beginBreak} onBuyLL={buyLightningLane} wallet={wallet} ll={ll} boughtLl={boughtLl}
         energy={energy} fuel={fuel} joy={joy} visited={visited} t={t} />}
       {tab === "setup" && (
         <div style={{ flex: 1, overflowY: "auto", background: C.gap }}>
@@ -1090,13 +1204,50 @@ function HappiestPlace() {
               <Toggle on={editUnchecked} onClick={() => setEditUnchecked(!editUnchecked)}
                 label={`Only the ${ATTRACTIONS.filter((a) => a.kind !== "shop" && !REVIEWED.has(a.id)).length} still unconfirmed`} />
             </div>
+            <div style={{ marginTop: 4, marginBottom: 14 }}>
+              <div style={{ fontSize: 12, letterSpacing: ".08em", fontWeight: 800, color: C.blue, textTransform: "uppercase", marginBottom: 7 }}>
+                Fix just one
+              </div>
+              <input value={pickSearch} onChange={(e) => setPickSearch(e.target.value)}
+                placeholder="Search attractions…"
+                style={{
+                  width: "100%", boxSizing: "border-box", padding: "10px 13px", borderRadius: 12,
+                  border: `1.5px solid ${C.border}`, fontFamily: F, fontSize: 15.5, color: C.navy, outline: "none",
+                }} />
+              {pickSearch.trim().length > 0 && (
+                <div style={{ maxHeight: 220, overflowY: "auto", marginTop: 8, border: `1px solid ${C.rule}`, borderRadius: 12 }}>
+                  {ATTRACTIONS.filter((a) => a.kind !== "shop" &&
+                      (a.name + " " + a.landName).toLowerCase().includes(pickSearch.trim().toLowerCase()))
+                    .slice(0, 40).map((a) => (
+                      <button key={a.id} onClick={() => {
+                        setEditQueue([a.id]); setEditIdx(0); setEditing(true);
+                        setPickSearch(""); setTab("map");
+                      }} style={{
+                        display: "flex", width: "100%", alignItems: "center", gap: 10, cursor: "pointer",
+                        background: C.white, border: "none", borderBottom: `1px solid ${C.rule}`,
+                        padding: "10px 12px", fontFamily: F, textAlign: "left",
+                      }}>
+                        <span style={{ flex: 1, minWidth: 0 }}>
+                          <span style={{ display: "block", fontSize: 15.5, fontWeight: 700, color: C.navy }}>{a.name}</span>
+                          <span style={{ display: "block", fontSize: 13.5, color: C.grey }}>
+                            {a.landName} · {PARKS[a.park].short}
+                          </span>
+                        </span>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: C.blue }}>Adjust</span>
+                      </button>
+                    ))}
+                </div>
+              )}
+            </div>
+
             <Row>
-              <Pill solid onClick={() => { setEditing(true); setEditIdx(0); setTab("map"); }}>
+              <Pill solid onClick={() => { setEditQueue(null); setEditing(true); setEditIdx(0); setTab("map"); }}>
                 {Object.keys(nudges).length ? "Continue adjusting" : "Start adjusting"}
               </Pill>
               <Pill onClick={() => {
                 if (!confirmReset) { setConfirmReset(true); return; }
                 setNudges({});
+                setEditQueue(null);
                 setEditUnchecked(false);   // a clean pass means every attraction
                 setEditIdx(0);
                 setConfirmReset(false);
@@ -1143,7 +1294,7 @@ function HappiestPlace() {
         <Sheet a={selA} wait={waits[selA.id]} walk={walkMinutes(pos, place(selA))}
           hop={pos.park !== selA.park} reps={visited[selA.id] || 0}
           wallet={wallet} ll={ll} llOk={LL_OK.has(selA.id)} t={t}
-          onClose={() => setSel(null)} onGo={beginAttraction} />
+          onClose={() => setSel(null)} onGo={beginAttraction} onTrain={beginTrain} />
       )}
 
       <TabBar tab={tab} setTab={setTab} disabled={!!run} />
@@ -1292,19 +1443,22 @@ function ParkMap({ park, items, waits, pos, sel, onSelect, visited, basemap, tra
             </g>
           ))}
 
-          {!calib && !editing && pos.park === park && (() => {
+          {/* Always drawn, whichever park is on screen - both parks share one map,
+              and losing track of yourself mid park-hop is disorienting. */}
+          {!calib && !editing && (() => {
             const p = fitted ? applyT(transforms[pos.park], pos.x, pos.y) : pos;
-            if (!isFinite(p.x)) return null;
+            if (!isFinite(p.x) || !isFinite(p.y)) return null;
+            const k = pinK * 1.6;
             return (
-              <g transform={`translate(${p.x} ${p.y}) scale(${pinK})`}
+              <g transform={`translate(${p.x} ${p.y}) scale(${k})`}
                 style={{ pointerEvents: "none", transition: moving ? "transform .95s linear" : "none" }}>
-                <ellipse cy="3" rx="11" ry="3.5" fill="rgba(18,40,63,.28)" />
-                {moving && <circle r="21" fill={C.blue} opacity=".16" />}
-                {/* teardrop marker with a little figure inside */}
-                <path d="M0 2 C -14 -10 -14 -27 0 -27 C 14 -27 14 -10 0 2 Z"
-                  fill={C.blue} stroke={C.white} strokeWidth="3" strokeLinejoin="round" />
-                <circle cx="0" cy="-20" r="4.2" fill={C.white} />
-                <path d="M-5.4 -7.5 C -5.4 -14, 5.4 -14, 5.4 -7.5 Z" fill={C.white} />
+                <ellipse cy="3" rx="13" ry="4" fill="rgba(18,40,63,.3)" />
+                {moving && <circle r="26" fill={C.blue} opacity=".15" />}
+                <circle cy="-15" r="21" fill={C.white} opacity=".55" />
+                <path d="M0 3 C -15 -11 -15 -30 0 -30 C 15 -30 15 -11 0 3 Z"
+                  fill={C.blue} stroke={C.white} strokeWidth="3.5" strokeLinejoin="round" />
+                <circle cx="0" cy="-22" r="4.6" fill={C.white} />
+                <path d="M-6 -8.5 C -6 -15.5, 6 -15.5, 6 -8.5 Z" fill={C.white} />
               </g>
             );
           })()}
@@ -1342,7 +1496,7 @@ function ParkMap({ park, items, waits, pos, sel, onSelect, visited, basemap, tra
         }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
             <div style={{ fontSize: 12, letterSpacing: ".08em", fontWeight: 800, color: C.blue, textTransform: "uppercase" }}>
-              {editIdx + 1} of {editCount} · {nudged} moved
+  {editCount === 1 ? "Fixing one" : `${editIdx + 1} of ${editCount}`} · {nudged} moved
             </div>
             <TextLink onClick={(e) => { e.stopPropagation(); onEditDone(); }}>Done</TextLink>
           </div>
@@ -1434,7 +1588,8 @@ function MapPin({ a, px, py, w, pinK, selected, done, dim, nameLabel, inert, onT
         </>
       ) : (
         <g transform={`translate(-11 ${-bh - 1}) scale(0.92)`}>
-          {a.kind === "dine" ? I.fork(selected ? C.white : C.navy)
+          {a.kind === "train" ? I.train(selected ? C.white : C.navy)
+            : a.kind === "dine" ? I.fork(selected ? C.white : C.navy)
             : isRide ? I.star(selected ? C.white : C.navy, true)
             : I.hat(selected ? C.white : C.navy)}
         </g>
@@ -1668,14 +1823,14 @@ function AttractionCard({ a, wait, walk, reps, ll, llOk, t, wallet, onOpen, onGo
           width: 54, height: 54, borderRadius: 10, flexShrink: 0, background: C.blueTint,
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
-          <Icon d={a.kind === "dine" ? "fork" : isRide ? "star" : "hat"} c={C.blue} f={isRide} s={26} />
+          <Icon d={a.kind === "train" ? "train" : a.kind === "dine" ? "fork" : isRide ? "star" : "hat"} c={C.blue} f={isRide} s={26} />
         </div>
       </div>
 
       <InfoBox>
         <div>
           <div style={{ fontSize: 15.5, fontWeight: 800, color: C.navy }}>
-            {a.kind === "dine" ? "Table Wait" : isRide ? "Standby Line" : "Next Show"}
+            {a.kind === "train" ? "Next Train" : a.kind === "dine" ? "Table Wait" : isRide ? "Standby Line" : "Next Show"}
           </div>
           <div style={{ marginTop: 3 }}>
             {wait < 0 ? (
@@ -1708,8 +1863,10 @@ function AttractionCard({ a, wait, walk, reps, ll, llOk, t, wallet, onOpen, onGo
       )}
 
       <div style={{ marginTop: 12 }}>
-        <BigButton disabled={broke || wait < 0} onClick={() => onGo(a, false)}>
-          {wait < 0 ? "Temporarily Closed" : broke ? "Not enough money" : a.kind === "dine" ? `Eat Here${a.cost ? ` · $${a.cost}` : ""}` : isRide ? "Join Standby Line" : "Go Watch"}
+        <BigButton disabled={broke || wait < 0} onClick={onOpen}>
+          {wait < 0 ? "Temporarily Closed" : a.kind === "train" ? "Choose a Destination"
+            : broke ? "Not enough money" : a.kind === "dine" ? `Eat Here${a.cost ? ` · $${a.cost}` : ""}`
+            : isRide ? "Join Standby Line" : "Go Watch"}
         </BigButton>
       </div>
     </div>
@@ -1724,7 +1881,7 @@ const InfoBox = ({ children }) => (
 );
 
 /* ---------------- detail sheet ---------------- */
-function Sheet({ a, wait, walk, hop, reps, wallet, ll, llOk, t, onClose, onGo }) {
+function Sheet({ a, wait, walk, hop, reps, wallet, ll, llOk, t, onClose, onGo, onTrain }) {
   const canLL = ll > 0 && llOk && wait > 15;
   const broke = a.cost > wallet;
   const total = walk + wait + a.dur;
@@ -1782,12 +1939,47 @@ function Sheet({ a, wait, walk, hop, reps, wallet, ll, llOk, t, onClose, onGo })
           {a.en >= 8 && "A good chance to get off your feet."}
         </div>
 
+        {a.kind === "train" ? (
+          <div style={{ marginTop: 14 }}>
+            <div style={{ fontSize: 12, letterSpacing: ".08em", fontWeight: 800, color: C.blue, textTransform: "uppercase", marginBottom: 8 }}>
+              Ride to
+            </div>
+            {RAIL_LOOP.filter((id) => id !== a.id).map((id) => {
+              const dest = byId[id];
+              const mins = railMinutes(a.id, id);
+              return (
+                <button key={id} onClick={() => onTrain(a, id)} style={{
+                  display: "flex", alignItems: "center", width: "100%", gap: 12, cursor: "pointer",
+                  border: `1.5px solid ${C.border}`, borderRadius: 12, padding: "12px 14px",
+                  marginBottom: 8, background: C.white, fontFamily: F, textAlign: "left",
+                }}>
+                  <Icon d="train" c={C.blue} s={20} />
+                  <span style={{ flex: 1 }}>
+                    <span style={{ display: "block", fontSize: 16, fontWeight: 800, color: C.navy }}>
+                      {dest.name.replace(" Station", "").replace(" Depot", "")}
+                    </span>
+                    <span style={{ display: "block", fontSize: 14, color: C.grey }}>{dest.landName}</span>
+                  </span>
+                  <span style={{ textAlign: "right" }}>
+                    <span style={{ display: "block", fontSize: 19, fontWeight: 800, color: C.navy }}>{mins}</span>
+                    <span style={{ display: "block", fontSize: 11, color: C.grey, fontWeight: 700 }}>MIN</span>
+                  </span>
+                </button>
+              );
+            })}
+            <div style={{ fontSize: 14.5, color: C.grey, lineHeight: 1.45 }}>
+              The train runs one way round the park. It is slower than walking, but you get your
+              energy back instead of spending it.
+            </div>
+          </div>
+        ) : (
         <div style={{ marginTop: 16 }}>
           <BigButton disabled={broke} onClick={() => onGo(a, false)}>
             {broke ? "Not enough money" : a.kind === "dine" ? "Eat Here" : isRide ? "Join Standby Line" : "Go Watch"}
           </BigButton>
         </div>
-        {canLL && (
+        )}
+        {canLL && a.kind !== "train" && (
           <button onClick={() => onGo(a, true)} style={{
             width: "100%", marginTop: 10, padding: "14px 18px", borderRadius: 26, cursor: "pointer",
             background: C.white, border: `1.5px solid ${C.blue}`, color: C.blue,
@@ -1864,9 +2056,13 @@ function ActivityRunner({ run, speed, setSpeed, onSkip }) {
   const isRide = a.kind === "ride" || a.kind === "night";
   const label = phase === "walk" ? "Walking there"
     : phase === "wait" ? (a.kind === "dine" ? "Waiting for a table" : "In line")
+    : a.kind === "break" ? "Taking a break"
+    : a.kind === "train" ? "On the train"
     : a.kind === "dine" ? "Eating" : isRide ? "On the ride" : "Watching";
   const left = phase === "walk" ? walk - i : phase === "wait" ? walk + wait - i : total - i;
-  const seg = [["Walk", walk], [a.kind === "dine" ? "Table" : "Line", wait], [a.kind === "dine" ? "Meal" : "Ride", dur]];
+  const seg = (walk || wait)
+    ? [["Walk", walk], [a.kind === "dine" ? "Table" : "Line", wait], [a.kind === "dine" ? "Meal" : a.kind === "train" ? "Ride" : "Time", dur]]
+    : [[a.kind === "break" ? "Break" : "Time", dur]];
 
   return (
     <div style={{
@@ -1879,7 +2075,9 @@ function ActivityRunner({ run, speed, setSpeed, onSkip }) {
           background: phase === "do" ? C.blue : C.blueTint,
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
-          <Icon d={phase === "walk" ? "locate" : phase === "wait" ? "clock" : a.kind === "dine" ? "fork" : isRide ? "star" : "hat"}
+          <Icon d={phase === "walk" ? "locate" : phase === "wait" ? "clock"
+            : a.kind === "break" ? "clock" : a.kind === "train" ? "train"
+            : a.kind === "dine" ? "fork" : isRide ? "star" : "hat"}
             c={phase === "do" ? C.white : C.blue} f={phase === "do" && isRide} s={22} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -1964,7 +2162,7 @@ function DayLog({ log }) {
   );
 }
 
-function YouTab({ rest, wallet, ll, boughtLl, energy, fuel, joy, visited, t }) {
+function YouTab({ onBreak, onBuyLL, wallet, ll, boughtLl, energy, fuel, joy, visited, t }) {
   const pace = 50 + (t / CLOSE) * 130;   // roughly where an average day sits
   const advice =
     energy < 25 ? "You're running on fumes. Sit down before you ride anything else — tired guests get almost nothing out of an E-Ticket."
@@ -1980,14 +2178,47 @@ function YouTab({ rest, wallet, ll, boughtLl, energy, fuel, joy, visited, t }) {
         <div style={{ fontSize: 14.5, color: C.grey, marginTop: 9 }}>{done} experiences so far today.</div>
       </Card>
       <Card>
-        <div style={{ fontSize: 17, fontWeight: 800, color: C.navy, marginBottom: 12 }}>Take a break</div>
-        <Row>
-          <Pill onClick={rest.bench}>Sit down · 20 min</Pill>
-          <Pill onClick={rest.churro}>Churro · $7</Pill>
-          <Pill onClick={rest.coffee}>Cold brew · $6</Pill>
-          <Pill onClick={rest.wander}>Wander · 25 min</Pill>
-        </Row>
+        <div style={{ fontSize: 17, fontWeight: 800, color: C.navy, marginBottom: 4 }}>Take a break</div>
+        <div style={{ fontSize: 14.5, color: C.grey, marginBottom: 12, lineHeight: 1.45 }}>
+          None of this rides anything. It buys back energy, or a little happiness, at the cost of time.
+        </div>
+        {BREAKS.map((b) => {
+          const shut = b.window && (t < b.window[0] || t > b.window[1]);
+          const broke = b.cost > wallet;
+          const off = shut || broke;
+          const bits = [`${b.mins >= 60 ? (b.mins / 60) + " hr" : b.mins + " min"}`];
+          if (b.cost) bits.push(`$${b.cost}`);
+          if (b.joy) bits.push(`${b.joy > 0 ? "+" : ""}${b.joy} happiness`);
+          if (b.en) bits.push(`${b.en > 0 ? "+" : ""}${b.en} energy`);
+          if (b.fuel) bits.push(`+${b.fuel} fed`);
+          return (
+            <button key={b.id} disabled={off} onClick={() => onBreak(b)} style={{
+              display: "block", width: "100%", textAlign: "left", cursor: off ? "default" : "pointer",
+              border: `1.5px solid ${off ? C.rule : C.border}`, borderRadius: 12,
+              padding: "12px 14px", marginBottom: 8, background: off ? C.gap : C.white,
+              fontFamily: F, opacity: off ? 0.6 : 1,
+            }}>
+              <span style={{ display: "block", fontSize: 16, fontWeight: 800, color: C.navy }}>{b.name}</span>
+              <span style={{ display: "block", fontSize: 14.5, color: C.grey, lineHeight: 1.4, margin: "2px 0 7px" }}>{b.desc}</span>
+              <span style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                {bits.map((x, i) => (
+                  <span key={x + i} style={{
+                    padding: "3px 9px", borderRadius: 11, fontSize: 12.5, fontWeight: 700,
+                    background: i === 0 ? C.blueTint : C.gap, color: i === 0 ? C.blueDeep : C.text,
+                  }}>{x}</span>
+                ))}
+              </span>
+              {shut && <span style={{ display: "block", fontSize: 13.5, fontWeight: 700, color: C.red, marginTop: 6 }}>
+                Only between 10 AM and 6 PM
+              </span>}
+              {!shut && broke && <span style={{ display: "block", fontSize: 13.5, fontWeight: 700, color: C.red, marginTop: 6 }}>
+                Not enough money
+              </span>}
+            </button>
+          );
+        })}
       </Card>
+
       <Card>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
           <svg width="18" height="18" viewBox="0 0 24 24">{I.ll(C.navy)}</svg>
@@ -2002,7 +2233,7 @@ function YouTab({ rest, wallet, ll, boughtLl, energy, fuel, joy, visited, t }) {
             <div style={{ fontSize: 15.5, color: C.text, lineHeight: 1.5, marginBottom: 12 }}>
               Five skips for $32. Cuts any eligible line to five minutes — but the money stings, and it's gone once spent.
             </div>
-            <BigButton disabled={wallet < 32} onClick={rest.ll}>Buy for $32</BigButton>
+            <BigButton disabled={wallet < 32} onClick={onBuyLL}>Buy for $32</BigButton>
           </>
         )}
       </Card>
@@ -2084,7 +2315,7 @@ function ResortArt() {
 }
 
 /* ---------------- title & end ---------------- */
-function Title({ onStart, ready }) {
+function Title({ onStart, ready, mode, setMode }) {
   return (
     <Shell>
       <div style={{ flex: 1, overflowY: "auto", padding: "52px 24px 30px", textAlign: "center" }}>
@@ -2112,6 +2343,22 @@ function Title({ onStart, ready }) {
             each time, and a tired or hungry guest gets far less out of an E-Ticket.
           </div>
         </div>
+        <div style={{ maxWidth: 340, margin: "0 auto 20px", textAlign: "left" }}>
+          <div style={{ fontSize: 12, letterSpacing: ".08em", fontWeight: 800, color: C.blue, textTransform: "uppercase", marginBottom: 8 }}>
+            Pick your day
+          </div>
+          <div style={{ display: "flex", gap: 6, marginBottom: 9 }}>
+            {Object.entries(DIFFICULTY).map(([k, d]) => (
+              <button key={k} onClick={() => setMode(k)} style={{
+                flex: 1, padding: "9px 4px", borderRadius: 12, cursor: "pointer", fontFamily: F,
+                fontSize: 15, fontWeight: 800,
+                border: `1.5px solid ${mode === k ? C.blue : C.border}`,
+                background: mode === k ? C.blue : C.white, color: mode === k ? C.white : C.navy,
+              }}>{d.label}</button>
+            ))}
+          </div>
+          <div style={{ fontSize: 14.5, color: C.grey, lineHeight: 1.45 }}>{DIFFICULTY[mode].blurb}</div>
+        </div>
         <BigButton onClick={onStart}>{ready ? "Start the Day" : "Set Up & Play"}</BigButton>
         {ready && (
           <div style={{ fontSize: 14, color: C.greyLt, marginTop: 10 }}>
@@ -2123,7 +2370,7 @@ function Title({ onStart, ready }) {
   );
 }
 
-function End({ joy, t, wallet, energy, visited, seed, onAgain }) {
+function End({ joy, t, wallet, energy, visited, seed, mode, onAgain }) {
   const rides = Object.entries(visited).reduce((s, [id, n]) => {
     const a = byId[id];
     return s + (a && (a.kind === "ride" || a.kind === "night") ? n : 0);
@@ -2148,7 +2395,8 @@ function End({ joy, t, wallet, energy, visited, seed, onAgain }) {
         <div style={{ fontSize: 11.5, letterSpacing: ".14em", fontWeight: 800, color: C.greyLt, textTransform: "uppercase", marginBottom: 8 }}>Happiness</div>
         <div style={{ fontSize: 21, fontWeight: 800, color: C.navy, marginBottom: 24 }}>{rank[0]}</div>
         <div style={{ background: C.gap, borderRadius: 14, padding: "6px 16px", textAlign: "left", maxWidth: 340, margin: "0 auto 26px" }}>
-          {[["Attractions ridden", rides], ["Different things tried", unique], ["Both parks", both ? "Yes (+3)" : "No"],
+          {[["Difficulty", DIFFICULTY[mode].label], ["Attractions ridden", rides],
+            ["Different things tried", unique], ["Both parks", both ? "Yes (+3)" : "No"],
             ["Money left", `$${Math.max(0, Math.round(wallet))}`], ["Energy remaining", `${Math.round(energy)}%`],
             ["Conditions", `${WEATHERS[seed.weather].label}, ${seed.crowd > 1.15 ? "packed" : seed.crowd > 0.95 ? "busy" : "light"}`]]
             .map(([k, val]) => (
