@@ -100,7 +100,7 @@ const DL_RAW = [
   ["toad", "Mr. Toad's Wild Ride", "Fantasyland", "ride", "C", 4, 25, 8, -1, 0, 0, 615, 316],
   ["snow", "Snow White's Enchanted Wish", "Fantasyland", "ride", "C", 5, 25, 8, -1, 0, 0, 583, 331],
   ["teacups", "Mad Tea Party", "Fantasyland", "ride", "C", 5, 25, 9, -5, 0, 0, 660, 303],
-  ["storybook", "Storybook Land Canal Boats", "Fantasyland", "ride", "B", 10, 20, 9, 6, 0, 0, 673, 273],
+  ["storybook", "Storybook Land Canal Boats", "Fantasyland", "ride", "B", 10, 20, 9, 6, 0, 0, 662, 278],
 
   ["railway", "Mickey & Minnie's Runaway Railway", "Toontown", "ride", "E", 10, 40, 19, -3, 0, 0, 646, 79],
   ["roger", "Roger Rabbit's Car Toon Spin", "Toontown", "ride", "D", 6, 30, 11, -3, 0, 0, 679, 107],
@@ -225,9 +225,9 @@ const DCA_RAW = [
   ["lucky", "Lucky Fortune Cookery", "San Fransokyo", "dine", "—", 18, 12, 11, 8, 26, 16, 515, 1158],
   ["poultry", "Poultry Palace", "Pixar Pier", "dine", "—", 14, 10, 10, 6, 26, 14, 374, 1261],
 
-  ["auntcass", "Aunt Cass Café", "San Fransokyo", "dine", "—", 22, 12, 12, 10, 32, 18, 548, 1145],
-  ["cocina", "Cocina Cucamonga Mexican Grill", "San Fransokyo", "dine", "—", 20, 12, 11, 8, 30, 17, 505, 1135],
-  ["corndogcastle", "Corn Dog Castle", "Paradise Gardens", "dine", "—", 10, 12, 10, 4, 24, 13, 275, 1140],
+  ["auntcass", "Aunt Cass Café", "San Fransokyo", "dine", "—", 22, 12, 12, 10, 32, 18, 495, 1150],
+  ["cocina", "Cocina Cucamonga Mexican Grill", "San Fransokyo", "dine", "—", 20, 12, 11, 8, 30, 17, 474, 1179],
+  ["corndogcastle", "Corn Dog Castle", "Paradise Gardens", "dine", "—", 10, 12, 10, 4, 24, 13, 276, 1086],
   ["hollywoodlounge", "Hollywood Lounge", "Hollywood Land", "dine", "—", 15, 10, 9, 8, 14, 16, 730, 908],
   ["boardwalk", "Games of the Boardwalk", "Pixar Pier", "ride", "A", 8, 5, 6, -2, 0, 10, 269, 1240],
   ["djunior", "Disney Junior Dream Factory", "Hollywood Land", "show", "B", 22, 10, 9, 8, 0, 0, 650, 956],
@@ -237,7 +237,7 @@ const DCA_RAW = [
 ];
 
 // positions confirmed by hand against the real map
-const REVIEWED = new Set(["alice", "autopia", "bakery", "bayou", "bear", "beignets", "bengal", "bluey", "boardwalk", "buzz", "candy", "canoes", "carnation", "carrousel", "caseyjr", "castlewalk", "chiptree", "chowder", "cinema", "columbia", "corndog", "critter", "daisy", "djunior", "dolewhip", "duckpond", "dumbo", "edelweiss", "falcon", "fantasmic", "fireworks", "funnel", "gadget", "gibson", "goofyyard", "grill", "guardians", "harbour", "hideaway", "horseshoe", "indy", "jellyfish", "jolly", "julep", "jungle", "launchbay", "lincoln", "mansion", "matterhorn", "maurice", "mickeyhouse", "milkstand", "minniehouse", "monorail", "monte", "nemo", "oga", "orbitor", "parade", "peterpan", "pinocchio", "pirates", "pixiehollow", "pizzaplanet", "plazainn", "pooh", "popcorn", "pym", "railroad", "railway", "rancho", "redrose", "rise", "roger", "ronto", "royaltheatre", "rr_nos", "rr_tom", "rr_toon", "shootin", "smallworld", "snow", "space", "startours", "storybook", "teacups", "thunder", "tiana", "tiki", "toad", "tomsawyer", "treehouse", "trolley", "turkeyleg", "twain", "vehicles", "webslingers"]);
+const REVIEWED = new Set(["alice", "auntcass", "autopia", "bakery", "bayou", "bear", "beignets", "bengal", "bluey", "boardwalk", "buzz", "candy", "canoes", "carnation", "carrousel", "caseyjr", "castlewalk", "chiptree", "chowder", "cinema", "cocina", "columbia", "corndog", "corndogcastle", "critter", "daisy", "djunior", "dolewhip", "duckpond", "dumbo", "edelweiss", "falcon", "fantasmic", "fireworks", "funnel", "gadget", "gibson", "goofyyard", "grill", "guardians", "harbour", "hideaway", "horseshoe", "indy", "jellyfish", "jolly", "julep", "jungle", "launchbay", "lincoln", "mansion", "matterhorn", "maurice", "mickeyhouse", "milkstand", "minniehouse", "monorail", "monte", "nemo", "oga", "orbitor", "parade", "peterpan", "pinocchio", "pirates", "pixiehollow", "pizzaplanet", "plazainn", "pooh", "popcorn", "pym", "railroad", "railway", "rancho", "redrose", "rise", "roger", "ronto", "royaltheatre", "rr_nos", "rr_tom", "rr_toon", "shootin", "smallworld", "snow", "space", "startours", "storybook", "teacups", "thunder", "tiana", "tiki", "toad", "tomsawyer", "treehouse", "trolley", "turkeyleg", "twain", "vehicles", "webslingers"]);
 
 /* The Disneyland Railroad runs a one-way grand circle. These are the minutes
    between consecutive stops; a full loop is about twenty minutes. */
@@ -2438,17 +2438,14 @@ function EventCard({ ev, onClose, onChoose }) {
     const b = [];
     if (o.minutesLost) b.push(`${o.minutesLost >= 60 ? o.minutesLost / 60 + " hr" : o.minutesLost + " min"}`);
     if (o.money) b.push(`${o.money > 0 ? "+" : "-"}$${Math.abs(o.money)}`);
-    if (o.joy) b.push(`${o.joy > 0 ? "+" : ""}${o.joy} happiness`);
-    if (o.energy) b.push(`${o.energy > 0 ? "+" : ""}${o.energy} energy`);
-    if (o.fuel) b.push(`-${o.fuel} hunger`);
-    if (o.comfort) b.push(`${o.comfort > 0 ? "+" : ""}${o.comfort} comfort`);
     if (o.ll) b.push(`+${o.ll} Lightning Lane`);
     if (o.waitMult) b.push(`waits ${o.waitMult < 1 ? "down" : "up"} ${Math.round(Math.abs(1 - o.waitMult) * 100)}%`);
     return b;
   };
+  /* Meter changes are deliberately hidden — same as the break cards. What you
+     see is what it costs you in time, money and logistics; what it does to you
+     is something you notice in the bars. */
   const bits = [];
-  if (ev.joy) bits.push(`${ev.joy > 0 ? "+" : ""}${ev.joy} happiness`);
-  if (ev.energy) bits.push(`${ev.energy > 0 ? "+" : ""}${ev.energy} energy`);
   if (ev.money) bits.push(`${ev.money > 0 ? "+" : "-"}$${Math.abs(ev.money)}`);
   if (ev.ll) bits.push(`+${ev.ll} Lightning Lane`);
   if (ev.timeShift) bits.push(`${ev.timeShift > 0 ? "lost" : "gained"} ${Math.abs(ev.timeShift)} min`);
