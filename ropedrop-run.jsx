@@ -192,7 +192,7 @@ const DCA_RAW = [
   ["gardengrill", "Paradise Garden Grill", "Paradise Gardens", "dine", "—", 20, 12, 12, 10, 30, 18, 50, 1410],
   ["bayside", "Bayside Brews", "Paradise Gardens", "dine", "—", 10, 8, 8, 4, 12, 11, 117, 1446],
   ["lucky", "Lucky Fortune Cookery", "San Fransokyo", "dine", "—", 18, 12, 11, 8, 26, 16, 477, 1465],
-  ["trattoria", "Wine Country Trattoria", "San Fransokyo", "dine", "—", 60, 20, 20, 18, 46, 44, 470, 1432],
+  ["trattoria", "Wine Country Trattoria", "San Fransokyo", "dine", "—", 60, 20, 20, 18, 46, 44, 450, 1350],
   ["poultry", "Poultry Palace", "Pixar Pier", "dine", "—", 14, 10, 10, 6, 26, 14, 295, 1598],
 
   ["auntcass", "Aunt Cass Café", "San Fransokyo", "dine", "—", 22, 12, 12, 10, 32, 18, 452, 1455],
@@ -207,7 +207,7 @@ const DCA_RAW = [
 ];
 
 // positions confirmed by hand against the real map
-const REVIEWED = new Set(["alice", "auntcass", "autopia", "bakery", "bayou", "bear", "bengal", "bluey", "boardwalk", "buzz", "candy", "canoes", "carnation", "carrousel", "caseyjr", "castlewalk", "chowder", "cinema", "cocina", "columbia", "corndog", "corndogcastle", "critter", "daisy", "djunior", "dolewhip", "dumbo", "edelweiss", "falcon", "fantasmic", "fireworks", "funnel", "gadget", "gibson", "goofyyard", "grill", "guardians", "harbour", "hideaway", "hollywoodlounge", "horseshoe", "indy", "jellyfish", "jolly", "julep", "jungle", "launchbay", "lincoln", "mansion", "matterhorn", "maurice", "mickeyhouse", "milkstand", "minniehouse", "monorail", "monte", "nemo", "oga", "orbitor", "parade", "peterpan", "pinocchio", "pirates", "pixiehollow", "pizzaplanet", "plazainn", "pooh", "popcorn", "pym", "railroad", "railway", "rancho", "redrose", "rise", "roger", "ronto", "royaltheatre", "rr_nos", "rr_tom", "rr_toon", "shootin", "smallworld", "snow", "space", "startours", "storybook", "teacups", "thunder", "tiana", "tiki", "toad", "tomsawyer", "treehouse", "trolley", "turkeyleg", "turtletalk", "twain", "vehicles", "webslingers"]);
+const REVIEWED = new Set(["alice", "auntcass", "autopia", "bakery", "bayou", "bear", "bengal", "bluey", "boardwalk", "buzz", "candy", "canoes", "carnation", "carrousel", "caseyjr", "castlewalk", "chowder", "cinema", "cocina", "columbia", "corndog", "corndogcastle", "critter", "daisy", "djunior", "dolewhip", "dumbo", "edelweiss", "falcon", "fantasmic", "fireworks", "funnel", "gadget", "gibson", "goofyyard", "grill", "guardians", "harbour", "hideaway", "hollywoodlounge", "horseshoe", "indy", "jellyfish", "jolly", "julep", "jungle", "launchbay", "lincoln", "mansion", "matterhorn", "maurice", "mickeyhouse", "milkstand", "minniehouse", "monorail", "monte", "nemo", "oga", "orbitor", "parade", "peterpan", "pinocchio", "pirates", "pixiehollow", "pizzaplanet", "plazainn", "pooh", "popcorn", "pym", "railroad", "railway", "rancho", "redrose", "rise", "roger", "ronto", "royaltheatre", "rr_nos", "rr_tom", "rr_toon", "shootin", "smallworld", "snow", "space", "startours", "storybook", "teacups", "thunder", "tiana", "tiki", "toad", "tomsawyer", "trattoria", "treehouse", "trolley", "turkeyleg", "turtletalk", "twain", "vehicles", "webslingers"]);
 
 /* The Disneyland Railroad runs a one-way grand circle. These are the minutes
    between consecutive stops; a full loop is about twenty minutes. */
@@ -1706,6 +1706,13 @@ export default function HappiestPlace() {
     push(`Upgraded to a Park Hopper — $${HOPPER_PRICE}`, "ok");
   };
   // why you can't start this attraction, if you can't
+  /* Without a Park Hopper your day ends when your own park shuts — California
+     Adventure closes hours before Disneyland, so a one-park DCA ticket is a
+     genuinely shorter day. */
+  const closeAt = hopper
+    ? CLOSE
+    : Math.min(CLOSE, Math.max(60, (PARK_CLOSE[startPark] || CLOSE + DAY_START) - DAY_START));
+
   const hopBlock = (a) => {
     if (!a || a.park === pos.park) return null;
     return hopper ? null : "hopper";
@@ -1732,12 +1739,14 @@ export default function HappiestPlace() {
     if (dead && isRun && !burnedOut) {
       setBurnedOut(energy <= 0 ? "energy" : fuel <= 0 ? "hunger" : "comfort");
     }
-    if (t >= CLOSE || dead) setScreen(isRun && !dead ? "recap" : "end");
+    if (t >= closeAt || dead) setScreen(isRun && !dead ? "recap" : "end");
     // a heads-up while there's still time to act on it
     if (!dcaWarned.current && PARK_CLOSE.dca < PARK_CLOSE.dl
         && M(t) >= PARK_CLOSE.dca - 60 && M(t) < PARK_CLOSE.dca) {
       dcaWarned.current = true;
-      push("California Adventure closes in an hour.", "bad");
+      push(hopper || startPark !== "dca"
+        ? "California Adventure closes in an hour."
+        : "California Adventure closes in an hour — and that's your day, without a Park Hopper.", "bad");
     }
   }, [t, energy, screen]);
 
@@ -1750,7 +1759,7 @@ export default function HappiestPlace() {
       onSetup={() => setScreen("setup")}
       onStart={() => (mapReady ? start() : setScreen("setup"))} />;
   if (screen === "end")
-    return <End joy={joy} t={t} wallet={wallet} energy={energy} comfort={comfort} visited={visited} track={track} log={log} seed={seed} mode={mode} unlimited={unlimited}
+    return <End joy={joy} t={t} wallet={wallet} energy={energy} comfort={comfort} visited={visited} track={track} log={log} seed={seed} mode={mode} unlimited={unlimited} closeAt={closeAt}
       isRun={isRun} runDay={runDay} runTotal={runTotal} runLog={runLog} burnedOut={burnedOut}
       won={isRun && RUN_MODES[runMode].days > 0 && runDay >= RUN_MODES[runMode].days && !burnedOut}
       onAgain={() => { setRunDay(1); setRunTotal(0); setRunLog([]); setCarry(null); setBurnedOut(null); start(); }} onTitle={() => setScreen("title")} />;
@@ -2181,7 +2190,7 @@ export default function HappiestPlace() {
       )}
 
       {tab === "day" && <DayLog log={log} />}
-      {tab === "you" && <YouTab onBreak={beginBreak} onBuyLL={buyLightningLane} onBuyHopper={buyHopper} hopper={hopper} wallet={wallet} freeLeft={freeLL} freeLL={freeLL} ll={llLeft} boughtLl={boughtLl}
+      {tab === "you" && <YouTab onBreak={beginBreak} onBuyLL={buyLightningLane} onBuyHopper={buyHopper} hopper={hopper} wallet={wallet} freeLeft={freeLL} closeAt={closeAt} freeLL={freeLL} ll={llLeft} boughtLl={boughtLl}
         energy={energy} fuel={fuel} comfort={comfort} joy={joy} visited={visited} t={t} seedWeather={seed.weather} />}
       {(() => {
         const shutSoon = PARK_CLOSE.dca - M(t);
@@ -2199,8 +2208,8 @@ export default function HappiestPlace() {
           }}>
             <div style={{ fontSize: 20, fontWeight: 800, color: C.navy }}>Call it a day?</div>
             <div style={{ fontSize: 15.5, color: C.text, lineHeight: 1.5, marginTop: 6 }}>
-              {t < CLOSE
-                ? `There are still ${Math.floor((CLOSE - t) / 60)}h ${(CLOSE - t) % 60}m before the park closes. Heading back now ends the day and scores it where it stands.`
+              {t < closeAt
+                ? `There are still ${Math.floor((closeAt - t) / 60)}h ${(closeAt - t) % 60}m before the park closes. Heading back now ends the day and scores it where it stands.`
                 : "The park is closing anyway."}
             </div>
             <div style={{
@@ -3348,9 +3357,9 @@ function DayLog({ log }) {
   );
 }
 
-function YouTab({ onBreak, onBuyLL, onBuyHopper, hopper, wallet, ll, boughtLl, freeLeft, freeLL, energy, fuel, comfort, joy, visited, t, seedWeather }) {
+function YouTab({ onBreak, onBuyLL, onBuyHopper, hopper, wallet, ll, boughtLl, freeLeft, freeLL, energy, fuel, comfort, joy, visited, t, closeAt, seedWeather }) {
   const [openSnack, setOpenSnack] = useState(null);
-  const pace = 50 + (t / CLOSE) * 130;   // roughly where an average day sits
+  const pace = 50 + (t / closeAt) * 130;   // roughly where an average day sits
   const advice =
     energy < 25 ? "You're running on fumes. Sit down before you ride anything else — tired guests get almost nothing out of an E-Ticket."
     : fuel < 25 ? "You're hungry, and it's dulling everything. Eat something."
@@ -3728,8 +3737,9 @@ function Title({ onStart, onSetup, ready, mode, setMode, runMode, setRunMode, pa
           </div>
           <div style={{ fontSize: 14.5, color: C.grey, lineHeight: 1.45, marginTop: 8 }}>
             Your ticket covers one park. A Park Hopper upgrade costs extra and lets you cross
-            over at any time. California Adventure closes earlier than Disneyland — usually
-            around 10 PM against midnight — so anything you want there has to happen first.
+            over at any time. California Adventure closes earlier than Disneyland — around 10 PM
+            against midnight — so starting there without a Hopper is a shorter day, and it ends
+            when that park shuts.
           </div>
         </div>
 
@@ -3747,7 +3757,7 @@ function Title({ onStart, onSetup, ready, mode, setMode, runMode, setRunMode, pa
   );
 }
 
-function End({ joy, t, wallet, energy, comfort, visited, track, log, seed, mode, unlimited,
+function End({ joy, t, wallet, energy, comfort, visited, track, log, seed, mode, unlimited, closeAt,
   isRun, runDay, runTotal, runLog, burnedOut, won, onAgain, onTitle }) {
   const [showLog, setShowLog] = useState(false);
   const rides = Object.entries(visited).reduce((s, [id, n]) => {
@@ -3828,7 +3838,7 @@ function End({ joy, t, wallet, energy, comfort, visited, track, log, seed, mode,
           {burnedOut === "hunger" ? "You ran on empty"
             : burnedOut === "comfort" ? "You couldn't take any more"
             : energy <= 0 ? "You're wiped out"
-            : t < CLOSE ? "Headed home early" : "Park closed"} · {clock(Math.min(t, CLOSE))}
+            : t < closeAt ? "Headed home early" : "Park closed"} · {clock(Math.min(t, closeAt))}
         </div>
         <div style={{ fontSize: 72, fontWeight: 800, color: rank[1], lineHeight: 1.05, margin: "10px 0 0" }}>{final}</div>
         <div style={{ fontSize: 11.5, letterSpacing: ".14em", fontWeight: 800, color: C.greyLt, textTransform: "uppercase", marginBottom: 8 }}>Happiness</div>
@@ -3837,7 +3847,7 @@ function End({ joy, t, wallet, energy, comfort, visited, track, log, seed, mode,
           {[["Difficulty", DIFFICULTY[mode].label], ["Attractions ridden", rides],
             ["Different things tried", unique], ["Both parks", both ? "Yes (+3)" : "No"],
             ["Money left", unlimited ? "Unlimited" : `$${Math.max(0, Math.round(wallet))}`], ["Energy remaining", `${Math.round(energy)}%`], ["Comfort at close", `${Math.round(comfort)}%`],
-            ["Conditions", `${weatherLabel(seed.weather, Math.min(t, CLOSE), seed.warm)}, ${seed.crowd > 1.25 ? "packed" : seed.crowd > 1.0 ? "busy" : seed.crowd > 0.78 ? "moderate" : "light"}`]]
+            ["Conditions", `${weatherLabel(seed.weather, Math.min(t, closeAt), seed.warm)}, ${seed.crowd > 1.25 ? "packed" : seed.crowd > 1.0 ? "busy" : seed.crowd > 0.78 ? "moderate" : "light"}`]]
             .map(([k, val]) => (
               <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: `1px solid ${C.rule}`, fontSize: 15.5 }}>
                 <span style={{ color: C.grey }}>{k}</span>
