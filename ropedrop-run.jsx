@@ -986,7 +986,20 @@ function earnedMilestones(ctx) {
 const I = {
   star: (c, f) => <path d="M12 2.6l2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95z" fill={f ? c : "none"} stroke={c} strokeWidth="1.8" strokeLinejoin="round" />,
   fork: (c) => <g fill="none" stroke={c} strokeWidth="1.9" strokeLinecap="round"><path d="M7 3v7a2 2 0 004 0V3M9 12v9" /><path d="M17 3c-1.6 1-2.4 3-2.4 5.2 0 1.7.8 2.8 2.4 2.8V21" /></g>,
-  hat: (c) => <g fill="none" stroke={c} strokeWidth="1.9" strokeLinejoin="round"><path d="M6.5 19h11M8 19l1.2-9.5h5.6L16 19z" /><path d="M4.5 6.2l1.6.5.5 1.6.5-1.6 1.6-.5-1.6-.5-.5-1.6-.5 1.6zM16.4 4.1l1.2.4.4 1.2.4-1.2 1.2-.4-1.2-.4-.4-1.2-.4 1.2z" fill={c} stroke="none" /></g>,
+  // an upended top hat with the magic coming out of it
+  hat: (c) => (
+    <g>
+      <g fill="none" stroke={c} strokeWidth="1.85" strokeLinejoin="round" strokeLinecap="round">
+        <path d="M3.6 12.4h16.8" />                        {/* brim, uppermost */}
+        <path d="M6.9 12.4v7.3a1.5 1.5 0 001.5 1.5h7.2a1.5 1.5 0 001.5-1.5v-7.3" />
+      </g>
+      <g fill={c} stroke="none">
+        <path d="M12 1.2l.95 2.5 2.5.95-2.5.95-.95 2.5-.95-2.5-2.5-.95 2.5-.95z" />
+        <path d="M6.2 6.0l.55 1.45 1.45.55-1.45.55-.55 1.45-.55-1.45L4.2 8l1.45-.55z" />
+        <path d="M17.9 5.6l.5 1.3 1.3.5-1.3.5-.5 1.3-.5-1.3-1.3-.5 1.3-.5z" />
+      </g>
+    </g>
+  ),
   mickey: (c, f) => <g fill={f ? c : "none"} stroke={c} strokeWidth="1.7"><circle cx="6.4" cy="7.4" r="3.1" /><circle cx="17.6" cy="7.4" r="3.1" /><circle cx="12" cy="15.2" r="5.2" /></g>,
   home: (c, f) => <path d="M3.5 11L12 4l8.5 7v8.2a1 1 0 01-1 1h-15a1 1 0 01-1-1z" fill={f ? c : "none"} stroke={c} strokeWidth="1.8" strokeLinejoin="round" />,
   pin: (c, f) => <path d="M12 21.5s7-6.4 7-11.4a7 7 0 10-14 0c0 5 7 11.4 7 11.4z" fill={f ? c : "none"} stroke={c} strokeWidth="1.8" strokeLinejoin="round" />,
@@ -995,8 +1008,26 @@ const I = {
   gear: (c, f) => <g fill="none" stroke={c} strokeWidth="1.8"><circle cx="12" cy="12" r="3.2" fill={f ? c : "none"} /><path d="M19.2 14.4a1.5 1.5 0 00.3 1.7l.1.1a1.8 1.8 0 11-2.6 2.6l-.1-.1a1.5 1.5 0 00-2.6 1.1v.2a1.8 1.8 0 11-3.6 0v-.1a1.5 1.5 0 00-2.6-1.1l-.1.1a1.8 1.8 0 11-2.6-2.6l.1-.1a1.5 1.5 0 00-1.1-2.6h-.2a1.8 1.8 0 110-3.6h.1a1.5 1.5 0 001.1-2.6l-.1-.1A1.8 1.8 0 117.9 4.7l.1.1a1.5 1.5 0 002.6-1.1V3.5a1.8 1.8 0 113.6 0v.1a1.5 1.5 0 002.6 1.1l.1-.1a1.8 1.8 0 112.6 2.6l-.1.1a1.5 1.5 0 001.1 2.6h.2a1.8 1.8 0 110 3.6h-.1a1.5 1.5 0 00-1.4.9z" /></g>,
   locate: (c) => <path d="M21 3L3 10.5l7.6 2.9L13.5 21z" fill={c} />,
   chevron: (c) => <path d="M15 5l-7 7 7 7" fill="none" stroke={c} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />,
-  train: (c) => <g fill="none" stroke={c} strokeWidth="1.8" strokeLinejoin="round"><rect x="4.5" y="3.5" width="15" height="12" rx="3" /><path d="M4.5 10h15M9 20l-1.5 2M15 20l1.5 2M7 15.5v2.5a1.5 1.5 0 003 0v-2.5M14 15.5v2.5a1.5 1.5 0 003 0v-2.5" /><circle cx="8.5" cy="12.8" r=".9" fill={c} /><circle cx="15.5" cy="12.8" r=".9" fill={c} /></g>,
+  // a steam engine: boiler, cab, funnel and big driving wheels
+  train: (c) => (
+    <g fill="none" stroke={c} strokeWidth="1.75" strokeLinejoin="round" strokeLinecap="round">
+      <path d="M2.6 18.6h18.8" />                          {/* rail */}
+      <path d="M2.9 8.6h9.6v7.3H2.9z" />                    {/* boiler */}
+      <path d="M12.5 5.4h5.4a1.2 1.2 0 011.2 1.2v9.3h-6.6z" />   {/* cab */}
+      <path d="M4.3 8.6V5.1h3.1v3.5" />                     {/* funnel */}
+      <path d="M3.4 5.1h4.9" />                             {/* flared lip */}
+      <path d="M13.9 7.6h3.4v2.5h-3.4z" />                  {/* cab window */}
+      <circle cx="6.3" cy="16" r="2.5" />                   {/* driving wheel */}
+      <circle cx="16.4" cy="16.4" r="2.1" />
+    </g>
+  ),
   ff: (c) => <g fill={c}><path d="M4 5.2l8.2 6.8L4 18.8z" /><path d="M12.6 5.2l8.2 6.8-8.2 6.8z" /></g>,
+  person: (c, f) => (
+    <g fill={f ? c : "none"} stroke={c} strokeWidth="1.8" strokeLinejoin="round">
+      <circle cx="12" cy="7.4" r="3.6" />
+      <path d="M4.9 20.4a7.1 7.1 0 0114.2 0z" />
+    </g>
+  ),
   ll: (c) => <path d="M13.6 2L4 13.4h5.2L8.4 22 20 9.6h-6z" fill={c} />,
 };
 const Icon = ({ d, c = C.grey, f = false, s = 24 }) => (
@@ -2497,7 +2528,10 @@ function MapPin({ a, px, py, w, pinK, selected, done, dim, nameLabel, inert, onT
       <path d={`M${-bw / 2} ${-bh - 12} h${bw} a8 8 0 018 8 v${bh - 16} a8 8 0 01-8 8 h${-bw / 2 + 7} l-7 12 l-7 -12 h${-bw / 2 + 7} a8 8 0 01-8 -8 v${-bh + 16} a8 8 0 018 -8 z`}
         transform={`translate(0 ${-2})`} fill={bg} stroke={done ? C.border : "rgba(18,40,63,.14)"} strokeWidth="1.5" />
       {closed ? (
-        <text x="0" y={-bh + 26} textAnchor="middle" style={{ fontFamily: F, fontSize: 24, fontWeight: 800, fill: C.greyLt }}>✕</text>
+        // no wait to show, so fall back to the attraction icon rather than a cross
+        <g transform={`translate(-11 ${-bh + 3}) scale(0.92)`} opacity="0.55">
+          {I.star(C.greyLt, false)}
+        </g>
       ) : showNum ? (
         <>
           <text x="0" y={-bh + 20} textAnchor="middle" style={{ fontFamily: F, fontSize: 27, fontWeight: 800, fill: done ? C.greyLt : fg }}>{label}</text>
@@ -2759,7 +2793,7 @@ function AttractionCard({ a, wait, walk, reps, llOk, llFree, freeLeft, mustSwitc
           </div>
           <div style={{ marginTop: 3 }}>
             {wait < 0 ? (
-              <span style={{ fontSize: 17, fontWeight: 800, color: C.red }}>Closed right now</span>
+              <span style={{ fontSize: 17, fontWeight: 800, color: C.red }}>Temporarily Closed</span>
             ) : (
               <>
                 <span style={{ fontSize: 23, fontWeight: 800, color: wait > 45 ? C.red : C.navy }}>
@@ -2852,7 +2886,7 @@ function AttractionCard({ a, wait, walk, reps, llOk, llFree, freeLeft, mustSwitc
           onClick={() => (a.kind === "train" ? onOpen() : onGo(a, mustSwitch ? "switch" : false))}>
           {hopBlocked === "hopper" ? "Needs a Park Hopper"
             : parkShut ? `${PARKS[a.park].short} has closed`
-            : wait < 0 ? "Closed right now" : mustSwitch ? `Rider Switch · ${HEIGHT[a.id]}" minimum`
+            : wait < 0 ? "Temporarily Closed" : mustSwitch ? `Rider Switch · ${HEIGHT[a.id]}" minimum`
             : a.kind === "train" ? "Choose a Destination"
             : broke ? "Not enough money" : a.kind === "dine" ? `Eat Here${a.cost ? ` · $${a.cost}` : ""}`
             : isRide ? "Join Standby Line" : "Go Watch"}
@@ -3418,7 +3452,7 @@ function YouTab({ onBreak, onBuyLL, onBuyHopper, hopper, wallet, ll, boughtLl, f
 }
 
 function TabBar({ tab, setTab, disabled }) {
-  const items = [["map", "pin", "Map"], ["list", "list", "List"], ["day", "clock", "Day"], ["you", "star", "You"], ["home", "home", "Home"]];
+  const items = [["map", "pin", "Map"], ["list", "list", "List"], ["day", "clock", "Day"], ["you", "person", "You"], ["home", "home", "Home"]];
   return (
     <div style={{
       display: "flex", borderTop: `1px solid ${C.rule}`, background: C.white, flexShrink: 0,
