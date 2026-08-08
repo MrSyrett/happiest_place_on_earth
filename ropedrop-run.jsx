@@ -231,6 +231,11 @@ function railMinutes(fromId, toId) {
 /* Not everything is running when the rope drops — Space Mountain and Rise are
    notorious for opening late, and there is always something walled off for
    refurbishment. Both are rolled once at the start of the day. */
+/* Any ride can go down while you're on it. You lose the time you'd already
+   spent, you get nothing out of it, the ride shuts for half an hour to an hour
+   — and a cast member hands you a Lightning Lane on the way out. */
+const BREAKDOWN_CHANCE = 0.022;
+
 const LATE_OPENERS = ["space", "rise", "matterhorn", "racers", "incredicoaster", "guardians"];
 const REFURB_CANDIDATES = ["mansion", "thunder", "pirates", "matterhorn", "startours", "buzz",
   "smallworld", "jungle", "monsters", "grizzly", "soarin", "midway", "luigi", "mermaid"];
@@ -418,11 +423,11 @@ function comfortRate(a, weather, temp) {
     const wet = Math.max(-2.6, Math.min(1.8, ((temp === undefined ? 75 : temp) - 78) / 9));
     return wet - (weather === "drizzle" ? 0.7 : 0);
   }
-  if (INDOOR.has(a.id)) return 0.9;
-  if (a.kind === "show") return 0.65;
-  if (a.kind === "dine") return 0.5;
-  if (a.kind === "train") return 0.5;
-  return weather === "drizzle" ? -0.6 : -0.25;   // out in it, and wetter still if it's raining
+  if (INDOOR.has(a.id)) return 0.55;
+  if (a.kind === "show") return 0.45;
+  if (a.kind === "dine") return 0.4;
+  if (a.kind === "train") return 0.35;
+  return weather === "drizzle" ? -0.7 : -0.35;   // out in it, and wetter still if it's raining
 }
 
 // comfort bleeds faster the hotter it actually is, and rain is its own penalty
@@ -659,7 +664,7 @@ const DIFFICULTY = {
 const CUSTOM_DEFAULT = {
   crowd: 0.85, weather: "clear",
   budget: 150, unlimited: false,
-  drain: 1.0, events: true,
+  drain: 1.0, events: "on",   // "on" | "off" | "magical" (nothing bad happens)
 };
 /* ---------------- multi-day runs ----------------
    A single day is self-contained. A RUN chains days together: you wake up in
@@ -791,7 +796,9 @@ const applyT = (T, x, y) => (T ? { x: T.a * x - T.b * y + T.tx, y: T.b * x + T.a
 /* ---------------- random events ----------------
    `when`: start = rolled once as the day begins; day = between activities.
    Effects are all optional and applied together. */
-/* Events carry an optional `park`. Anything without one can happen anywhere;
+/* Events carry an optional `park`, and an optional `from`/`to` window in
+   absolute minutes past midnight — the fireworks dash makes no sense at 11 AM,
+   and Cars Land doesn't light up in the morning. Anything without one can happen anywhere;
    the rest only fire while you're actually standing in that park, so a Park
    Hopper day naturally sees both pools. */
 const EVENTS = [
@@ -839,7 +846,7 @@ const EVENTS = [
   { id: "underdressed", kind: "bad", when: "start", w: 5, title: "Colder than you dressed for",
     text: "You checked the forecast for a Californian theme park and packed accordingly. The morning has other ideas.",
     comfort: -16, energy: -4, joy: -3 },
-  { id: "cocoa", park: "dl", kind: "good", when: "day", w: 6, title: "Hot chocolate on Main Street",
+  { id: "cocoa", from: 1020, to: 1500, park: "dl", kind: "good", when: "day", w: 6, title: "Hot chocolate on Main Street",
     text: "Whipped cream, a cinnamon stick, and both hands round the cup while the cold afternoon goes by.",
     comfort: 16, fuel: 8, energy: 4, money: -7, joy: 5 },
   { id: "forgot", park: "dl", kind: "bad", when: "start", w: 5, title: "You forgot the sunscreen",
@@ -878,7 +885,7 @@ const EVENTS = [
   { id: "dl_lincoln", park: "dl", kind: "good", when: "day", w: 5, title: "Great Moments to yourself",
     text: "Nobody else came in. Air conditioning, a comfortable seat, and Lincoln stands up just for you.",
     joy: 8, energy: 10, comfort: 14, minutesLost: 18 },
-  { id: "dl_flag", park: "dl", kind: "good", when: "day", w: 4, title: "Flag Retreat on Main Street",
+  { id: "dl_flag", from: 930, to: 1080, park: "dl", kind: "good", when: "day", w: 4, title: "Flag Retreat on Main Street",
     text: "The band, the colour guard, a veteran picked out of the crowd. Everybody stops. You weren't expecting to feel that.",
     joy: 13, minutesLost: 15 },
   { id: "dl_piano", park: "dl", kind: "good", when: "day", w: 5, title: "The Coke Corner pianist takes your request",
@@ -893,10 +900,10 @@ const EVENTS = [
   { id: "dl_wheelhouse", park: "dl", kind: "good", when: "day", w: 3, title: "Invited up to the wheelhouse",
     text: "The Mark Twain's pilot waves you up, hands you the wheel for a minute, and gives you a certificate.",
     joy: 16, minutesLost: 12 },
-  { id: "dl_walt", park: "dl", kind: "good", when: "day", w: 3, title: "The light is on in Walt's apartment",
+  { id: "dl_walt", from: 1140, to: 1500, park: "dl", kind: "good", when: "day", w: 3, title: "The light is on in Walt's apartment",
     text: "Above the Fire Station, still burning. You stand and look at it for longer than you meant to.",
     joy: 10 },
-  { id: "dl_engineer", park: "dl", kind: "good", when: "day", w: 4, title: "The engineer waved you into the cab",
+  { id: "dl_engineer", from: 480, to: 660, park: "dl", kind: "good", when: "day", w: 4, title: "The engineer waved you into the cab",
     text: "A slow lap of the park from the footplate of a hundred-year-old locomotive.",
     joy: 14, energy: 6, comfort: 6, minutesLost: 20 },
   { id: "dl_partners", park: "dl", kind: "good", when: "day", w: 4, title: "Partners with nobody in the way",
@@ -941,19 +948,19 @@ const EVENTS = [
   { id: "dl_indy_frontseat", park: "dl", kind: "good", when: "day", w: 4, title: "Front seat on Indiana Jones",
     text: "Every near miss lands properly from there, and the boulder is genuinely alarming.",
     joy: 10 },
-  { id: "dl_orbitor", park: "dl", kind: "good", when: "day", w: 3, title: "Astro Orbitor at the right moment",
+  { id: "dl_orbitor", from: 1080, to: 1320, park: "dl", kind: "good", when: "day", w: 3, title: "Astro Orbitor at the right moment",
     text: "Tomorrowland spinning below you with the sun going down behind the Matterhorn.",
     joy: 8 },
-  { id: "dl_fantasmic_spot", park: "dl", kind: "good", when: "day", w: 4, title: "You stumbled into a perfect Fantasmic spot",
+  { id: "dl_fantasmic_spot", from: 1140, to: 1320, park: "dl", kind: "good", when: "day", w: 4, title: "You stumbled into a perfect Fantasmic spot",
     text: "Front of the rail, nobody in front, and forty minutes before it starts.",
     joy: 9, energy: -4, minutesLost: 25 },
-  { id: "dl_mainstreet_window", park: "dl", kind: "good", when: "day", w: 3, title: "You read the windows on Main Street",
+  { id: "dl_mainstreet_window", from: 480, to: 720, park: "dl", kind: "good", when: "day", w: 3, title: "You read the windows on Main Street",
     text: "Every name up there built something. You lost twenty minutes and gained a bit of perspective.",
     joy: 7, minutesLost: 20 },
   { id: "dl_scrim", park: "dl", kind: "bad", when: "start", w: 4, title: "There's scrim on the castle",
     text: "Refurbishment. Half of it is behind a printed screen and every photo you take today will have it in.",
     joy: -8 },
-  { id: "dl_roped", park: "dl", kind: "bad", when: "day", w: 6, title: "The parade route has you trapped",
+  { id: "dl_roped", from: 1080, to: 1290, park: "dl", kind: "bad", when: "day", w: 6, title: "The parade route has you trapped",
     text: "You're on the wrong side of Main Street and there's no crossing for twenty minutes.",
     joy: -5, energy: -3, comfort: -6, minutesLost: 20 },
   { id: "dl_smallworld_stop", park: "dl", kind: "bad", when: "day", w: 5, title: "The boats have backed up",
@@ -968,7 +975,7 @@ const EVENTS = [
   { id: "dl_ge_trek", park: "dl", kind: "bad", when: "day", w: 5, title: "The walk back from Galaxy's Edge",
     text: "It's further than it looks from anywhere, and you've done it twice already today.",
     joy: -3, energy: -11, comfort: -7, minutesLost: 10 },
-  { id: "dl_toontown_sun", park: "dl", kind: "bad", when: "day", w: 4, title: "Toontown is a sun trap",
+  { id: "dl_toontown_sun", from: 660, to: 1020, park: "dl", kind: "bad", when: "day", w: 4, title: "Toontown is a sun trap",
     text: "No shade anywhere and everything is painted to reflect. It's ten degrees hotter in here.",
     joy: -3, energy: -5, comfort: -13 },
   { id: "dl_pirates_soaked", park: "dl", kind: "bad", when: "day", w: 4, title: "You got the wet seat on Pirates",
@@ -980,13 +987,13 @@ const EVENTS = [
   { id: "dl_mintjulep_out", park: "dl", kind: "bad", when: "day", w: 3, title: "They're out of beignets",
     text: "You walked all the way to New Orleans Square for them, too.",
     joy: -7, energy: -4, minutesLost: 10 },
-  { id: "dl_tomorrowland_glare", park: "dl", kind: "bad", when: "day", w: 4, title: "Tomorrowland at two in the afternoon",
+  { id: "dl_tomorrowland_glare", from: 720, to: 1020, park: "dl", kind: "bad", when: "day", w: 4, title: "Tomorrowland at two in the afternoon",
     text: "All that white concrete and metal, throwing the sun straight back at you.",
     joy: -3, energy: -4, comfort: -11 },
   { id: "dl_gum", park: "dl", kind: "bad", when: "day", w: 3, title: "Gum, on Main Street, on your shoe",
     text: "They don't even sell it here. Somebody brought that in deliberately.",
     joy: -5, minutesLost: 8 },
-  { id: "dl_bench", park: "dl", kind: "bad", when: "day", w: 4, title: "Every bench in the hub is taken",
+  { id: "dl_bench", from: 660, to: 1080, park: "dl", kind: "bad", when: "day", w: 4, title: "Every bench in the hub is taken",
     text: "You do a full lap looking, and end up sitting on a planter wall.",
     joy: -4, energy: -5, comfort: -6, minutesLost: 10 },
   { id: "dl_photo_fail", park: "dl", kind: "bad", when: "day", w: 3, title: "The PhotoPass shot didn't take",
@@ -998,7 +1005,7 @@ const EVENTS = [
   { id: "dl_singalong", park: "dl", kind: "bad", when: "day", w: 3, title: "Someone is singing along to everything",
     text: "Loudly, a bar behind, and for the entire length of the queue.",
     joy: -6 },
-  { id: "dl_frontierland_dust", park: "dl", kind: "bad", when: "day", w: 3, title: "The dust in Frontierland",
+  { id: "dl_frontierland_dust", from: 660, to: 1020, park: "dl", kind: "bad", when: "day", w: 3, title: "The dust in Frontierland",
     text: "It's in your eyes, your drink and the back of your throat.",
     joy: -3, comfort: -8 },
   { id: "dl_haunted_delay", park: "dl", kind: "bad", when: "day", w: 3, title: "Stuck in the stretching room",
@@ -1007,7 +1014,7 @@ const EVENTS = [
   { id: "dl_castle_crowd", park: "dl", kind: "bad", when: "day", w: 5, title: "You can't get near the castle",
     text: "Three separate photo sessions and a tour group, all in the one spot everyone wants.",
     joy: -4, minutesLost: 10 },
-  { id: "dl_railroad_full", park: "dl", kind: "bad", when: "day", w: 3, title: "The train left without you",
+  { id: "dl_railroad_full", from: 900, to: 1440, park: "dl", kind: "bad", when: "day", w: 3, title: "The train left without you",
     text: "Full at Main Street. The next one is twenty minutes and you can walk it faster.",
     joy: -4, energy: -4, minutesLost: 8 },
   { id: "dca_racers_win", park: "dca", kind: "good", when: "day", w: 6, title: "Your car won the race",
@@ -1022,7 +1029,7 @@ const EVENTS = [
   { id: "dca_incredi_front", park: "dca", kind: "good", when: "day", w: 5, title: "Front car on Incredicoaster",
     text: "That first launch with nothing in front of you is the best five seconds in the park.",
     joy: 11 },
-  { id: "dca_carsland_neon", park: "dca", kind: "good", when: "day", w: 5, title: "Radiator Springs at lighting time",
+  { id: "dca_carsland_neon", from: 1140, to: 1440, park: "dca", kind: "good", when: "day", w: 5, title: "Radiator Springs at lighting time",
     text: "The whole street comes on at once, the neon hums, and everyone stops walking.",
     joy: 14, comfort: 4, minutesLost: 10 },
   { id: "dca_luigi", park: "dca", kind: "good", when: "day", w: 4, title: "Luigi's cars actually dance",
@@ -1049,7 +1056,7 @@ const EVENTS = [
   { id: "dca_lamplight_view", park: "dca", kind: "good", when: "day", w: 4, title: "A table on the Lamplight balcony",
     text: "Right over the water with the pier lit up. You didn't book it and got it anyway.",
     joy: 13, energy: 12, fuel: 30, comfort: 16, money: -48, minutesLost: 45 },
-  { id: "dca_woc_rail", park: "dca", kind: "good", when: "day", w: 5, title: "Front rail for World of Color",
+  { id: "dca_woc_rail", from: 1140, to: 1350, park: "dca", kind: "good", when: "day", w: 5, title: "Front rail for World of Color",
     text: "You got there early enough and the whole lagoon is yours to look at.",
     joy: 13, energy: -4, minutesLost: 25 },
   { id: "dca_trolley", park: "dca", kind: "good", when: "day", w: 4, title: "The Red Car Trolley came along",
@@ -1067,7 +1074,7 @@ const EVENTS = [
   { id: "dca_boardwalk_win", park: "dca", kind: "good", when: "day", w: 3, title: "You actually won on the Boardwalk",
     text: "A stuffed thing bigger than your bag, which you will now carry for nine hours.",
     joy: 10, energy: -4, money: -12 },
-  { id: "dca_pier_sunset", park: "dca", kind: "good", when: "day", w: 5, title: "Sunset behind Pixar Pier",
+  { id: "dca_pier_sunset", from: 1080, to: 1260, park: "dca", kind: "good", when: "day", w: 5, title: "Sunset behind Pixar Pier",
     text: "The wheel and the coaster in silhouette, and the whole lagoon gone gold.",
     joy: 11, comfort: 4 },
   { id: "dca_philhar", park: "dca", kind: "good", when: "day", w: 3, title: "PhilharMagic in an empty theatre",
@@ -1094,13 +1101,13 @@ const EVENTS = [
   { id: "dca_incredi_stall", park: "dca", kind: "bad", when: "day", w: 4, title: "Held on the Incredicoaster brake run",
     text: "Ten minutes stopped in the sun, strapped in, listening to the safety loop.",
     joy: -6, comfort: -10, minutesLost: 10 },
-  { id: "dca_carsland_heat", park: "dca", kind: "bad", when: "day", w: 6, title: "There is no shade in Cars Land",
+  { id: "dca_carsland_heat", from: 660, to: 1020, park: "dca", kind: "bad", when: "day", w: 6, title: "There is no shade in Cars Land",
     text: "It's a desert themed to look like a desert and it is doing an excellent job.",
     joy: -3, energy: -6, comfort: -15 },
-  { id: "dca_pier_wind", park: "dca", kind: "bad", when: "day", w: 4, title: "The wind came up off the water",
+  { id: "dca_pier_wind", from: 1020, to: 1440, park: "dca", kind: "bad", when: "day", w: 4, title: "The wind came up off the water",
     text: "Everything on the pier that spins has stopped, and you're cold in a t-shirt.",
     joy: -5, comfort: -11 },
-  { id: "dca_lamplight_full", park: "dca", kind: "bad", when: "day", w: 4, title: "Lamplight has nothing until nine",
+  { id: "dca_lamplight_full", from: 960, to: 1260, park: "dca", kind: "bad", when: "day", w: 4, title: "Lamplight has nothing until nine",
     text: "No walk-ups, no cancellations, and you'd built the evening around it.",
     joy: -7, minutesLost: 8 },
   { id: "dca_woc_spray", park: "dca", kind: "bad", when: "day", w: 4, title: "You were in the World of Color splash zone",
@@ -1109,10 +1116,10 @@ const EVENTS = [
   { id: "dca_avengers_queue", park: "dca", kind: "bad", when: "day", w: 5, title: "The whole of Avengers Campus queued at once",
     text: "Something let out and every line in the land doubled in about four minutes.",
     joy: -4, comfort: -5, waitMult: 1.35, minutes: 55 },
-  { id: "dca_bakery_closed", park: "dca", kind: "bad", when: "day", w: 3, title: "The Bakery Tour has stopped for the day",
+  { id: "dca_bakery_closed", from: 1080, to: 1440, park: "dca", kind: "bad", when: "day", w: 3, title: "The Bakery Tour has stopped for the day",
     text: "No sourdough, no free sample, and the smell is still coming out of the vents.",
     joy: -5 },
-  { id: "dca_swings_wind", park: "dca", kind: "bad", when: "day", w: 3, title: "Silly Symphony Swings shut for wind",
+  { id: "dca_swings_wind", from: 1020, to: 1440, park: "dca", kind: "bad", when: "day", w: 3, title: "Silly Symphony Swings shut for wind",
     text: "Along with the Zephyr and the Jellyfish. Half of Paradise Gardens is standing still.",
     joy: -5 },
   { id: "dca_hollywood_empty", park: "dca", kind: "bad", when: "day", w: 3, title: "Hollywood Land feels half-finished",
@@ -1133,7 +1140,7 @@ const EVENTS = [
   { id: "dca_guardians_scream", park: "dca", kind: "bad", when: "day", w: 4, title: "The child next to you screamed the whole drop sequence",
     text: "Directly into your ear, at a pitch you didn't know was possible.",
     joy: -6, comfort: -4 },
-  { id: "dca_pier_crush", park: "dca", kind: "bad", when: "day", w: 5, title: "Pixar Pier at parade time",
+  { id: "dca_pier_crush", from: 1080, to: 1320, park: "dca", kind: "bad", when: "day", w: 5, title: "Pixar Pier at parade time",
     text: "One narrow boardwalk, everyone on it, and nobody moving in the same direction.",
     joy: -5, energy: -4, comfort: -8, minutesLost: 8 },
   { id: "dca_soarin_smell", park: "dca", kind: "bad", when: "day", w: 3, title: "The Soarin' scent effect misfired",
@@ -1142,7 +1149,7 @@ const EVENTS = [
   { id: "dca_stroller_park", park: "dca", kind: "bad", when: "day", w: 3, title: "You can't find where you left the stroller",
     text: "They move them. They always move them.",
     joy: -5, energy: -4, minutesLost: 12 },
-  { id: "dca_photopass_missed", park: "dca", kind: "bad", when: "day", w: 3, title: "The Cars Land photographer had packed up",
+  { id: "dca_photopass_missed", from: 1140, to: 1440, park: "dca", kind: "bad", when: "day", w: 3, title: "The Cars Land photographer had packed up",
     text: "You came back for it specially and the spot is empty.",
     joy: -5, energy: -3, minutesLost: 8 },
   { id: "dca_mermaid_stop", park: "dca", kind: "bad", when: "day", w: 3, title: "Stopped inside Little Mermaid",
@@ -1208,7 +1215,7 @@ const CHOICES = [
       { label: "Stop and watch", sub: "Fifteen minutes of your day", joy: 9, energy: 4, comfort: 4, minutesLost: 15 },
       { label: "Keep moving", sub: "You've somewhere to be", joy: -1, comfort: -1 },
     ] },
-  { id: "paradecross", park: "dl", w: 9, title: "A parade is forming across your path",
+  { id: "paradecross", from: 1080, to: 1290, park: "dl", w: 9, title: "A parade is forming across your path",
     text: "The rope is up and cast members are holding the crossing.",
     options: [
       { label: "Wait and watch it go by", sub: "Twenty minutes", joy: 10, energy: 2, comfort: 3, minutesLost: 20 },
@@ -1250,7 +1257,7 @@ const CHOICES = [
       { label: "Hand it in yourself", sub: "Ten minutes out of your day", joy: 9, energy: -4, comfort: -2, minutesLost: 10 },
       { label: "Tell the nearest cast member", sub: "Someone else's problem now", joy: -1 },
     ] },
-  { id: "fireworkspot", park: "dl", w: 7, title: "Fireworks in twenty minutes and you're across the park",
+  { id: "fireworkspot", from: 1140, to: 1290, park: "dl", w: 7, title: "Fireworks in twenty minutes and you're across the park",
     text: "The hub is already filling up with people staking out spots.",
     options: [
       { label: "Hurry for a good spot", sub: "Costs your legs, worth the view", joy: 14, energy: -15, comfort: -8, minutesLost: 20 },
@@ -1690,7 +1697,7 @@ export default function HappiestPlace() {
     setMods({ mult: 1, until: 0, closures: {} });
     setEventCard(null); setEventLog([]);
     lastEvent.current = 0;
-    if (!isCustom || custom.events) setTimeout(() => fireEvent("start", OPEN), 450);
+    if (!isCustom || custom.events !== "off") setTimeout(() => fireEvent("start", OPEN), 450);
     const notes = [];
     if (refurb && byId[refurb]) notes.push(`${byId[refurb].name} is closed for refurbishment today.`);
     for (const id of Object.keys(late)) if (byId[id]) notes.push(`${byId[id].name} opens about ${late[id]} minutes late.`);
@@ -1824,6 +1831,9 @@ export default function HappiestPlace() {
       a: togo ? { ...a, en: Math.round(a.en * TOGO_REST), name: `${a.name} (to go)` } : a,
       useLL, single, togo, switching, walk, wait, posted, dur, painRate, gain, reps,
       comfortRate: togo ? -0.25 : comfortRate(a, seed.weather, tempAt(seed.weather, t, seed.warm)),
+      // a ride can fail under you, partway through
+      breakAt: a.kind === "ride" && Math.random() < BREAKDOWN_CHANCE
+        ? walk + wait + Math.max(1, Math.floor(dur * (0.3 + Math.random() * 0.5))) : -1,
       i: 0, net: 0, paid: false, from: { ...pos },
     });
   }
@@ -1848,9 +1858,19 @@ export default function HappiestPlace() {
     setEventCard(null);
   }
 
+  /* Magical mode keeps every good event and drops the rest. Choice events are
+     kept only when neither option can hurt you. */
+  const magical = isCustom && custom.events === "magical";
+  const optionIsKind = (o) => (o.joy || 0) >= 0 && (o.energy || 0) >= 0
+    && (o.comfort || 0) >= 0 && (o.fuel || 0) >= 0 && !(o.waitMult > 1);
+
   function fireEvent(when, atTime) {
-    if (when === "day" && Math.random() < 0.42) {
-      const pool = CHOICES.filter((e) => !e.park || e.park === pos.park);
+    if (when === "day" && Math.random() < 0.42 && CHOICES.some((e) => (!e.park || e.park === pos.park)
+        && (!magical || e.options.every(optionIsKind))
+        && (e.from === undefined || (M(atTime) >= e.from && M(atTime) <= e.to)))) {
+      const pool = CHOICES.filter((e) => (!e.park || e.park === pos.park)
+        && (!magical || e.options.every(optionIsKind))
+        && (e.from === undefined || (M(atTime) >= e.from && M(atTime) <= e.to)));
       const total = pool.reduce((x, e) => x + e.w, 0);
       let roll = Math.random() * total;
       const ev = pool.find((e) => (roll -= e.w) <= 0) || pool[0];
@@ -1859,7 +1879,9 @@ export default function HappiestPlace() {
       setEventCard({ ...ev, choice: true, key: Math.random() });
       return;
     }
-    const pool = EVENTS.filter((e) => e.when === when && (!e.park || e.park === pos.park));
+    const pool = EVENTS.filter((e) => e.when === when && (!e.park || e.park === pos.park)
+      && (!magical || e.kind === "good")
+      && (e.from === undefined || (M(atTime) >= e.from && M(atTime) <= e.to)));
     const total = pool.reduce((x, e) => x + e.w, 0);
     let roll = Math.random() * total;
     const ev = pool.find((e) => (roll -= e.w) <= 0) || pool[0];
@@ -1914,7 +1936,7 @@ export default function HappiestPlace() {
     setRun(null);
     // roughly one event every couple of activities, never twice inside an hour
     const now = t;
-    if ((!isCustom || custom.events) && now - lastEvent.current > 55 && Math.random() < 0.34) {
+    if ((!isCustom || custom.events !== "off") && now - lastEvent.current > 55 && Math.random() < 0.34) {
       setTimeout(() => fireEvent("day", now), 700);
     }
   }
@@ -1947,34 +1969,55 @@ export default function HappiestPlace() {
 
     const net = r.net + dJoy;
     const next = r.i + 1;
-    if (next >= total) finishRun(r, net);
+    if (r.breakAt > 0 && next >= r.breakAt) breakDown(r);
+    else if (next >= total) finishRun(r, net);
     else setRun({ ...r, i: next, net, paid: r.paid || phase === "do" });
+  }
+
+  /* The ride failed under you. You've already spent the walk, the queue and
+     part of the ride; you get none of the payoff, the ride shuts, and a cast
+     member hands you a Lightning Lane on the way out through the service door. */
+  function breakDown(r) {
+    const a = r.a;
+    const down = 30 + Math.floor(Math.random() * 31);
+    setRun(null);
+    setPos({ park: a.park, x: a.x, y: a.y, landName: a.landName });
+    setMapPark(a.park);
+    setMods((m) => ({ ...m, closures: { ...m.closures, [a.id]: t + down } }));
+    setJoy((j) => happy(j - 9));
+    setComfort((c) => clamp(c - 5));
+    setBoughtLl((b) => b);
+    grantLL();
+    push(`${a.name} broke down while you were on it — ${r.i} min gone, closed about ${down} min. 1 free Lightning Lane.`, "bad");
+    setEventCard({
+      id: "brokedown", kind: "bad", key: Math.random(),
+      title: `${a.name} stopped with you on it`,
+      text: "The lights come up, the soundtrack cuts out, and everyone shuffles out through a door "
+          + "marked for cast members only. A supervisor hands you a Lightning Lane for the trouble.",
+      joy: -9, ll: 1,
+    });
   }
 
   function skipRun() {
     const r = run;
     if (!r) return;
     const total = r.walk + r.wait + r.dur;
+    // skipping fast-forwards the same minutes — including the one where it fails
+    const stop = r.breakAt > 0 ? Math.min(r.breakAt, total) : total;
     let dJ = 0, dE = 0, dF = 0, dC = 0;
-    for (let i = r.i; i < total; i++) {
+    for (let i = r.i; i < stop; i++) {
       const d = minuteDelta(r, i, t + i, drain, seed.weather, fatigue);
       dJ += d.dJoy; dE += d.dEn; dF += d.dFu; dC += d.dCf;
     }
-    setT((x) => x + (total - r.i));
+    setT((x) => x + (stop - r.i));
     setJoy((j) => happy(j + dJ));
     setEnergy((e) => clamp(e + dE));
     setFuel((f) => clamp(f + dF));
     setComfort((c) => clamp(c + dC));
     if (!r.paid && r.a.cost) setWallet((w) => w - r.a.cost);
-    finishRun(r, r.net + dJ);
+    if (r.breakAt > 0 && stop >= r.breakAt) breakDown({ ...r, i: stop - r.walk - r.wait });
+    else finishRun(r, r.net + dJ);
   }
-
-  // the clock: one real second per park minute, at 1x
-  useEffect(() => {
-    if (!run || screen !== "play") return;
-    const id = setTimeout(stepMinute, Math.max(45, 1000 / speed));
-    return () => clearTimeout(id);
-  }, [run, speed, screen]);
 
   function beginBreak(b) {
     if (run || b.cost > wallet) return;
@@ -3914,10 +3957,7 @@ function Title({ onStart, onSetup, ready, mode, setMode, runMode, setRunMode, pa
           width: 74, height: 74, borderRadius: 37, background: C.blueTint, margin: "0 auto 20px",
           display: "flex", alignItems: "center", justifyContent: "center",
         }}><Icon d="mickey" c={C.blue} f s={40} /></div>
-        <div style={{ fontSize: 12.5, letterSpacing: ".2em", fontWeight: 800, color: C.blue, textTransform: "uppercase" }}>
-          One day · Two parks
-        </div>
-        <h1 style={{ fontSize: 38, fontWeight: 800, color: C.navy, margin: "8px 0 14px", lineHeight: 1.1 }}>
+        <h1 style={{ fontSize: 38, fontWeight: 800, color: C.navy, margin: "0 0 14px", lineHeight: 1.1 }}>
           Ropedrop<br />Run
         </h1>
         <p style={{ fontSize: 16.5, lineHeight: 1.55, color: C.text, maxWidth: 330, margin: "0 auto 22px" }}>
@@ -3976,8 +4016,13 @@ function Title({ onStart, onSetup, ready, mode, setMode, runMode, setRunMode, pa
                 onPick={(v) => setCustom((c) => ({ ...c, budget: v, unlimited: v >= 99999 }))} />
               <Knob label="Energy, hunger &amp; comfort drain" choices={DRAIN_CHOICES} value={custom.drain}
                 onPick={(v) => setCustom((c) => ({ ...c, drain: v }))} />
-              <Knob label="Random events" choices={[["On", true], ["Off", false]]} value={custom.events}
-                onPick={(v) => setCustom((c) => ({ ...c, events: v }))} last />
+              <Knob label="Random events" choices={[["On", "on"], ["Magical", "magical"], ["Off", "off"]]}
+                value={custom.events} onPick={(v) => setCustom((c) => ({ ...c, events: v }))} />
+              <div style={{ fontSize: 13.5, color: C.grey, lineHeight: 1.4 }}>
+                {custom.events === "magical" ? "Only good things happen. No breakdowns, no downpours, no lost afternoons."
+                  : custom.events === "off" ? "Nothing interrupts the day at all."
+                  : "The full mix, good and bad."}
+              </div>
             </div>
           )}
           <div style={{ fontSize: 14.5, color: C.grey, lineHeight: 1.45 }}>{DIFFICULTY[mode].blurb}</div>
