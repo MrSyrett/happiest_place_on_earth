@@ -77,29 +77,29 @@ const DL_RAW = [
   ["gadget", "Chip 'n' Dale's GADGETcoaster", "Toontown", "ride", "B", 3, 12, 6, -2, 0, 0, 518, 108],
 
   // --- classic Disneyland food & treats ---
-  ["corndog", "Little Red Wagon Corn Dog", "Main Street", "dine", "—", 15, 25, 15, 6, 26, 13, 629, 650],
+  ["corndog", "Little Red Wagon", "Main Street", "dine", "—", 15, 25, 15, 6, 26, 13, 629, 650],
   ["gibson", "Gibson Girl Ice Cream Parlor", "Main Street", "dine", "—", 12, 15, 11, 4, 16, 9, 562, 681],
-  ["candy", "Candy Palace Candy Apple", "Main Street", "dine", "—", 8, 8, 9, 2, 12, 11, 559, 674],
-  ["plazainn", "Plaza Inn Fried Chicken", "Main Street", "dine", "—", 45, 18, 20, 18, 48, 34, 637, 599],
+  ["candy", "Candy Palace", "Main Street", "dine", "—", 8, 8, 9, 2, 12, 11, 559, 674],
+  ["plazainn", "Plaza Inn", "Main Street", "dine", "—", 45, 18, 20, 18, 48, 34, 637, 599],
   ["carnation", "Carnation Café", "Main Street", "dine", "—", 40, 20, 17, 16, 42, 30, 560, 704],
   ["popcorn", "Popcorn Cart", "Main Street", "dine", "—", 6, 5, 7, 2, 10, 7, 563, 801],
 
-  ["dolewhip", "Dole Whip at Tiki Juice Bar", "Adventureland", "dine", "—", 12, 20, 17, 6, 18, 8, 504, 594],
+  ["dolewhip", "Tiki Juice Bar", "Adventureland", "dine", "—", 12, 20, 17, 6, 18, 8, 504, 594],
   ["hideaway", "The Tropical Hideaway", "Adventureland", "dine", "—", 18, 12, 12, 8, 24, 14, 510, 642],
-  ["monte", "Café Orleans Monte Cristo", "New Orleans Sq.", "dine", "—", 50, 22, 21, 18, 46, 38, 303, 677],
-  ["chowder", "Royal Street Veranda Chowder", "New Orleans Sq.", "dine", "—", 15, 10, 12, 8, 26, 14, 346, 677],
+  ["monte", "Café Orleans", "New Orleans Sq.", "dine", "—", 50, 22, 21, 18, 46, 38, 303, 677],
+  ["chowder", "Royal Street Veranda", "New Orleans Sq.", "dine", "—", 15, 10, 12, 8, 26, 14, 346, 677],
 
-  ["harbour", "Harbour Galley Lobster Roll", "Bayou Country", "dine", "—", 18, 12, 13, 8, 26, 18, 225, 564],
+  ["harbour", "Harbour Galley", "Bayou Country", "dine", "—", 18, 12, 13, 8, 26, 18, 225, 564],
 
   ["rancho", "Rancho del Zocalo", "Frontierland", "dine", "—", 30, 14, 14, 12, 36, 22, 451, 509],
-  ["funnel", "Stage Door Café Funnel Cake", "Frontierland", "dine", "—", 12, 12, 13, 4, 20, 11, 422, 592],
+  ["funnel", "Stage Door Café", "Frontierland", "dine", "—", 12, 12, 13, 4, 20, 11, 422, 592],
   ["turkeyleg", "Turkey Leg Cart", "Frontierland", "dine", "—", 10, 8, 13, 6, 30, 15, 378, 495],
 
   ["maurice", "Maurice's Treats", "Fantasyland", "dine", "—", 10, 12, 11, 4, 18, 10, 548, 513],
   ["redrose", "Red Rose Taverne", "Fantasyland", "dine", "—", 25, 15, 13, 10, 32, 20, 515, 351],
   ["edelweiss", "Edelweiss Snacks", "Fantasyland", "dine", "—", 8, 8, 10, 4, 22, 12, 737, 361],
 
-  ["milkstand", "Blue Milk at the Milk Stand", "Galaxy's Edge", "dine", "—", 10, 16, 13, 4, 12, 9, 381, 225],
+  ["milkstand", "The Milk Stand", "Galaxy's Edge", "dine", "—", 10, 16, 13, 4, 12, 9, 381, 225],
 
   ["pizzaplanet", "Alien Pizza Planet", "Tomorrowland", "dine", "—", 25, 14, 12, 10, 34, 19, 830, 610],
   ["daisy", "Café Daisy", "Toontown", "dine", "—", 15, 10, 9, 8, 24, 14, 612, 61],
@@ -184,7 +184,7 @@ const DCA_RAW = [
   ["smokejumpers", "Smokejumpers Grill", "Grizzly Peak", "dine", "—", 20, 12, 9, 8, 28, 17, 493, 1138],
 
   // --- California Adventure food & treats ---
-  ["schmoozies", "Schmoozies Smoothies", "Hollywood Land", "dine", "—", 10, 10, 9, 6, 16, 10, 731, 1171],
+  ["schmoozies", "Schmoozies", "Hollywood Land", "dine", "—", 10, 10, 9, 6, 16, 10, 731, 1171],
   ["wieners", "Award Wieners", "Hollywood Land", "dine", "—", 15, 12, 11, 6, 26, 15, 674, 1176],
   ["jackjack", "Jack-Jack Cookie Num Nums", "Pixar Pier", "dine", "—", 8, 14, 13, 3, 16, 8, 352, 1631],
   ["snowman", "Adorable Snowman Frosted Treats", "Pixar Pier", "dine", "—", 10, 12, 12, 4, 18, 9, 401, 1540],
@@ -398,36 +398,29 @@ const SINGLE_JOY = 0.75;   // three quarters of the happiness
    INDOOR is the properly climate-controlled stuff; WET rides are a relief in
    the heat and thoroughly unpleasant when it's already raining. */
 const INDOOR = new Set([
-  // Disneyland
   "pirates", "mansion", "smallworld", "peterpan", "snow", "toad", "pinocchio", "alice",
-  "space", "startours", "buzz", "nemo", "indy", "tiki", "lincoln", "cinema", "rise",
-  "falcon", "railway", "roger", "bluey", "launchbay", "mickeyhouse", "minniehouse",
-  "oga", "dockingbay", "bayou", "monte", "tianas", "julep", "plazainn", "carnation", "gibson", "jolly", "redrose",
-  "rancho", "bear", "harbour", "grill", "pizzaplanet", "daisy", "chowder",
-  // California Adventure
+  "space", "startours", "buzz", "indy", "tiki", "lincoln", "cinema", "rise", "falcon",
+  "railway", "roger", "bluey", "launchbay", "mickeyhouse", "minniehouse", "oga",
+  "dockingbay", "bayou", "tianas", "plazainn", "jolly", "redrose", "pizzaplanet",
   "guardians", "webslingers", "midway", "soarin", "monsters", "philhar", "animation",
-  "turtletalk", "djunior", "lamplight", "carthay", "ghirardelli", "lucky", "bakery",
-  "pym", "flos", "schmoozies", "boardwalk", "auntcass", "cocina", "hollywoodlounge",
-  "trattoria",
+  "turtletalk", "djunior", "lamplight", "carthay", "ghirardelli", "bakery", "pym", "flos",
+  "auntcass", "hollywoodlounge", "trattoria"
 ]);
 const WET = new Set(["grizzly", "tiana"]);
 
 /* Comfort recovery is a RATE, not a lump: three minutes in Snow White should not
    restore as much as half an hour in a theatre. */
+/* Only genuinely enclosed, air-conditioned places give comfort back. Everything
+   else — open-air rides, patio dining, outdoor stages, the railroad — costs you
+   something, just less than being on your feet in a queue. */
 function comfortRate(a, weather, temp) {
-  /* Getting soaked is a treat in real heat and grim otherwise, on a smooth
-     curve rather than a threshold — being drenched at 65 degrees should not
-     feel the same as being drenched at 95. Rain adds to it, because there's
-     nowhere to dry off. */
   if (WET.has(a.id)) {
     const wet = Math.max(-2.6, Math.min(1.8, ((temp === undefined ? 75 : temp) - 78) / 9));
     return wet - (weather === "drizzle" ? 0.7 : 0);
   }
-  if (INDOOR.has(a.id)) return 0.55;
-  if (a.kind === "show") return 0.45;
-  if (a.kind === "dine") return 0.4;
-  if (a.kind === "train") return 0.35;
-  return weather === "drizzle" ? -0.7 : -0.35;   // out in it, and wetter still if it's raining
+  if (INDOOR.has(a.id)) return 0.55;             // the only thing that recovers
+  if (a.kind === "ride") return -0.35;           // out in it, on your feet or in the sun
+  return -0.15;                                  // seated or shaded, but still outside
 }
 
 // comfort bleeds faster the hotter it actually is, and rain is its own penalty
@@ -1395,6 +1388,17 @@ export default function HappiestPlace() {
   const [energy, setEnergy] = useState(100);
   const [fuel, setFuel] = useState(72);
   const [comfort, setComfort] = useState(100);
+  /* Comfort has a ceiling that ratchets down as the day wears on: air
+     conditioning gives back a portion of what the day took, never all of it.
+     Only a night's sleep lifts the ceiling again. */
+  const [comfortCap, setComfortCap] = useState(100);
+  const COMFORT_RATCHET = 0.18;  // a portion of everything you lose is gone for good
+  const bumpComfort = (d) => {
+    if (d < 0) setComfortCap((k) => Math.max(25, k + d * COMFORT_RATCHET));
+    setComfort((c) => Math.max(0, Math.min(comfortCapRef.current, c + d)));
+  };
+  const comfortCapRef = useRef(100);
+  useEffect(() => { comfortCapRef.current = comfortCap; }, [comfortCap]);
   const [wallet, setWallet] = useState(DIFFICULTY.medium.budget);
   const [pos, setPos] = useState({ park: "dl", x: 592, y: 675, landName: "Main Street" });
   const [mapPark, setMapPark] = useState("dl");
@@ -1682,7 +1686,8 @@ export default function HappiestPlace() {
     setSeed({ ...cond, lateOpen: late, refurb });
     setScreen("play"); setT(OPEN); setJoy(50);
     setEnergy(c ? overnight.energy(c.energy, day) : Math.round(100 * PARTY[party].energy)); setFuel(carry ? overnight.fuel(carry.fuel) : 72);
-    setComfort(c ? overnight.comfort(c.comfort, day) : 100);
+    const c0 = c ? overnight.comfort(c.comfort, day) : 100;
+    setComfort(c0); setComfortCap(c0); comfortCapRef.current = c0;
     setWallet(budgetOf + (c ? Math.max(0, Math.round(c.wallet)) : 0));
     const gp = (parkOverride === "dl" || parkOverride === "dca") ? parkOverride : startPark;
     const gate = gp === "dl"
@@ -1735,7 +1740,7 @@ export default function HappiestPlace() {
     const hot = 1 + 0.55 * heatAt(seed.weather, t, seed.warm) + 0.30 * coldAt(seed.weather, t, seed.warm);
     setEnergy((e) => clamp(e - (mins / 10) * 0.3 * hot * drain * fatigue));
     setFuel((f) => clamp(f - (mins / 10) * 0.95 * PARTY[party].hunger * drain));
-    setComfort((c) => clamp(c - mins * comfortDrain(seed.weather, t, seed.warm) * drain * fatigue));
+    bumpComfort(-mins * comfortDrain(seed.weather, t, seed.warm) * drain * fatigue);
     setJoy((j) => happy(j - (mins / 10) * 0.35 * drain));
     setT((x) => x + mins);
   }
@@ -1843,7 +1848,7 @@ export default function HappiestPlace() {
     if (e.joy) setJoy((j) => happy(j + e.joy));
     if (e.energy) setEnergy((en) => clamp(en + e.energy));
     if (e.fuel) setFuel((f) => clamp(f + e.fuel));
-    if (e.comfort) setComfort((c) => clamp(c + e.comfort));
+    if (e.comfort) bumpComfort(e.comfort);
     if (e.money) setWallet((w) => Math.max(0, w + e.money));
     if (e.ll) grantLL();
     if (e.timeShift) setT((x) => x + e.timeShift);
@@ -1902,7 +1907,7 @@ export default function HappiestPlace() {
     if (ev.joy) setJoy((j) => happy(j + ev.joy));
     if (ev.energy) setEnergy((e) => clamp(e + ev.energy));
     if (ev.fuel) setFuel((f) => clamp(f + ev.fuel));
-    if (ev.comfort) setComfort((c) => clamp(c + ev.comfort));
+    if (ev.comfort) bumpComfort(ev.comfort);
     if (ev.money) setWallet((w) => Math.max(0, w + ev.money));
     if (ev.ll) grantLL();
     if (ev.timeShift) setT((x) => x + ev.timeShift);
@@ -1985,7 +1990,7 @@ export default function HappiestPlace() {
     setMapPark(a.park);
     setMods((m) => ({ ...m, closures: { ...m.closures, [a.id]: t + down } }));
     setJoy((j) => happy(j - 9));
-    setComfort((c) => clamp(c - 5));
+    bumpComfort(-5);
     setBoughtLl((b) => b);
     grantLL();
     push(`${a.name} broke down while you were on it — ${r.i} min gone, closed about ${down} min. 1 free Lightning Lane.`, "bad");
@@ -2013,11 +2018,19 @@ export default function HappiestPlace() {
     setJoy((j) => happy(j + dJ));
     setEnergy((e) => clamp(e + dE));
     setFuel((f) => clamp(f + dF));
-    setComfort((c) => clamp(c + dC));
+    bumpComfort(dC);
     if (!r.paid && r.a.cost) setWallet((w) => w - r.a.cost);
     if (r.breakAt > 0 && stop >= r.breakAt) breakDown({ ...r, i: stop - r.walk - r.wait });
     else finishRun(r, r.net + dJ);
   }
+
+  /* Drives the activity: one game-minute per tick, which is what advances the
+     progress bar and walks the marker along the path. */
+  useEffect(() => {
+    if (!run || screen !== "play") return;
+    const id = setTimeout(stepMinute, Math.max(45, 1000 / speed));
+    return () => clearTimeout(id);
+  }, [run, speed, screen]);
 
   function beginBreak(b) {
     if (run || b.cost > wallet) return;
@@ -2503,7 +2516,7 @@ export default function HappiestPlace() {
 
   return (
     <Shell>
-      <StatusBar t={t} joy={joy} energy={energy} fuel={fuel} comfort={comfort} wallet={wallet} ll={llLeft} seed={seed} unlimited={unlimited} />
+      <StatusBar t={t} joy={joy} energy={energy} fuel={fuel} comfort={comfort} comfortCap={comfortCap} wallet={wallet} ll={llLeft} seed={seed} unlimited={unlimited} />
 
       {(tab === "map" || tab === "list") && !editing && !run && (
         <>
@@ -2534,6 +2547,8 @@ export default function HappiestPlace() {
           {listed.map(({ a, w }) => (
             <AttractionCard key={a.id} a={dress(a)} wait={waits[a.id]} walk={w} reps={visited[a.id] || 0}
               llOk={llReady(a.id)} llFree={!boughtLl && !singlePass[a.id]} freeLeft={freeLL}
+              closedWhy={mods.refurb === a.id ? "refurb"
+                : (mods.lateOpen && t < (mods.lateOpen[a.id] || 0)) ? "late" : "closure"}
               mustSwitch={needsSwitch(a, party)} hopBlocked={hopBlock(a)} parkShut={!parkOpenNow(a.park, t)} t={t} wallet={wallet}
               onOpen={() => setSel(a.id)} onGo={beginAttraction} />
           ))}
@@ -2588,6 +2603,8 @@ export default function HappiestPlace() {
           hop={pos.park !== selA.park} reps={visited[selA.id] || 0}
           wallet={wallet} llOk={llReady(selA.id)}
           llFree={!boughtLl && !singlePass[selA.id]} freeLeft={freeLL}
+          closedWhy={mods.refurb === selA.id ? "refurb"
+            : (mods.lateOpen && t < (mods.lateOpen[selA.id] || 0)) ? "late" : "closure"}
           spPrice={singlePass[selA.id] ? 0 : (SINGLE_PASS[selA.id] || 0)} onBuySingle={buySinglePass}
           mustSwitch={needsSwitch(selA, party)} hopBlocked={hopBlock(selA)} onBuyHopper={buyHopper} t={t}
           onClose={() => setSel(null)} onGo={beginAttraction} onTrain={beginTrain} />
@@ -2981,7 +2998,7 @@ function NavBar({ title, onBack }) {
   );
 }
 
-function StatusBar({ t, joy, energy, fuel, comfort, wallet, ll, seed, unlimited }) {
+function StatusBar({ t, joy, energy, fuel, comfort, comfortCap, wallet, ll, seed, unlimited }) {
   return (
     <div style={{ padding: "7px 14px 8px", borderBottom: `1px solid ${C.rule}`, flexShrink: 0, background: C.white }}>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
@@ -3013,21 +3030,28 @@ function StatusBar({ t, joy, energy, fuel, comfort, wallet, ll, seed, unlimited 
               so it reads the same way as Energy and Comfort. */}
           <Meter label="Hunger" v={fuel}
             c={fuel < 25 ? C.red : fuel < 50 ? C.amber : C.green} />
-          <Meter label="Comfort" v={comfort} c={comfort < 30 ? C.red : C.blue} />
+          <Meter label="Comfort" v={comfort} cap={comfortCap} c={comfort < 30 ? C.red : C.blue} />
         </div>
       </div>
     </div>
   );
 }
 
-function Meter({ label, v, c }) {
+function Meter({ label, v, c, cap }) {
   return (
     <div style={{ flex: 1 }}>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, fontWeight: 700, color: C.greyLt }}>
         <span>{label}</span><span style={{ color: C.text }}>{Math.round(v)}</span>
       </div>
-      <div style={{ height: 4, borderRadius: 2, background: C.rule, marginTop: 2, overflow: "hidden" }}>
+      <div style={{ height: 4, borderRadius: 2, background: C.rule, marginTop: 2, position: "relative", overflow: "hidden" }}>
         <div style={{ width: `${clamp(v)}%`, height: "100%", background: c, borderRadius: 3, transition: "width .35s ease" }} />
+        {/* how much of the bar the day has taken for good */}
+        {cap !== undefined && cap < 99.5 && (
+          <div style={{
+            position: "absolute", right: 0, top: 0, bottom: 0,
+            width: `${clamp(100 - cap)}%`, background: C.greyLt, opacity: 0.45,
+          }} />
+        )}
       </div>
     </div>
   );
@@ -3161,7 +3185,7 @@ function ShowListButton({ onClick }) {
 }
 
 /* ---------------- attraction card (list) ---------------- */
-function AttractionCard({ a, wait, walk, reps, llOk, llFree, freeLeft, mustSwitch, hopBlocked, parkShut, t, wallet, onOpen, onGo }) {
+function AttractionCard({ a, wait, walk, reps, llOk, llFree, freeLeft, mustSwitch, hopBlocked, parkShut, closedWhy, t, wallet, onOpen, onGo }) {
   const isRide = a.kind === "ride" || a.kind === "night";
   // no wait threshold: Disney lets you book any eligible ride, and spending a
   // skip on a walk-on is a real mistake the player is allowed to make
@@ -3187,15 +3211,30 @@ function AttractionCard({ a, wait, walk, reps, llOk, llFree, freeLeft, mustSwitc
         </div>
       </div>
 
+      {wait < 0 ? (
+        // nothing here is meaningful while it's shut, so show only why
+        <div style={{
+          background: "#FCEAEA", borderRadius: 14, padding: "16px 16px", marginBottom: 10,
+        }}>
+          <div style={{ fontSize: 17.5, fontWeight: 800, color: C.red }}>
+            {closedWhy === "refurb" ? "Closed for Refurbishment"
+              : closedWhy === "late" ? "Not Open Yet" : "Temporarily Closed"}
+          </div>
+          <div style={{ fontSize: 15, color: C.text, lineHeight: 1.45, marginTop: 4 }}>
+            {closedWhy === "refurb" ? "It's down for the whole day. Nothing to do but plan around it."
+              : closedWhy === "late" ? "It opens later than the rest of the park. Come back a bit after rope drop."
+              : "It's gone down. These usually come back within the hour."}
+          </div>
+          <div style={{ fontSize: 14.5, color: C.grey, marginTop: 6 }}>{walk} min walk from here</div>
+        </div>
+      ) : (
       <InfoBox>
         <div>
           <div style={{ fontSize: 15.5, fontWeight: 800, color: C.navy }}>
             {a.kind === "train" ? "Next Train" : a.kind === "dine" ? "Seated" : isRide ? "Standby Line" : "Next Show"}
           </div>
           <div style={{ marginTop: 3 }}>
-            {wait < 0 ? (
-              <span style={{ fontSize: 17, fontWeight: 800, color: C.red }}>Temporarily Closed</span>
-            ) : (
+            {false ? null : (
               <>
                 <span style={{ fontSize: 23, fontWeight: 800, color: wait > 45 ? C.red : C.navy }}>
                   {a.kind === "dine" ? seatedMinutes(a) : wait || "—"}
@@ -3208,8 +3247,9 @@ function AttractionCard({ a, wait, walk, reps, llOk, llFree, freeLeft, mustSwitc
         </div>
         <TextLink onClick={onOpen}>View Details</TextLink>
       </InfoBox>
+      )}
 
-      {isQuickService(a) && walk >= MOBILE_MIN_WALK && (
+      {wait >= 0 && isQuickService(a) && walk >= MOBILE_MIN_WALK && (
         <InfoBox>
           <div>
             <div style={{ fontSize: 15.5, fontWeight: 800, color: C.navy }}>Mobile Order</div>
@@ -3225,7 +3265,7 @@ function AttractionCard({ a, wait, walk, reps, llOk, llFree, freeLeft, mustSwitc
         </InfoBox>
       )}
 
-      {isQuickService(a) && (
+      {wait >= 0 && isQuickService(a) && (
         <InfoBox>
           <div>
             <div style={{ fontSize: 15.5, fontWeight: 800, color: C.navy }}>Eat on the Go</div>
@@ -3305,7 +3345,7 @@ const InfoBox = ({ children }) => (
 );
 
 /* ---------------- detail sheet ---------------- */
-function Sheet({ a, wait, walk, hop, reps, wallet, llOk, llFree, freeLeft, spPrice, mustSwitch, hopBlocked, onBuyHopper, t, onClose, onGo, onTrain, onBuySingle }) {
+function Sheet({ a, wait, walk, hop, reps, wallet, llOk, llFree, freeLeft, spPrice, mustSwitch, hopBlocked, closedWhy, onBuyHopper, t, onClose, onGo, onTrain, onBuySingle }) {
   const canLL = llOk;
   const singleOk = singleRiderOpen(a.id, t) && wait >= 10;
   const singleWait = Math.max(5, Math.round((wait * SINGLE_WAIT) / 5) * 5);
@@ -3327,6 +3367,23 @@ function Sheet({ a, wait, walk, hop, reps, wallet, llOk, llFree, freeLeft, spPri
         <div style={{ fontSize: 14.5, color: C.grey, marginTop: 3 }}>
           {a.landName} · {PARKS[a.park].short}{a.ticket !== "—" ? ` · ${a.ticket}-Ticket` : ""}
         </div>
+
+        {wait < 0 && (
+          <div style={{
+            marginTop: 12, background: "#FCEAEA", borderRadius: 12, padding: "14px 14px",
+          }}>
+            <div style={{ fontSize: 17.5, fontWeight: 800, color: C.red }}>
+              {closedWhy === "refurb" ? "Closed for Refurbishment"
+                : closedWhy === "late" ? "Not Open Yet" : "Temporarily Closed"}
+            </div>
+            <div style={{ fontSize: 15, color: C.text, lineHeight: 1.45, marginTop: 4 }}>
+              {closedWhy === "refurb" ? "It's down for the whole day. Nothing to do but plan around it."
+                : closedWhy === "late" ? "It opens later than the rest of the park — try again a bit after rope drop."
+                : "It's gone down. These usually come back within the hour."}
+            </div>
+            <div style={{ fontSize: 14.5, color: C.grey, marginTop: 6 }}>{walk} min walk from here</div>
+          </div>
+        )}
 
         {hopBlocked === "hopper" && (
           <div style={{
