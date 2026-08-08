@@ -60,7 +60,7 @@ const DL_RAW = [
 
   ["thunder", "Big Thunder Mountain", "Frontierland", "ride", "E", 8, 40, 18, -7, 0, 0, 422, 504],
   ["twain", "Mark Twain Riverboat", "Frontierland", "ride", "C", 18, 10, 10, 12, 0, 0, 385, 515],
-  ["horseshoe", "Golden Horseshoe", "Frontierland", "dine", "\u2014", 25, 12, 12, 8, 30, 17, 427, 562],
+  ["horseshoe", "Golden Horseshoe", "Frontierland", "dine", "—", 25, 12, 12, 8, 30, 17, 427, 562],
   ["fantasmic", "Fantasmic!", "Frontierland", "night", "E", 30, 45, 30, -8, 0, 0, 312, 568],
 
   ["matterhorn", "Matterhorn Bobsleds", "Fantasyland", "ride", "E", 8, 45, 16, -9, 0, 0, 709, 367],
@@ -151,7 +151,9 @@ const DCA_RAW = [
   ["turtletalk", "Turtle Talk with Crush", "Hollywood Land", "show", "B", 15, 15, 11, 11, 0, 0, 725, 1201],
 
   ["webslingers", "WEB SLINGERS", "Avengers Campus", "ride", "D", 6, 45, 14, -3, 0, 0, 630, 1307],
+  ["spiderman", "The Amazing Spider-Man!", "Avengers Campus", "show", "B", 10, 12, 12, 4, 0, 0, 592, 1313],
   ["guardians", "Guardians of the Galaxy", "Avengers Campus", "ride", "E", 7, 50, 21, -9, 0, 0, 835, 1298],
+  ["danceoff", "Guardians of the Galaxy: Awesome Dance Off!", "Avengers Campus", "show", "B", 15, 10, 11, 2, 0, 0, 806, 1319],
   ["pym", "Pym Test Kitchen", "Avengers Campus", "dine", "—", 25, 15, 13, 10, 32, 24, 733, 1307],
 
   ["racers", "Radiator Springs Racers", "Cars Land", "ride", "E", 8, 75, 25, -6, 0, 0, 630, 1558],
@@ -170,6 +172,7 @@ const DCA_RAW = [
   ["whirlwind", "Inside Out Emotional Whirlwind", "Pixar Pier", "ride", "C", 5, 15, 8, -2, 0, 0, 122, 1532],
 
   ["mermaid", "Little Mermaid", "Paradise Gardens", "ride", "C", 6, 12, 9, 4, 0, 0, 332, 1381],
+  ["cappuccino", "Cappuccino Cart", "Paradise Gardens", "dine", "—", 8, 8, 8, 8, 12, 8, 372, 1398],
   ["skyschool", "Goofy's Sky School", "Paradise Gardens", "ride", "D", 4, 30, 10, -6, 0, 0, 103, 1378],
   ["swings", "Silly Symphony Swings", "Paradise Gardens", "ride", "C", 5, 15, 9, -3, 0, 0, 146, 1469],
   ["zephyr", "Golden Zephyr", "Paradise Gardens", "ride", "B", 4, 10, 6, -1, 0, 0, 188, 1423],
@@ -189,6 +192,7 @@ const DCA_RAW = [
   ["gardengrill", "Paradise Garden Grill", "Paradise Gardens", "dine", "—", 20, 12, 12, 10, 30, 18, 50, 1410],
   ["bayside", "Bayside Brews", "Paradise Gardens", "dine", "—", 10, 8, 8, 4, 12, 11, 117, 1446],
   ["lucky", "Lucky Fortune Cookery", "San Fransokyo", "dine", "—", 18, 12, 11, 8, 26, 16, 477, 1465],
+  ["trattoria", "Wine Country Trattoria", "San Fransokyo", "dine", "—", 60, 20, 20, 18, 46, 44, 470, 1432],
   ["poultry", "Poultry Palace", "Pixar Pier", "dine", "—", 14, 10, 10, 6, 26, 14, 295, 1598],
 
   ["auntcass", "Aunt Cass Café", "San Fransokyo", "dine", "—", 22, 12, 12, 10, 32, 18, 452, 1455],
@@ -196,7 +200,7 @@ const DCA_RAW = [
   ["corndogcastle", "Corn Dog Castle", "Paradise Gardens", "dine", "—", 10, 12, 10, 4, 24, 13, 169, 1372],
   ["hollywoodlounge", "Hollywood Lounge", "Hollywood Land", "dine", "—", 15, 10, 9, 8, 14, 16, 822, 1112],
   ["boardwalk", "Games of the Boardwalk", "Pixar Pier", "ride", "A", 8, 5, 6, -2, 0, 10, 160, 1571],
-  ["djunior", "Disney Junior Dream Factory", "Hollywood Land", "show", "B", 22, 10, 9, 8, 0, 0, 652, 1205],
+  ["djunior", "Disney Jr. Mickey Mouse Clubhouse Live", "Hollywood Land", "show", "B", 22, 10, 9, 8, 0, 0, 652, 1205],
   ["bakery", "The Bakery Tour", "San Fransokyo", "dine", "—", 15, 5, 8, 4, 14, 7, 488, 1418],
 
   ["woc", "World of Color", "Paradise Bay", "night", "E", 25, 45, 29, -6, 0, 0, 252, 1492],
@@ -246,6 +250,13 @@ function actualWait(posted, id, t) {
 // absolute minutes past midnight: Rise 10 PM, the river craft at dusk
 const LAST_CALL = { rise: 1320, twain: 1140, columbia: 1140, tomsawyer: 1140, canoes: 1080, redwood: 1200 };
 
+/* A few venues change over entirely in the evening — same building, different
+   show. NIGHT_SWAP renames them (and can adjust what they're worth) past a
+   given clock time. */
+const NIGHT_SWAP = {
+  djunior: { from: 1050, name: "Disney Friends Dance Party", joy: 2 },   // 5:30 PM
+};
+
 const NIGHT = {          // absolute minutes past midnight
   parade: [1180, 1280],
   fireworks: [1200, 1275],
@@ -277,10 +288,23 @@ const SEASONS = {
              ["fw2", "Festival Marketplace: Citrus Grove", "San Fransokyo", 14, 12, 26],
              ["fw3", "Festival Marketplace: Nuts About Cheese", "Hollywood Land", 15, 14, 28]] },
   halloween:{ label: "Halloween Time", crowd: 1.18, warm: 6,
-    blurb: "Late August to October. Hot, busy, and the overlays are worth it.",
+    blurb: "Late August to October. Hot, busy, and the overlays are worth it. "
+         + "Oogie Boogie Bash takes over California Adventure in the evening.",
     overlay: { mansion: "Haunted Mansion Holiday", fireworks: "Halloween Screams" },
     boost: { mansion: 6, fireworks: 5 },
-    booths: [["hw1", "Plaza de la Familia Marketplace", "San Fransokyo", 14, 12, 26]] },
+    /* Mission: BREAKOUT! runs its Monsters After Dark version only during the
+       Bash — a different ride track, and the queue reflects it. */
+    nightFrom: 1020,                                   // 5:00 PM, when the Bash starts
+    nightOverlay: { guardians: { name: "Guardians of the Galaxy \u2013 Monsters After Dark", joy: 7, waitMult: 1.25 } },
+    booths: [["hw1", "Plaza de la Familia Marketplace", "San Fransokyo", 14, 12, 26]],
+    /* Oogie Boogie Bash is a separately ticketed evening event. These only
+       exist during Halloween, and only after 5 PM. */
+    extras: [
+      ["oogie_trails", "Oogie Boogie Bash: Treat Trails", "Hollywood Land", "dine", 20, 14, 15, 6, 34, 0, 700, 1218],
+      ["oogie_parade", "Frightfully Fun Parade", "Buena Vista St.", "night", 25, 20, 22, -2, 0, 0, 596, 1188],
+      ["oogie_grove", "Villains Grove", "Grizzly Peak", "show", 18, 22, 19, 4, 0, 0, 430, 1250],
+      ["oogie_mickey", "Mickey's Trick and Treat", "Hollywood Land", "show", 25, 18, 17, 8, 0, 0, 668, 1228],
+    ] },
   holidays: { label: "The Holidays", crowd: 1.32, warm: -10,
     blurb: "Mid-November to early January. The busiest and the prettiest.",
     overlay: { mansion: "Haunted Mansion Holiday", smallworld: "\"it's a small world\" Holiday",
@@ -291,10 +315,17 @@ const SEASONS = {
 
 const SEASON_FOOD = Object.entries(SEASONS).flatMap(([sk, sv]) => (sv.booths || []).map(
   ([id, name, land, dur, wait, fuel]) => ({
-    id, name, landName: land, kind: "dine", ticket: "\u2014", dur, wait,
+    id, name, landName: land, kind: "dine", ticket: "—", dur, wait,
     joy: 13, en: 6, fuel, cost: 17, x: 0, y: 0, park: "dca", season: sk,
   })));
-const ATTRACTIONS = [...build(DL_RAW, "dl"), ...build(DCA_RAW, "dca"), ...SEASON_FOOD];
+// seasonal attractions, which unlike the booths have a place on the map and hours
+const SEASON_EXTRA = Object.entries(SEASONS).flatMap(([sk, sv]) => (sv.extras || []).map(
+  ([id, name, land, kind, dur, wait, joy, en, fuel, cost, x, y]) => ({
+    id, name, landName: land, kind, ticket: kind === "dine" ? "—" : "B",
+    dur, wait, joy, en, fuel, cost, x, y, park: "dca", season: sk,
+    open: sv.nightFrom || 1020, close: 1440,
+  })));
+const ATTRACTIONS = [...build(DL_RAW, "dl"), ...build(DCA_RAW, "dca"), ...SEASON_FOOD, ...SEASON_EXTRA];
 const byId = Object.fromEntries(ATTRACTIONS.map((a) => [a.id, a]));
 
 const PARKS = {
@@ -372,6 +403,7 @@ const INDOOR = new Set([
   "guardians", "webslingers", "midway", "soarin", "monsters", "philhar", "animation",
   "turtletalk", "djunior", "lamplight", "carthay", "ghirardelli", "lucky", "bakery",
   "pym", "flos", "schmoozies", "boardwalk", "auntcass", "cocina", "hollywoodlounge",
+  "trattoria",
 ]);
 const WET = new Set(["grizzly", "tiana"]);
 
@@ -1122,9 +1154,17 @@ export default function HappiestPlace() {
      originals, and the queues reflect that. */
   const sea = SEASONS[season];
   const dress = (a) => {
+    let out = a;
+    const sw = NIGHT_SWAP[a.id];
+    if (sw && M(t) >= sw.from) out = { ...out, name: sw.name, joy: out.joy + (sw.joy || 0) };
     const nm = sea.overlay && sea.overlay[a.id];
-    if (!nm) return a;
-    return { ...a, name: nm, joy: a.joy + ((sea.boost && sea.boost[a.id]) || 0) };
+    if (nm) out = { ...out, name: nm, joy: out.joy + ((sea.boost && sea.boost[a.id]) || 0) };
+    // a seasonal night overlay wins over both
+    const nn = sea.nightOverlay && sea.nightOverlay[a.id];
+    if (nn && M(t) >= (sea.nightFrom || 1020)) {
+      out = { ...out, name: nn.name, joy: out.joy + (nn.joy || 0), wait: Math.round(out.wait * (nn.waitMult || 1)) };
+    }
+    return out;
   };
   const place = (a) => dress(nudges[a.id] ? { ...a, ...nudges[a.id] } : a);
 
