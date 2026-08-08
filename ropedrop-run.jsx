@@ -26,180 +26,180 @@ const F = "'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-se
 
 /* ---------------- game model (unchanged) ---------------- */
 const DL_RAW = [
-  ["railroad", "Main Street Station", "Main Street", "train", "B", 0, 10, 0, 0, 0, 0, 595, 671],
-  ["rr_nos", "New Orleans Square Station", "New Orleans Sq.", "train", "B", 0, 10, 0, 0, 0, 0, 321, 556],
-  ["rr_toon", "Toontown Depot", "Toontown", "train", "B", 0, 10, 0, 0, 0, 0, 626, 150],
-  ["rr_tom", "Tomorrowland Station", "Tomorrowland", "train", "B", 0, 10, 0, 0, 0, 0, 875, 408],
-  ["cinema", "Main Street Cinema", "Main Street", "show", "A", 10, 0, 4, 2, 0, 0, 601, 606],
-  ["jolly", "Jolly Holiday Bakery", "Main Street", "dine", "—", 25, 12, 9, 10, 30, 16, 556, 492],
-  ["emporium", "The Emporium", "Main Street", "shop", "—", 15, 0, 12, -2, 0, 48, 609, 644],
-  ["parade", "Electrical Parade", "Main Street", "night", "E", 25, 20, 18, -2, 0, 0, 593, 473],
-  ["fireworks", "Fireworks over the Castle", "Central Plaza", "night", "E", 25, 30, 28, -4, 0, 0, 596, 362],
+  ["railroad", "Main Street Station", "Main Street", "train", "B", 0, 10, 0, 0, 0, 0, 581, 837],
+  ["rr_nos", "New Orleans Square Station", "New Orleans Sq.", "train", "B", 0, 10, 0, 0, 0, 0, 227, 688],
+  ["rr_toon", "Toontown Depot", "Toontown", "train", "B", 0, 10, 0, 0, 0, 0, 621, 164],
+  ["rr_tom", "Tomorrowland Station", "Tomorrowland", "train", "B", 0, 10, 0, 0, 0, 0, 943, 497],
+  ["cinema", "Main Street Cinema", "Main Street", "show", "A", 10, 0, 4, 2, 0, 0, 589, 753],
+  ["jolly", "Jolly Holiday Bakery", "Main Street", "dine", "—", 25, 12, 9, 10, 30, 16, 531, 606],
+  ["emporium", "The Emporium", "Main Street", "shop", "—", 15, 0, 12, -2, 0, 48, 599, 802],
+  ["parade", "Electrical Parade", "Main Street", "night", "E", 25, 20, 18, -2, 0, 0, 578, 581],
+  ["fireworks", "Fireworks over the Castle", "Central Plaza", "night", "E", 25, 30, 28, -4, 0, 0, 582, 438],
 
-  ["indy", "Indiana Jones Adventure", "Adventureland", "ride", "E", 5, 45, 20, -8, 0, 0, 475, 537],
-  ["jungle", "Jungle Cruise", "Adventureland", "ride", "D", 12, 35, 13, -3, 0, 0, 502, 524],
-  ["treehouse", "Adventureland Treehouse", "Adventureland", "ride", "B", 12, 5, 7, -6, 0, 0, 451, 532],
-  ["tiki", "Enchanted Tiki Room", "Adventureland", "show", "B", 17, 10, 9, 8, 0, 0, 536, 485],
-  ["bengal", "Bengal Barbecue", "Adventureland", "dine", "—", 20, 10, 10, 8, 28, 14, 477, 511],
+  ["indy", "Indiana Jones Adventure", "Adventureland", "ride", "E", 5, 45, 20, -8, 0, 0, 426, 664],
+  ["jungle", "Jungle Cruise", "Adventureland", "ride", "D", 12, 35, 13, -3, 0, 0, 461, 647],
+  ["treehouse", "Adventureland Treehouse", "Adventureland", "ride", "B", 12, 5, 7, -6, 0, 0, 395, 657],
+  ["tiki", "Enchanted Tiki Room", "Adventureland", "show", "B", 17, 10, 9, 8, 0, 0, 505, 597],
+  ["bengal", "Bengal Barbecue", "Adventureland", "dine", "—", 20, 10, 10, 8, 28, 14, 429, 630],
 
-  ["pirates", "Pirates of the Caribbean", "New Orleans Sq.", "ride", "D", 15, 30, 16, 2, 0, 0, 425, 528],
-  ["mansion", "Haunted Mansion", "New Orleans Sq.", "ride", "D", 12, 38, 16, 0, 0, 0, 299, 490],
-  ["bayou", "Blue Bayou Restaurant", "New Orleans Sq.", "dine", "—", 75, 20, 26, 25, 55, 72, 406, 559],
-  ["julep", "Mint Julep Bar", "New Orleans Sq.", "dine", "—", 12, 12, 12, 4, 20, 11, 343, 552],
-  ["tianas", "Tiana's Palace", "New Orleans Sq.", "dine", "—", 35, 18, 17, 14, 40, 26, 348, 538],
+  ["pirates", "Pirates of the Caribbean", "New Orleans Sq.", "ride", "D", 15, 30, 16, 2, 0, 0, 362, 652],
+  ["mansion", "Haunted Mansion", "New Orleans Sq.", "ride", "D", 12, 38, 16, 0, 0, 0, 199, 603],
+  ["bayou", "Blue Bayou Restaurant", "New Orleans Sq.", "dine", "—", 75, 20, 26, 25, 55, 72, 337, 692],
+  ["julep", "Mint Julep Bar", "New Orleans Sq.", "dine", "—", 12, 12, 12, 4, 20, 11, 256, 683],
+  ["tianas", "Tiana's Palace", "New Orleans Sq.", "dine", "—", 35, 18, 17, 14, 40, 26, 262, 665],
 
-  ["tiana", "Tiana's Bayou Adventure", "Bayou Country", "ride", "E", 12, 53, 19, -6, 0, 0, 256, 429],
-  ["pooh", "Winnie the Pooh", "Bayou Country", "ride", "C", 5, 12, 7, 2, 0, 0, 271, 407],
-  ["bear", "Hungry Bear Restaurant", "Bayou Country", "dine", "—", 25, 12, 11, 10, 30, 19, 266, 391],
+  ["tiana", "Tiana's Bayou Adventure", "Bayou Country", "ride", "E", 12, 53, 19, -6, 0, 0, 143, 524],
+  ["pooh", "Winnie the Pooh", "Bayou Country", "ride", "C", 5, 12, 7, 2, 0, 0, 163, 496],
+  ["bear", "Hungry Bear Restaurant", "Bayou Country", "dine", "—", 25, 12, 11, 10, 30, 19, 156, 475],
 
-  ["rise", "Rise of the Resistance", "Galaxy's Edge", "ride", "E", 18, 64, 24, -10, 0, 0, 235, 241],
-  ["falcon", "Smugglers Run", "Galaxy's Edge", "ride", "E", 8, 36, 16, -4, 0, 0, 370, 140],
-  ["oga", "Oga's Cantina", "Galaxy's Edge", "dine", "—", 30, 25, 18, 6, 10, 34, 415, 163],
-  ["ronto", "Ronto Roasters", "Galaxy's Edge", "dine", "—", 18, 12, 10, 8, 26, 17, 364, 199],
-  ["dockingbay", "Docking Bay 7 Food and Cargo", "Galaxy's Edge", "dine", "—", 30, 14, 14, 11, 34, 21, 360, 176],
+  ["rise", "Rise of the Resistance", "Galaxy's Edge", "ride", "E", 18, 64, 24, -10, 0, 0, 116, 282],
+  ["falcon", "Smugglers Run", "Galaxy's Edge", "ride", "E", 8, 36, 16, -4, 0, 0, 291, 151],
+  ["oga", "Oga's Cantina", "Galaxy's Edge", "dine", "—", 30, 25, 18, 6, 10, 34, 349, 181],
+  ["ronto", "Ronto Roasters", "Galaxy's Edge", "dine", "—", 18, 12, 10, 8, 26, 17, 283, 227],
+  ["dockingbay", "Docking Bay 7 Food and Cargo", "Galaxy's Edge", "dine", "—", 30, 14, 14, 11, 34, 21, 278, 198],
 
-  ["thunder", "Big Thunder Mountain", "Frontierland", "ride", "E", 8, 40, 18, -7, 0, 0, 472, 413],
-  ["twain", "Mark Twain Riverboat", "Frontierland", "ride", "C", 18, 10, 10, 12, 0, 0, 443, 422],
-  ["horseshoe", "Golden Horseshoe", "Frontierland", "dine", "\u2014", 25, 12, 12, 8, 30, 17, 476, 458],
-  ["fantasmic", "Fantasmic!", "Frontierland", "night", "E", 30, 45, 30, -8, 0, 0, 387, 463],
+  ["thunder", "Big Thunder Mountain", "Frontierland", "ride", "E", 8, 40, 18, -7, 0, 0, 422, 504],
+  ["twain", "Mark Twain Riverboat", "Frontierland", "ride", "C", 18, 10, 10, 12, 0, 0, 385, 515],
+  ["horseshoe", "Golden Horseshoe", "Frontierland", "dine", "\u2014", 25, 12, 12, 8, 30, 17, 427, 562],
+  ["fantasmic", "Fantasmic!", "Frontierland", "night", "E", 30, 45, 30, -8, 0, 0, 312, 568],
 
-  ["matterhorn", "Matterhorn Bobsleds", "Fantasyland", "ride", "E", 8, 45, 16, -9, 0, 0, 694, 307],
-  ["peterpan", "Peter Pan's Flight", "Fantasyland", "ride", "D", 6, 36, 14, -2, 0, 0, 606, 323],
-  ["smallworld", "it's a small world", "Fantasyland", "ride", "C", 16, 15, 11, 10, 0, 0, 697, 165],
-  ["alice", "Alice in Wonderland", "Fantasyland", "ride", "C", 7, 22, 9, -1, 0, 0, 646, 318],
-  ["toad", "Mr. Toad's Wild Ride", "Fantasyland", "ride", "C", 4, 20, 8, -1, 0, 0, 620, 304],
-  ["snow", "Snow White's Enchanted Wish", "Fantasyland", "ride", "C", 5, 18, 8, -1, 0, 0, 583, 331],
-  ["teacups", "Mad Tea Party", "Fantasyland", "ride", "C", 5, 15, 9, -5, 0, 0, 660, 303],
-  ["storybook", "Storybook Land Canal Boats", "Fantasyland", "ride", "B", 10, 15, 9, 6, 0, 0, 662, 278],
+  ["matterhorn", "Matterhorn Bobsleds", "Fantasyland", "ride", "E", 8, 45, 16, -9, 0, 0, 709, 367],
+  ["peterpan", "Peter Pan's Flight", "Fantasyland", "ride", "D", 6, 36, 14, -2, 0, 0, 595, 388],
+  ["smallworld", "it's a small world", "Fantasyland", "ride", "C", 16, 15, 11, 10, 0, 0, 713, 184],
+  ["alice", "Alice in Wonderland", "Fantasyland", "ride", "C", 7, 22, 9, -1, 0, 0, 647, 381],
+  ["toad", "Mr. Toad's Wild Ride", "Fantasyland", "ride", "C", 4, 20, 8, -1, 0, 0, 613, 363],
+  ["snow", "Snow White's Enchanted Wish", "Fantasyland", "ride", "C", 5, 18, 8, -1, 0, 0, 566, 398],
+  ["teacups", "Mad Tea Party", "Fantasyland", "ride", "C", 5, 15, 9, -5, 0, 0, 665, 362],
+  ["storybook", "Storybook Land Canal Boats", "Fantasyland", "ride", "B", 10, 15, 9, 6, 0, 0, 668, 330],
 
-  ["railway", "Mickey & Minnie's Runaway Railway", "Toontown", "ride", "E", 10, 40, 19, -3, 0, 0, 646, 79],
-  ["roger", "Roger Rabbit's Car Toon Spin", "Toontown", "ride", "D", 6, 25, 11, -3, 0, 0, 679, 107],
-  ["gadget", "Chip 'n' Dale's GADGETcoaster", "Toontown", "ride", "B", 3, 12, 6, -2, 0, 0, 546, 106],
+  ["railway", "Mickey & Minnie's Runaway Railway", "Toontown", "ride", "E", 10, 40, 19, -3, 0, 0, 647, 73],
+  ["roger", "Roger Rabbit's Car Toon Spin", "Toontown", "ride", "D", 6, 25, 11, -3, 0, 0, 690, 109],
+  ["gadget", "Chip 'n' Dale's GADGETcoaster", "Toontown", "ride", "B", 3, 12, 6, -2, 0, 0, 518, 108],
 
   // --- classic Disneyland food & treats ---
-  ["corndog", "Little Red Wagon Corn Dog", "Main Street", "dine", "—", 15, 25, 15, 6, 26, 13, 632, 526],
-  ["gibson", "Gibson Girl Ice Cream Parlor", "Main Street", "dine", "—", 12, 15, 11, 4, 16, 9, 580, 550],
-  ["candy", "Candy Palace Candy Apple", "Main Street", "dine", "—", 8, 8, 9, 2, 12, 11, 578, 545],
-  ["plazainn", "Plaza Inn Fried Chicken", "Main Street", "dine", "—", 45, 18, 20, 18, 48, 34, 638, 487],
-  ["carnation", "Carnation Café", "Main Street", "dine", "—", 40, 20, 17, 16, 42, 30, 579, 568],
-  ["popcorn", "Popcorn Cart", "Main Street", "dine", "—", 6, 5, 7, 2, 10, 7, 581, 643],
+  ["corndog", "Little Red Wagon Corn Dog", "Main Street", "dine", "—", 15, 25, 15, 6, 26, 13, 629, 650],
+  ["gibson", "Gibson Girl Ice Cream Parlor", "Main Street", "dine", "—", 12, 15, 11, 4, 16, 9, 562, 681],
+  ["candy", "Candy Palace Candy Apple", "Main Street", "dine", "—", 8, 8, 9, 2, 12, 11, 559, 674],
+  ["plazainn", "Plaza Inn Fried Chicken", "Main Street", "dine", "—", 45, 18, 20, 18, 48, 34, 637, 599],
+  ["carnation", "Carnation Café", "Main Street", "dine", "—", 40, 20, 17, 16, 42, 30, 560, 704],
+  ["popcorn", "Popcorn Cart", "Main Street", "dine", "—", 6, 5, 7, 2, 10, 7, 563, 801],
 
-  ["dolewhip", "Dole Whip at Tiki Juice Bar", "Adventureland", "dine", "—", 12, 20, 17, 6, 18, 8, 535, 483],
-  ["hideaway", "The Tropical Hideaway", "Adventureland", "dine", "—", 18, 12, 12, 8, 24, 14, 540, 520],
-  ["monte", "Café Orleans Monte Cristo", "New Orleans Sq.", "dine", "—", 50, 22, 21, 18, 46, 38, 380, 547],
-  ["chowder", "Royal Street Veranda Chowder", "New Orleans Sq.", "dine", "—", 15, 10, 12, 8, 26, 14, 413, 547],
+  ["dolewhip", "Dole Whip at Tiki Juice Bar", "Adventureland", "dine", "—", 12, 20, 17, 6, 18, 8, 504, 594],
+  ["hideaway", "The Tropical Hideaway", "Adventureland", "dine", "—", 18, 12, 12, 8, 24, 14, 510, 642],
+  ["monte", "Café Orleans Monte Cristo", "New Orleans Sq.", "dine", "—", 50, 22, 21, 18, 46, 38, 303, 677],
+  ["chowder", "Royal Street Veranda Chowder", "New Orleans Sq.", "dine", "—", 15, 10, 12, 8, 26, 14, 346, 677],
 
-  ["harbour", "Harbour Galley Lobster Roll", "Bayou Country", "dine", "—", 18, 12, 13, 8, 26, 18, 319, 460],
+  ["harbour", "Harbour Galley Lobster Roll", "Bayou Country", "dine", "—", 18, 12, 13, 8, 26, 18, 225, 564],
 
-  ["rancho", "Rancho del Zocalo", "Frontierland", "dine", "—", 30, 14, 14, 12, 36, 22, 494, 417],
-  ["funnel", "Stage Door Café Funnel Cake", "Frontierland", "dine", "—", 12, 12, 13, 4, 20, 11, 472, 481],
-  ["turkeyleg", "Turkey Leg Cart", "Frontierland", "dine", "—", 10, 8, 13, 6, 30, 15, 438, 406],
+  ["rancho", "Rancho del Zocalo", "Frontierland", "dine", "—", 30, 14, 14, 12, 36, 22, 451, 509],
+  ["funnel", "Stage Door Café Funnel Cake", "Frontierland", "dine", "—", 12, 12, 13, 4, 20, 11, 422, 592],
+  ["turkeyleg", "Turkey Leg Cart", "Frontierland", "dine", "—", 10, 8, 13, 6, 30, 15, 378, 495],
 
-  ["maurice", "Maurice's Treats", "Fantasyland", "dine", "—", 10, 12, 11, 4, 18, 10, 569, 420],
-  ["redrose", "Red Rose Taverne", "Fantasyland", "dine", "—", 25, 15, 13, 10, 32, 20, 544, 295],
-  ["edelweiss", "Edelweiss Snacks", "Fantasyland", "dine", "—", 8, 8, 10, 4, 22, 12, 716, 302],
+  ["maurice", "Maurice's Treats", "Fantasyland", "dine", "—", 10, 12, 11, 4, 18, 10, 548, 513],
+  ["redrose", "Red Rose Taverne", "Fantasyland", "dine", "—", 25, 15, 13, 10, 32, 20, 515, 351],
+  ["edelweiss", "Edelweiss Snacks", "Fantasyland", "dine", "—", 8, 8, 10, 4, 22, 12, 737, 361],
 
-  ["milkstand", "Blue Milk at the Milk Stand", "Galaxy's Edge", "dine", "—", 10, 16, 13, 4, 12, 9, 440, 197],
+  ["milkstand", "Blue Milk at the Milk Stand", "Galaxy's Edge", "dine", "—", 10, 16, 13, 4, 12, 9, 381, 225],
 
-  ["pizzaplanet", "Alien Pizza Planet", "Tomorrowland", "dine", "—", 25, 14, 12, 10, 34, 19, 788, 495],
-  ["daisy", "Café Daisy", "Toontown", "dine", "—", 15, 10, 9, 8, 24, 14, 619, 70],
+  ["pizzaplanet", "Alien Pizza Planet", "Tomorrowland", "dine", "—", 25, 14, 12, 10, 34, 19, 830, 610],
+  ["daisy", "Café Daisy", "Toontown", "dine", "—", 15, 10, 9, 8, 24, 14, 612, 61],
 
   // --- Fantasyland classics that were missing ---
-  ["dumbo", "Dumbo the Flying Elephant", "Fantasyland", "ride", "C", 2, 30, 10, -2, 0, 0, 598, 273],
-  ["carrousel", "King Arthur Carrousel", "Fantasyland", "ride", "B", 3, 8, 7, 0, 0, 0, 593, 311],
-  ["pinocchio", "Pinocchio's Daring Journey", "Fantasyland", "ride", "C", 4, 15, 8, -1, 0, 0, 563, 308],
-  ["caseyjr", "Casey Jr. Circus Train", "Fantasyland", "ride", "B", 4, 12, 7, 2, 0, 0, 561, 275],
-  ["castlewalk", "Sleeping Beauty Castle Walkthrough", "Fantasyland", "ride", "A", 8, 5, 6, -2, 0, 0, 572, 359],
-  ["pixiehollow", "Pixie Hollow", "Fantasyland", "show", "A", 10, 20, 7, 0, 0, 0, 665, 404],
-  ["bluey", "Bluey's Best Day Ever!", "Fantasyland", "show", "C", 25, 15, 12, 8, 0, 0, 594, 179],
-  ["royaltheatre", "Royal Theatre", "Fantasyland", "show", "B", 25, 10, 11, 10, 0, 0, 544, 410],
+  ["dumbo", "Dumbo the Flying Elephant", "Fantasyland", "ride", "C", 2, 30, 10, -2, 0, 0, 585, 323],
+  ["carrousel", "King Arthur Carrousel", "Fantasyland", "ride", "B", 3, 8, 7, 0, 0, 0, 579, 372],
+  ["pinocchio", "Pinocchio's Daring Journey", "Fantasyland", "ride", "C", 4, 15, 8, -1, 0, 0, 540, 368],
+  ["caseyjr", "Casey Jr. Circus Train", "Fantasyland", "ride", "B", 4, 12, 7, 2, 0, 0, 537, 326],
+  ["castlewalk", "Sleeping Beauty Castle Walkthrough", "Fantasyland", "ride", "A", 8, 5, 6, -2, 0, 0, 551, 434],
+  ["pixiehollow", "Pixie Hollow", "Fantasyland", "show", "A", 10, 20, 7, 0, 0, 0, 671, 492],
+  ["bluey", "Bluey's Best Day Ever!", "Fantasyland", "show", "C", 25, 15, 12, 8, 0, 0, 580, 202],
+  ["royaltheatre", "Royal Theatre", "Fantasyland", "show", "B", 25, 10, 11, 10, 0, 0, 515, 500],
 
   // --- Frontierland & Bayou Country river attractions ---
-  ["columbia", "Sailing Ship Columbia", "Frontierland", "ride", "C", 15, 10, 9, 10, 0, 0, 440, 444],
-  ["tomsawyer", "Pirate's Lair on Tom Sawyer Island", "Frontierland", "ride", "B", 30, 5, 9, -8, 0, 0, 385, 440],
-  ["shootin", "Frontierland Shootin' Exposition", "Frontierland", "ride", "A", 6, 0, 5, -1, 0, 1, 517, 431],
-  ["canoes", "Davy Crockett's Explorer Canoes", "Bayou Country", "ride", "C", 15, 20, 10, -12, 0, 0, 308, 400],
+  ["columbia", "Sailing Ship Columbia", "Frontierland", "ride", "C", 15, 10, 9, 10, 0, 0, 381, 544],
+  ["tomsawyer", "Pirate's Lair on Tom Sawyer Island", "Frontierland", "ride", "B", 30, 5, 9, -8, 0, 0, 310, 539],
+  ["shootin", "Frontierland Shootin' Exposition", "Frontierland", "ride", "A", 6, 0, 5, -1, 0, 1, 480, 527],
+  ["canoes", "Davy Crockett's Explorer Canoes", "Bayou Country", "ride", "C", 15, 20, 10, -12, 0, 0, 211, 487],
 
   // --- Main Street & Tomorrowland ---
-  ["lincoln", "Great Moments with Mr. Lincoln", "Main Street", "show", "A", 18, 5, 7, 8, 0, 0, 625, 652],
-  ["vehicles", "Main Street Vehicles", "Main Street", "ride", "A", 5, 10, 6, 3, 0, 0, 614, 656],
-  ["monorail", "Disneyland Monorail", "Tomorrowland", "ride", "B", 12, 15, 8, 6, 0, 0, 830, 359],
-  ["launchbay", "Star Wars Launch Bay", "Tomorrowland", "show", "B", 15, 5, 7, 2, 0, 0, 795, 432],
+  ["lincoln", "Great Moments with Mr. Lincoln", "Main Street", "show", "A", 18, 5, 7, 8, 0, 0, 620, 812],
+  ["vehicles", "Main Street Vehicles", "Main Street", "ride", "A", 5, 10, 6, 3, 0, 0, 606, 817],
+  ["monorail", "Disneyland Monorail", "Tomorrowland", "ride", "B", 12, 15, 8, 6, 0, 0, 885, 434],
+  ["launchbay", "Star Wars Launch Bay", "Tomorrowland", "show", "B", 15, 5, 7, 2, 0, 0, 839, 528],
 
   // --- Toontown ---
-  ["mickeyhouse", "Mickey's House and Meet Mickey", "Toontown", "show", "B", 15, 30, 11, -1, 0, 0, 571, 77],
-  ["minniehouse", "Minnie's House", "Toontown", "ride", "A", 8, 15, 6, -1, 0, 0, 587, 64],
-  ["goofyyard", "Goofy's How-to-Play Yard", "Toontown", "ride", "A", 12, 5, 6, -4, 0, 0, 603, 109],
+  ["mickeyhouse", "Mickey's House and Meet Mickey", "Toontown", "show", "B", 15, 30, 11, -1, 0, 0, 550, 70],
+  ["minniehouse", "Minnie's House", "Toontown", "ride", "A", 8, 15, 6, -1, 0, 0, 571, 53],
+  ["goofyyard", "Goofy's How-to-Play Yard", "Toontown", "ride", "A", 12, 5, 6, -4, 0, 0, 592, 111],
 
-  ["space", "Space Mountain", "Tomorrowland", "ride", "E", 8, 58, 21, -8, 0, 0, 757, 511],
-  ["startours", "Star Tours", "Tomorrowland", "ride", "D", 12, 35, 14, -5, 0, 0, 684, 459],
-  ["buzz", "Buzz Lightyear Astro Blasters", "Tomorrowland", "ride", "C", 8, 30, 10, -2, 0, 0, 702, 439],
-  ["nemo", "Finding Nemo Submarines", "Tomorrowland", "ride", "C", 15, 30, 10, 4, 0, 0, 791, 373],
-  ["autopia", "Autopia", "Tomorrowland", "ride", "C", 10, 35, 8, -2, 0, 0, 821, 414],
-  ["orbitor", "Astro Orbitor", "Tomorrowland", "ride", "B", 5, 20, 7, -3, 0, 0, 652, 441],
-  ["grill", "Galactic Grill", "Tomorrowland", "dine", "—", 20, 10, 9, 8, 28, 16, 743, 419],
+  ["space", "Space Mountain", "Tomorrowland", "ride", "E", 8, 58, 21, -8, 0, 0, 790, 630],
+  ["startours", "Star Tours", "Tomorrowland", "ride", "D", 12, 35, 14, -5, 0, 0, 696, 563],
+  ["buzz", "Buzz Lightyear Astro Blasters", "Tomorrowland", "ride", "C", 8, 30, 10, -2, 0, 0, 719, 537],
+  ["nemo", "Finding Nemo Submarines", "Tomorrowland", "ride", "C", 15, 30, 10, 4, 0, 0, 834, 452],
+  ["autopia", "Autopia", "Tomorrowland", "ride", "C", 10, 35, 8, -2, 0, 0, 873, 505],
+  ["orbitor", "Astro Orbitor", "Tomorrowland", "ride", "B", 5, 20, 7, -3, 0, 0, 655, 540],
+  ["grill", "Galactic Grill", "Tomorrowland", "dine", "—", 20, 10, 9, 8, 28, 16, 772, 512],
 ];
 
 const DCA_RAW = [
-  ["carthay", "Carthay Circle Restaurant", "Buena Vista St.", "dine", "—", 70, 18, 24, 22, 52, 68, 595, 962],
-  ["trolley", "Red Car Trolley", "Buena Vista St.", "ride", "B", 8, 8, 6, 4, 0, 0, 761, 963],
-  ["fiddler", "Fiddler, Fifer & Practical Café", "Buena Vista St.", "dine", "—", 18, 10, 8, 8, 24, 13, 554, 906],
+  ["carthay", "Carthay Circle Restaurant", "Buena Vista St.", "dine", "—", 70, 18, 24, 22, 52, 68, 581, 1212],
+  ["trolley", "Red Car Trolley", "Buena Vista St.", "ride", "B", 8, 8, 6, 4, 0, 0, 795, 1214],
+  ["fiddler", "Fiddler, Fifer & Practical Café", "Buena Vista St.", "dine", "—", 18, 10, 8, 8, 24, 13, 528, 1140],
 
-  ["monsters", "Monsters, Inc. Mike & Sulley", "Hollywood Land", "ride", "C", 6, 20, 9, -1, 0, 0, 745, 880],
-  ["philhar", "Mickey's PhilharMagic", "Hollywood Land", "show", "C", 14, 15, 11, 8, 0, 0, 693, 920],
-  ["animation", "Animation Academy", "Hollywood Land", "show", "B", 30, 10, 12, 12, 0, 0, 716, 951],
-  ["turtletalk", "Turtle Talk with Crush", "Hollywood Land", "show", "B", 15, 15, 11, 11, 0, 0, 707, 953],
+  ["monsters", "Monsters, Inc. Mike & Sulley", "Hollywood Land", "ride", "C", 6, 20, 9, -1, 0, 0, 775, 1107],
+  ["philhar", "Mickey's PhilharMagic", "Hollywood Land", "show", "C", 14, 15, 11, 8, 0, 0, 707, 1158],
+  ["animation", "Animation Academy", "Hollywood Land", "show", "B", 30, 10, 12, 12, 0, 0, 737, 1198],
+  ["turtletalk", "Turtle Talk with Crush", "Hollywood Land", "show", "B", 15, 15, 11, 11, 0, 0, 725, 1201],
 
-  ["webslingers", "WEB SLINGERS", "Avengers Campus", "ride", "D", 6, 45, 14, -3, 0, 0, 633, 1035],
-  ["guardians", "Guardians of the Galaxy", "Avengers Campus", "ride", "E", 7, 50, 21, -9, 0, 0, 792, 1028],
-  ["pym", "Pym Test Kitchen", "Avengers Campus", "dine", "—", 25, 15, 13, 10, 32, 24, 713, 1035],
+  ["webslingers", "WEB SLINGERS", "Avengers Campus", "ride", "D", 6, 45, 14, -3, 0, 0, 630, 1307],
+  ["guardians", "Guardians of the Galaxy", "Avengers Campus", "ride", "E", 7, 50, 21, -9, 0, 0, 835, 1298],
+  ["pym", "Pym Test Kitchen", "Avengers Campus", "dine", "—", 25, 15, 13, 10, 32, 24, 733, 1307],
 
-  ["racers", "Radiator Springs Racers", "Cars Land", "ride", "E", 8, 75, 25, -6, 0, 0, 633, 1230],
-  ["mater", "Mater's Junkyard Jamboree", "Cars Land", "ride", "C", 4, 18, 8, -4, 0, 0, 581, 1083],
-  ["luigi", "Luigi's Rollickin' Roadsters", "Cars Land", "ride", "C", 4, 18, 8, -3, 0, 0, 676, 1167],
-  ["flos", "Flo's V8 Café", "Cars Land", "dine", "—", 22, 12, 11, 9, 30, 18, 587, 1174],
-  ["cozy", "Cozy Cone Motel", "Cars Land", "dine", "—", 10, 8, 7, 4, 16, 11, 619, 1126],
+  ["racers", "Radiator Springs Racers", "Cars Land", "ride", "E", 8, 75, 25, -6, 0, 0, 630, 1558],
+  ["mater", "Mater's Junkyard Jamboree", "Cars Land", "ride", "C", 4, 18, 8, -4, 0, 0, 563, 1369],
+  ["luigi", "Luigi's Rollickin' Roadsters", "Cars Land", "ride", "C", 4, 18, 8, -3, 0, 0, 685, 1477],
+  ["flos", "Flo's V8 Café", "Cars Land", "dine", "—", 22, 12, 11, 9, 30, 18, 570, 1486],
+  ["cozy", "Cozy Cone Motel", "Cars Land", "dine", "—", 10, 8, 7, 4, 16, 11, 612, 1424],
 
-  ["ghirardelli", "Ghirardelli Soda Fountain", "San Fransokyo", "dine", "—", 18, 14, 12, 6, 20, 15, 534, 1130],
-  ["lamplight", "Lamplight Lounge", "Pixar Pier", "dine", "—", 55, 22, 20, 18, 44, 52, 414, 1194],
+  ["ghirardelli", "Ghirardelli Soda Fountain", "San Fransokyo", "dine", "—", 18, 14, 12, 6, 20, 15, 502, 1429],
+  ["lamplight", "Lamplight Lounge", "Pixar Pier", "dine", "—", 55, 22, 20, 18, 44, 52, 347, 1512],
 
-  ["incredicoaster", "Incredicoaster", "Pixar Pier", "ride", "E", 5, 40, 19, -9, 0, 0, 433, 1284],
-  ["palaround", "Pixar Pal-A-Round", "Pixar Pier", "ride", "D", 12, 30, 13, -1, 0, 0, 301, 1208],
-  ["midway", "Toy Story Midway Mania", "Pixar Pier", "ride", "D", 7, 40, 14, -2, 0, 0, 342, 1269],
-  ["critter", "Jessie's Critter Carousel", "Pixar Pier", "ride", "B", 4, 10, 6, 0, 0, 0, 396, 1288],
-  ["whirlwind", "Inside Out Emotional Whirlwind", "Pixar Pier", "ride", "C", 5, 15, 8, -2, 0, 0, 240, 1210],
+  ["incredicoaster", "Incredicoaster", "Pixar Pier", "ride", "E", 5, 40, 19, -9, 0, 0, 372, 1628],
+  ["palaround", "Pixar Pal-A-Round", "Pixar Pier", "ride", "D", 12, 30, 13, -1, 0, 0, 201, 1530],
+  ["midway", "Toy Story Midway Mania", "Pixar Pier", "ride", "D", 7, 40, 14, -2, 0, 0, 254, 1609],
+  ["critter", "Jessie's Critter Carousel", "Pixar Pier", "ride", "B", 4, 10, 6, 0, 0, 0, 324, 1633],
+  ["whirlwind", "Inside Out Emotional Whirlwind", "Pixar Pier", "ride", "C", 5, 15, 8, -2, 0, 0, 122, 1532],
 
-  ["mermaid", "Little Mermaid", "Paradise Gardens", "ride", "C", 6, 12, 9, 4, 0, 0, 402, 1093],
-  ["skyschool", "Goofy's Sky School", "Paradise Gardens", "ride", "D", 4, 30, 10, -6, 0, 0, 225, 1090],
-  ["swings", "Silly Symphony Swings", "Paradise Gardens", "ride", "C", 5, 15, 9, -3, 0, 0, 258, 1161],
-  ["zephyr", "Golden Zephyr", "Paradise Gardens", "ride", "B", 4, 10, 6, -1, 0, 0, 291, 1125],
-  ["jellyfish", "Jumpin' Jellyfish", "Paradise Gardens", "ride", "A", 3, 12, 5, -1, 0, 0, 260, 1115],
+  ["mermaid", "Little Mermaid", "Paradise Gardens", "ride", "C", 6, 12, 9, 4, 0, 0, 332, 1381],
+  ["skyschool", "Goofy's Sky School", "Paradise Gardens", "ride", "D", 4, 30, 10, -6, 0, 0, 103, 1378],
+  ["swings", "Silly Symphony Swings", "Paradise Gardens", "ride", "C", 5, 15, 9, -3, 0, 0, 146, 1469],
+  ["zephyr", "Golden Zephyr", "Paradise Gardens", "ride", "B", 4, 10, 6, -1, 0, 0, 188, 1423],
+  ["jellyfish", "Jumpin' Jellyfish", "Paradise Gardens", "ride", "A", 3, 12, 5, -1, 0, 0, 148, 1410],
 
-  ["soarin", "Soarin'", "Grizzly Peak", "ride", "E", 12, 40, 20, 2, 0, 0, 499, 867],
-  ["grizzly", "Grizzly River Run", "Grizzly Peak", "ride", "E", 8, 40, 17, -8, 0, 0, 421, 964],
-  ["redwood", "Redwood Creek Challenge Trail", "Grizzly Peak", "ride", "B", 20, 0, 8, -10, 0, 0, 361, 1029],
-  ["smokejumpers", "Smokejumpers Grill", "Grizzly Peak", "dine", "—", 20, 12, 9, 8, 28, 17, 527, 904],
+  ["soarin", "Soarin'", "Grizzly Peak", "ride", "E", 12, 40, 20, 2, 0, 0, 457, 1090],
+  ["grizzly", "Grizzly River Run", "Grizzly Peak", "ride", "E", 8, 40, 17, -8, 0, 0, 356, 1215],
+  ["redwood", "Redwood Creek Challenge Trail", "Grizzly Peak", "ride", "B", 20, 0, 8, -10, 0, 0, 279, 1299],
+  ["smokejumpers", "Smokejumpers Grill", "Grizzly Peak", "dine", "—", 20, 12, 9, 8, 28, 17, 493, 1138],
 
   // --- California Adventure food & treats ---
-  ["schmoozies", "Schmoozies Smoothies", "Hollywood Land", "dine", "—", 10, 10, 9, 6, 16, 10, 711, 930],
-  ["wieners", "Award Wieners", "Hollywood Land", "dine", "—", 15, 12, 11, 6, 26, 15, 667, 934],
-  ["jackjack", "Jack-Jack Cookie Num Nums", "Pixar Pier", "dine", "—", 8, 14, 13, 3, 16, 8, 418, 1286],
-  ["snowman", "Adorable Snowman Frosted Treats", "Pixar Pier", "dine", "—", 10, 12, 12, 4, 18, 9, 456, 1216],
-  ["angrydogs", "Angry Dogs", "Pixar Pier", "dine", "—", 12, 10, 10, 5, 24, 13, 294, 1245],
-  ["gardengrill", "Paradise Garden Grill", "Paradise Gardens", "dine", "—", 20, 12, 12, 10, 30, 18, 184, 1115],
-  ["bayside", "Bayside Brews", "Paradise Gardens", "dine", "—", 10, 8, 8, 4, 12, 11, 236, 1143],
-  ["lucky", "Lucky Fortune Cookery", "San Fransokyo", "dine", "—", 18, 12, 11, 8, 26, 16, 515, 1158],
-  ["poultry", "Poultry Palace", "Pixar Pier", "dine", "—", 14, 10, 10, 6, 26, 14, 374, 1261],
+  ["schmoozies", "Schmoozies Smoothies", "Hollywood Land", "dine", "—", 10, 10, 9, 6, 16, 10, 731, 1171],
+  ["wieners", "Award Wieners", "Hollywood Land", "dine", "—", 15, 12, 11, 6, 26, 15, 674, 1176],
+  ["jackjack", "Jack-Jack Cookie Num Nums", "Pixar Pier", "dine", "—", 8, 14, 13, 3, 16, 8, 352, 1631],
+  ["snowman", "Adorable Snowman Frosted Treats", "Pixar Pier", "dine", "—", 10, 12, 12, 4, 18, 9, 401, 1540],
+  ["angrydogs", "Angry Dogs", "Pixar Pier", "dine", "—", 12, 10, 10, 5, 24, 13, 192, 1578],
+  ["gardengrill", "Paradise Garden Grill", "Paradise Gardens", "dine", "—", 20, 12, 12, 10, 30, 18, 50, 1410],
+  ["bayside", "Bayside Brews", "Paradise Gardens", "dine", "—", 10, 8, 8, 4, 12, 11, 117, 1446],
+  ["lucky", "Lucky Fortune Cookery", "San Fransokyo", "dine", "—", 18, 12, 11, 8, 26, 16, 477, 1465],
+  ["poultry", "Poultry Palace", "Pixar Pier", "dine", "—", 14, 10, 10, 6, 26, 14, 295, 1598],
 
-  ["auntcass", "Aunt Cass Café", "San Fransokyo", "dine", "—", 22, 12, 12, 10, 32, 18, 495, 1150],
-  ["cocina", "Cocina Cucamonga Mexican Grill", "San Fransokyo", "dine", "—", 20, 12, 11, 8, 30, 17, 474, 1179],
-  ["corndogcastle", "Corn Dog Castle", "Paradise Gardens", "dine", "—", 10, 12, 10, 4, 24, 13, 276, 1086],
-  ["hollywoodlounge", "Hollywood Lounge", "Hollywood Land", "dine", "—", 15, 10, 9, 8, 14, 16, 782, 884],
-  ["boardwalk", "Games of the Boardwalk", "Pixar Pier", "ride", "A", 8, 5, 6, -2, 0, 10, 269, 1240],
-  ["djunior", "Disney Junior Dream Factory", "Hollywood Land", "show", "B", 22, 10, 9, 8, 0, 0, 650, 956],
-  ["bakery", "The Bakery Tour", "San Fransokyo", "dine", "—", 15, 5, 8, 4, 14, 7, 523, 1121],
+  ["auntcass", "Aunt Cass Café", "San Fransokyo", "dine", "—", 22, 12, 12, 10, 32, 18, 452, 1455],
+  ["cocina", "Cocina Cucamonga Mexican Grill", "San Fransokyo", "dine", "—", 20, 12, 11, 8, 30, 17, 425, 1493],
+  ["corndogcastle", "Corn Dog Castle", "Paradise Gardens", "dine", "—", 10, 12, 10, 4, 24, 13, 169, 1372],
+  ["hollywoodlounge", "Hollywood Lounge", "Hollywood Land", "dine", "—", 15, 10, 9, 8, 14, 16, 822, 1112],
+  ["boardwalk", "Games of the Boardwalk", "Pixar Pier", "ride", "A", 8, 5, 6, -2, 0, 10, 160, 1571],
+  ["djunior", "Disney Junior Dream Factory", "Hollywood Land", "show", "B", 22, 10, 9, 8, 0, 0, 652, 1205],
+  ["bakery", "The Bakery Tour", "San Fransokyo", "dine", "—", 15, 5, 8, 4, 14, 7, 488, 1418],
 
-  ["woc", "World of Color", "Paradise Bay", "night", "E", 25, 45, 29, -6, 0, 0, 340, 1179],
+  ["woc", "World of Color", "Paradise Bay", "night", "E", 25, 45, 29, -6, 0, 0, 252, 1492],
 ];
 
 // positions confirmed by hand against the real map
@@ -429,6 +429,7 @@ let CLOSE = 960;              // length of the day in minutes
    whatever you want from DCA has to happen before it goes dark. */
 let PARK_CLOSE = { dl: 1440, dca: 1320 };
 const DCA_LATEST = 1320;      // 10:00 PM
+const MAXW_NOTE = 2600;       // what an uploaded map gets shrunk to
 
 const M = (t) => DAY_START + t;
 function setDayWindow(startMin, endMin) {
@@ -439,7 +440,7 @@ function setDayWindow(startMin, endMin) {
 const parkOpenNow = (park, t) => M(t) <= (PARK_CLOSE[park] || CLOSE);
 const HOP_MINUTES = 5;      // just the turnstile queue at the other gate — bags are already checked
 const CANVAS_W = 1000;
-const CANVAS_H = 1364;      // matches the clean resort map aspect (1290x1759)
+const CANVAS_H = 1789;      // matches the stitched resort map (1560 x 2791)
 
 function clock(t) {
   const h24 = Math.floor(M(t) / 60) % 24;
@@ -519,7 +520,7 @@ function waitFor(a, t, crowd, weather, mods) {
   if (mods && mods.lateOpen && t < (mods.lateOpen[a.id] || 0)) return -1;   // not open yet
   if (mods && mods.closures && mods.closures[a.id] > t) return -1;   // temporarily closed
   if (a.kind === "night") return a.wait;
-  if (!a.wait) return 0;
+  if (!a.wait) return a.kind === "ride" ? 5 : 0;   // an operating ride never posts zero
   if (a.last !== undefined && M(t) > a.last) return 0;
   const jitter = 0.88 + hash(a.id + Math.floor(t / 20)) * 0.24;
   const wx = weather === "drizzle" ? 0.82 : weather === "hot" ? 1.04 : 1;
@@ -527,8 +528,16 @@ function waitFor(a, t, crowd, weather, mods) {
   const fw = M(t) >= 1260 && M(t) <= 1300 ? 0.9 : 1;
   const mult = mods && mods.until > t ? mods.mult : 1;
   const w = a.wait * dayCurve(a.id, a.ticket, t) * crowd * jitter * wx * fw * mult;
-  const posted = Math.round(w / 5) * 5;
-  return Math.max(MIN_WAIT[a.id] || 0, posted);   // Disney posts in 5-minute steps
+  /* At the moment the rope drops nobody is in a queue yet — everything is a
+     walk-on. Lines build over the first forty minutes or so. This keys off the
+     clock, not off t, so arriving at 3 PM gets no such gift. */
+  const ramp = Math.max(0, Math.min(1, (M(t) - 480) / 40));
+  const posted = Math.round((w * ramp) / 5) * 5;
+  const floor = Math.round((MIN_WAIT[a.id] || 0) * ramp);
+  /* The Disney app never posts zero — an open ride reads 5 minutes even when
+     you'll walk straight on. actualWait() turns a posted 5 back into 0. */
+  const board = Math.max(floor, posted);
+  return a.kind === "ride" ? Math.max(5, board) : board;
 }
 
 /* Coordinates are measured off the real resort map, so distance is now
@@ -544,7 +553,7 @@ function crushPenalty(fromLand, toLand, t) {
   return Math.max(CRUSH_LANDS[fromLand] || 0, CRUSH_LANDS[toLand] || 0);
 }
 
-const UNITS_PER_MIN = 54;   // detour factor: real paths wind, they are not straight lines
+const UNITS_PER_MIN = 70;   // detour factor: real paths wind, they are not straight lines
 
 /* Straight-line distance can't see the park's topology. Toontown is a
    cul-de-sac reached only through Fantasyland, and Galaxy's Edge has just two
@@ -611,6 +620,31 @@ const CUSTOM_DEFAULT = {
   budget: 150, unlimited: false,
   drain: 1.0, events: true,
 };
+/* ---------------- multi-day runs ----------------
+   A single day is self-contained. A RUN chains days together: you wake up in
+   whatever state you went to bed in, unspent money rolls over, and each day is
+   harder than the last. Let any meter hit zero and the run is over. */
+const RUN_MODES = {
+  single:   { label: "One day",  days: 0,
+    blurb: "A single day, scored on its own." },
+  campaign: { label: "Campaign", days: 5,
+    blurb: "Five days back to back. Survive all five and you've won." },
+  arcade:   { label: "Arcade",   days: 0, endless: true,
+    blurb: "Keep going until you burn out. How many days can you last?" },
+};
+/* Sleep gives some of it back, never all of it, and less the deeper into the
+   run you are — the ceiling itself drops each night. Hunger goes the other way:
+   you spend eight hours not eating, so you wake up emptier than you went to bed.
+   Crowds are NOT part of this. How busy the park is has nothing to do with how
+   many days you've been there. */
+const overnight = {
+  energy:  (v, d) => Math.round(Math.max(0, Math.min(100 - (d - 1) * 7, v * 0.62 + 26))),
+  comfort: (v, d) => Math.round(Math.max(0, Math.min(100 - (d - 1) * 6, v * 0.58 + 28))),
+  fuel:    (v) => Math.round(Math.max(0, v - 16)),
+};
+// cumulative fatigue: energy and comfort go faster every day. Nothing else does.
+const dayFatigue = (d) => 1 + 0.14 * (d - 1);
+
 const CROWD_CHOICES = [["Empty", 0.35], ["Light", 0.55], ["Moderate", 0.85], ["Busy", 1.15], ["Packed", 1.45]];
 const BUDGET_CHOICES = [["$0", 0], ["$75", 75], ["$150", 150], ["$300", 300], ["Unlimited", 99999]];
 const DRAIN_CHOICES = [["Gentle", 0.5], ["Normal", 1.0], ["Harsh", 1.4]];
@@ -660,12 +694,12 @@ const happy = (v) => Math.max(0, Math.round(v * 10) / 10);
    After that nothing can shift: what you see is exactly what is stored. */
 const FRAME_DEFAULT = {
   dl: [
-    { label: "Sleeping Beauty Castle", hint: "the blue castle at the centre of the park", x: 572, y: 359 },
-    { label: "Space Mountain", hint: "the big white ribbed dome in Tomorrowland", x: 757, y: 511 },
+    { label: "Sleeping Beauty Castle", hint: "the blue castle at the centre of the park", x: 551, y: 434 },
+    { label: "Space Mountain", hint: "the big white ribbed dome in Tomorrowland", x: 790, y: 630 },
   ],
   dca: [
-    { label: "Pixar Pal-A-Round", hint: "the Ferris wheel at Pixar Pier", x: 301, y: 1208 },
-    { label: "Carthay Circle", hint: "the domed tower at the top of Buena Vista Street", x: 595, y: 962 },
+    { label: "Pixar Pal-A-Round", hint: "the Ferris wheel at Pixar Pier", x: 201, y: 1530 },
+    { label: "Carthay Circle", hint: "the domed tower at the top of Buena Vista Street", x: 581, y: 1212 },
   ],
 };
 /* iOS keeps a home-screen web app's storage completely separate from Safari's.
@@ -1005,10 +1039,18 @@ export default function HappiestPlace() {
   const [season, setSeason] = useState("regular");
   const [startPark, setStartPark] = useState("dl");
   const [custom, setCustom] = useState(CUSTOM_DEFAULT);
+  const [runMode, setRunMode] = useState("single");
+  const [runDay, setRunDay] = useState(1);
+  const [runTotal, setRunTotal] = useState(0);
+  const [runLog, setRunLog] = useState([]);        // one line per completed day
+  const [carry, setCarry] = useState(null);        // how yesterday ended
+  const [burnedOut, setBurnedOut] = useState(null);
   const isCustom = mode === "custom";
   const budgetOf = isCustom ? custom.budget : DIFFICULTY[mode].budget;
   const unlimited = isCustom ? custom.unlimited : !!DIFFICULTY[mode].unlimited;
+  const isRun = runMode !== "single";
   const drain = (isCustom ? custom.drain : DIFFICULTY[mode].drain) * PARTY[party].drain;
+  const fatigue = isRun ? dayFatigue(runDay) : 1;
   const [flash, setFlash] = useState(null);
   const [run, setRun] = useState(null);      // the activity playing out in real time
   const [speed, setSpeed] = useState(2);
@@ -1187,17 +1229,19 @@ export default function HappiestPlace() {
     r.onload = () => {
       const img = new Image();
       img.onload = () => {
-        // shrink before storing: a full-resolution photo can blow the ~5 MB
-        // localStorage quota, and 1400px is more than the map ever needs
+        /* Only uploads get shrunk, and only because localStorage caps out
+           around 5 MB. A map committed to the repo as map.jpg skips this path
+           entirely and is used at full resolution — that's the way to get a
+           sharp zoomed-in map. */
         let src = r.result;
-        const MAXW = 1400;
+        const MAXW = 2600;
         if (img.width > MAXW) {
           try {
             const c = document.createElement("canvas");
             c.width = MAXW;
             c.height = Math.round(img.height * MAXW / img.width);
             c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-            src = c.toDataURL("image/jpeg", 0.85);
+            src = c.toDataURL("image/jpeg", 0.9);
           } catch (e) { /* tainted or unsupported — keep the original */ }
         }
         applyBasemap(src, img.width, img.height, false);
@@ -1220,7 +1264,25 @@ export default function HappiestPlace() {
     if (next.length === 2) setCalib(null);
   }
 
-  function start() {
+  /* Close out a day inside a run and set up the next one. */
+  function nextDay(park) {
+    setRunTotal((x) => x + joy);
+    setRunLog((L) => [...L, { day: runDay, joy: Math.round(joy), spent: track.spent,
+      rides: Object.keys(visited).filter((id) => byId[id]).length }]);
+    const c = { energy, fuel, comfort, wallet };
+    setCarry(c);
+    setRunDay((d) => d + 1);
+    setStartPark(park);
+    start(park, c, runDay + 1);
+  }
+  function endRun() {
+    setRunTotal((x) => x + joy);
+    setScreen("end");
+  }
+
+  function start(parkOverride, carryOverride, dayOverride) {
+    const c = carryOverride !== undefined ? carryOverride : carry;
+    const day = dayOverride !== undefined ? dayOverride : runDay;
     setDayWindow(isCustom ? custom.startMin : 480, isCustom ? custom.endMin : 1440);
     const cond = isCustom
       ? { weather: custom.weather, crowd: custom.crowd }
@@ -1235,11 +1297,15 @@ export default function HappiestPlace() {
     const refurb = Math.random() < 0.5
       ? REFURB_CANDIDATES[Math.floor(Math.random() * REFURB_CANDIDATES.length)] : null;
     setSeed({ ...cond, lateOpen: late, refurb });
-    setScreen("play"); setT(OPEN); setJoy(50); setEnergy(Math.round(100 * PARTY[party].energy)); setFuel(72); setComfort(100); setWallet(budgetOf);
-    const gate = startPark === "dl"
+    setScreen("play"); setT(OPEN); setJoy(50);
+    setEnergy(c ? overnight.energy(c.energy, day) : Math.round(100 * PARTY[party].energy)); setFuel(carry ? overnight.fuel(carry.fuel) : 72);
+    setComfort(c ? overnight.comfort(c.comfort, day) : 100);
+    setWallet(budgetOf + (c ? Math.max(0, Math.round(c.wallet)) : 0));
+    const gp = (parkOverride === "dl" || parkOverride === "dca") ? parkOverride : startPark;
+    const gate = gp === "dl"
       ? { park: "dl", x: 595, y: 690, landName: "Main Street" }
       : { park: "dca", x: 590, y: 1000, landName: "Buena Vista St." };
-    setPos(gate); setMapPark(startPark); setVisited({});
+    setPos(gate); setMapPark(gp); setVisited({});
     setLlUsed({}); setBoughtLl(false); setSinglePass({}); setFreeLL(0); setHopper(false);
     setTrack({ minEnergy: 100, minComfort: 100, spent: 0, lastAt: 0, before10: 0 }); setLog([]); setTab("map"); setSel(null); setCat("ride");
     setGoingHome(false); dcaWarned.current = false;
@@ -1282,23 +1348,23 @@ export default function HappiestPlace() {
 
   function passTime(mins) {
     const hot = 1 + 0.55 * heatAt(seed.weather, t, seed.warm) + 0.30 * coldAt(seed.weather, t, seed.warm);
-    setEnergy((e) => clamp(e - (mins / 10) * 0.3 * hot * drain));
+    setEnergy((e) => clamp(e - (mins / 10) * 0.3 * hot * drain * fatigue));
     setFuel((f) => clamp(f - (mins / 10) * 0.95 * PARTY[party].hunger * drain));
-    setComfort((c) => clamp(c - mins * comfortDrain(seed.weather, t, seed.warm) * drain));
+    setComfort((c) => clamp(c - mins * comfortDrain(seed.weather, t, seed.warm) * drain * fatigue));
     setJoy((j) => happy(j - (mins / 10) * 0.35 * drain));
     setT((x) => x + mins);
   }
 
   /* One minute of an activity. Kept pure so the same maths drives both the
      live tick and the Skip button. */
-  function minuteDelta(r, i, atMin, dr, wx) {
+  function minuteDelta(r, i, atMin, dr, wx, fat = 1) {
     const hot = 1 + 0.55 * heatAt(wx, atMin, seed.warm) + 0.30 * coldAt(wx, atMin, seed.warm);
     const { a, walk, wait, dur } = r;
     const phase = i < walk ? "walk" : i < walk + wait ? "wait" : "do";
     const base = comfortDrain(wx, atMin, seed.warm);
-    let dJoy = -0.035 * dr, dEn = -0.03 * hot * dr, dFu = -0.095 * dr, dCf = -base * dr;
-    if (phase === "walk") { dEn -= 0.45 * hot * dr; dJoy -= 0.05 * dr; dCf -= base * 1.1; }
-    if (phase === "wait") { dEn -= 0.06 * dr; dJoy -= r.painRate * dr; dCf -= base * 0.9; }
+    let dJoy = -0.035 * dr, dEn = -0.03 * hot * dr * fat, dFu = -0.095 * dr, dCf = -base * dr * fat;
+    if (phase === "walk") { dEn -= 0.45 * hot * dr * fat; dJoy -= 0.05 * dr; dCf -= base * 1.1 * dr * fat; }
+    if (phase === "wait") { dEn -= 0.06 * dr * fat; dJoy -= r.painRate * dr; dCf -= base * 0.9 * dr * fat; }
     if (phase === "do") {
       dJoy += r.gain / dur;
       dEn += (a.en > 0 ? a.en : a.en * hot) / dur;
@@ -1391,7 +1457,7 @@ export default function HappiestPlace() {
     if (e.fuel) setFuel((f) => clamp(f + e.fuel));
     if (e.comfort) setComfort((c) => clamp(c + e.comfort));
     if (e.money) setWallet((w) => Math.max(0, w + e.money));
-    if (e.ll) { setBoughtLl(true); grantLL(); }
+    if (e.ll) grantLL();
     if (e.timeShift) setT((x) => x + e.timeShift);
     if (e.minutesLost) setT((x) => x + e.minutesLost);
   }
@@ -1436,7 +1502,7 @@ export default function HappiestPlace() {
     if (ev.fuel) setFuel((f) => clamp(f + ev.fuel));
     if (ev.comfort) setComfort((c) => clamp(c + ev.comfort));
     if (ev.money) setWallet((w) => Math.max(0, w + ev.money));
-    if (ev.ll) { setBoughtLl(true); grantLL(); }
+    if (ev.ll) grantLL();
     if (ev.timeShift) setT((x) => x + ev.timeShift);
     if (ev.minutesLost) setT((x) => x + ev.minutesLost);
 
@@ -1477,7 +1543,7 @@ export default function HappiestPlace() {
     const r = run;
     if (!r) return;
     const total = r.walk + r.wait + r.dur;
-    const { dJoy, dEn, dFu, dCf, phase } = minuteDelta(r, r.i, t + r.i, drain, seed.weather);
+    const { dJoy, dEn, dFu, dCf, phase } = minuteDelta(r, r.i, t + r.i, drain, seed.weather, fatigue);
 
     setT((x) => x + 1);
     setJoy((j) => happy(j + dJoy));
@@ -1511,7 +1577,7 @@ export default function HappiestPlace() {
     const total = r.walk + r.wait + r.dur;
     let dJ = 0, dE = 0, dF = 0, dC = 0;
     for (let i = r.i; i < total; i++) {
-      const d = minuteDelta(r, i, t + i, drain, seed.weather);
+      const d = minuteDelta(r, i, t + i, drain, seed.weather, fatigue);
       dJ += d.dJoy; dE += d.dEn; dF += d.dFu; dC += d.dCf;
     }
     setT((x) => x + (total - r.i));
@@ -1590,7 +1656,12 @@ export default function HappiestPlace() {
 
   useEffect(() => {
     if (screen !== "play") return;
-    if (t >= CLOSE || energy <= 0) setScreen("end");
+    // in a run, burning out on ANY meter is the end of it
+    const dead = energy <= 0 || (isRun && (fuel <= 0 || comfort <= 0));
+    if (dead && isRun && !burnedOut) {
+      setBurnedOut(energy <= 0 ? "energy" : fuel <= 0 ? "hunger" : "comfort");
+    }
+    if (t >= CLOSE || dead) setScreen(isRun && !dead ? "recap" : "end");
     // a heads-up while there's still time to act on it
     if (!dcaWarned.current && PARK_CLOSE.dca < PARK_CLOSE.dl
         && M(t) >= PARK_CLOSE.dca - 60 && M(t) < PARK_CLOSE.dca) {
@@ -1602,12 +1673,16 @@ export default function HappiestPlace() {
   const mapReady = !!(basemap && transforms.dl && transforms.dca);
   if (screen === "title")
     return <Title ready={mapReady} mode={mode} setMode={setMode}
+      runMode={runMode} setRunMode={(m) => { setRunMode(m); setRunDay(1); setRunTotal(0); setRunLog([]); setCarry(null); setBurnedOut(null); }}
       party={party} setParty={setParty} season={season} setSeason={setSeason}
       startPark={startPark} setStartPark={setStartPark} custom={custom} setCustom={setCustom}
       onSetup={() => setScreen("setup")}
       onStart={() => (mapReady ? start() : setScreen("setup"))} />;
   if (screen === "end")
-    return <End joy={joy} t={t} wallet={wallet} energy={energy} comfort={comfort} visited={visited} track={track} log={log} seed={seed} mode={mode} unlimited={unlimited} onAgain={start} onTitle={() => setScreen("title")} />;
+    return <End joy={joy} t={t} wallet={wallet} energy={energy} comfort={comfort} visited={visited} track={track} log={log} seed={seed} mode={mode} unlimited={unlimited}
+      isRun={isRun} runDay={runDay} runTotal={runTotal} runLog={runLog} burnedOut={burnedOut}
+      won={isRun && RUN_MODES[runMode].days > 0 && runDay >= RUN_MODES[runMode].days && !burnedOut}
+      onAgain={() => { setRunDay(1); setRunTotal(0); setRunLog([]); setCarry(null); setBurnedOut(null); start(); }} onTitle={() => setScreen("title")} />;
 
   const mapProps = {
     park: mapPark, waits, pos, basemap, transforms, anchors, calib,
@@ -1648,7 +1723,7 @@ export default function HappiestPlace() {
             <div style={{ fontSize: 15.5, color: C.grey, lineHeight: 1.5, marginBottom: 12, marginTop: 10 }}>
               {bundleState === "looking" ? "Checking the site for a map file…"
                 : basemap && basemap.bundled ? `Using ${bundleState} from the site — nothing to upload, on any device.`
-                : basemap ? "Using a map from this device. Put the file in the repo as map.jpg and every browser will pick it up automatically."
+                : basemap ? `Using a map from this device, shrunk to ${MAXW_NOTE}px wide to fit browser storage — which is why it softens when you zoom in. Commit the file to the repo as map.jpg instead and it loads at full resolution.`
                 : "Playing on the built-in map."}
             </div>
             {saveWarn && (
@@ -1898,12 +1973,92 @@ export default function HappiestPlace() {
           </Card>
         </div>
             <div style={{ padding: "4px 16px 26px" }}>
-              <BigButton disabled={!ready} onClick={start}>
+              <BigButton disabled={!ready} onClick={() => start()}>
                 {ready ? "Open the Gates" : "Calibrate both parks first"}
               </BigButton>
             </div>
           </div>
         )}
+      </Shell>
+    );
+  }
+
+  /* ---------- overnight recap ---------- */
+  if (screen === "recap") {
+    const total = RUN_MODES[runMode].days;
+    const won = total > 0 && runDay >= total;
+    if (won) { setTimeout(endRun, 0); return <Shell><div /></Shell>; }
+    const rows = [
+      ["Energy", energy, overnight.energy(energy, runDay + 1), C.amber],
+      ["Hunger", fuel, overnight.fuel(fuel), C.green],
+      ["Comfort", comfort, overnight.comfort(comfort, runDay + 1), C.blue],
+    ];
+    return (
+      <Shell>
+        <div style={{ flex: 1, overflowY: "auto", padding: "26px 18px 24px", textAlign: "center" }}>
+          <div style={{ fontSize: 12.5, letterSpacing: ".18em", fontWeight: 800, color: C.blue, textTransform: "uppercase" }}>
+            {total ? `Day ${runDay} of ${total}` : `Day ${runDay}`} · done
+          </div>
+          <div style={{ fontSize: 40, fontWeight: 800, color: C.pink, margin: "6px 0 0", lineHeight: 1.1 }}>
+            {Math.round(joy)}
+          </div>
+          <div style={{ fontSize: 15, color: C.grey, marginBottom: 4 }}>happiness today</div>
+          <div style={{ fontSize: 15.5, color: C.navy, fontWeight: 700, marginBottom: 20 }}>
+            {Math.round(runTotal + joy)} across the run
+          </div>
+
+          <div style={{ maxWidth: 340, margin: "0 auto 18px", textAlign: "left" }}>
+            <div style={{ fontSize: 12, letterSpacing: ".08em", fontWeight: 800, color: C.blue, textTransform: "uppercase", marginBottom: 8 }}>
+              After a night's sleep
+            </div>
+            <div style={{ fontSize: 14, color: C.grey, lineHeight: 1.45, marginBottom: 9 }}>
+              You get some of it back, never all of it — and you spend eight hours not eating.
+            </div>
+            {rows.map(([label, was, will, col]) => (
+              <div key={label} style={{
+                display: "flex", alignItems: "center", gap: 10, background: C.gap,
+                borderRadius: 11, padding: "10px 13px", marginBottom: 7,
+              }}>
+                <span style={{ flex: 1, fontSize: 15.5, fontWeight: 700, color: C.navy }}>{label}</span>
+                <span style={{ fontSize: 15, color: C.greyLt }}>{Math.round(was)}</span>
+                <span style={{ fontSize: 15, color: C.greyLt }}>→</span>
+                <span style={{ fontSize: 17, fontWeight: 800, color: will < 40 ? C.red : col }}>{will}</span>
+              </div>
+            ))}
+            <div style={{
+              display: "flex", alignItems: "center", gap: 10, background: C.gap,
+              borderRadius: 11, padding: "10px 13px",
+            }}>
+              <span style={{ flex: 1, fontSize: 15.5, fontWeight: 700, color: C.navy }}>Money kept</span>
+              <span style={{ fontSize: 17, fontWeight: 800, color: C.green }}>
+                ${Math.max(0, Math.round(wallet))}
+              </span>
+            </div>
+            <div style={{ fontSize: 14, color: C.grey, lineHeight: 1.45, marginTop: 9 }}>
+              Tomorrow you get another ${budgetOf} on top of what's left. The park will be as busy
+              as it happens to be — but you'll tire and wilt
+              {" "}{Math.round((dayFatigue(runDay + 1) - 1) * 100)}% faster than on day one, and there's
+              only so much a night's sleep gives back.
+            </div>
+          </div>
+
+          <div style={{ maxWidth: 340, margin: "0 auto", textAlign: "left" }}>
+            <div style={{ fontSize: 12, letterSpacing: ".08em", fontWeight: 800, color: C.blue, textTransform: "uppercase", marginBottom: 8 }}>
+              Start tomorrow in
+            </div>
+            <div style={{ display: "flex", gap: 7 }}>
+              {Object.values(PARKS).map((p) => (
+                <button key={p.id} onClick={() => nextDay(p.id)} style={{
+                  flex: 1, padding: "14px 8px", borderRadius: 14, cursor: "pointer", fontFamily: F,
+                  fontSize: 15.5, fontWeight: 800, border: "none", background: C.blue, color: C.white,
+                }}>{p.short}</button>
+              ))}
+            </div>
+            <TextLink onClick={endRun} style={{ display: "block", textAlign: "center", marginTop: 16 }}>
+              Stop here and score the run
+            </TextLink>
+          </div>
+        </div>
       </Shell>
     );
   }
@@ -1946,7 +2101,8 @@ export default function HappiestPlace() {
           {listed.length === 0 && <Empty>Nothing matches those filters right now.</Empty>}
           {listed.map(({ a, w }) => (
             <AttractionCard key={a.id} a={dress(a)} wait={waits[a.id]} walk={w} reps={visited[a.id] || 0}
-              llOk={llReady(a.id)} mustSwitch={needsSwitch(a, party)} hopBlocked={hopBlock(a)} parkShut={!parkOpenNow(a.park, t)} t={t} wallet={wallet}
+              llOk={llReady(a.id)} llFree={!boughtLl && !singlePass[a.id]} freeLeft={freeLL}
+              mustSwitch={needsSwitch(a, party)} hopBlocked={hopBlock(a)} parkShut={!parkOpenNow(a.park, t)} t={t} wallet={wallet}
               onOpen={() => setSel(a.id)} onGo={beginAttraction} />
           ))}
           <div style={{ height: 12 }} />
@@ -1954,7 +2110,7 @@ export default function HappiestPlace() {
       )}
 
       {tab === "day" && <DayLog log={log} />}
-      {tab === "you" && <YouTab onBreak={beginBreak} onBuyLL={buyLightningLane} onBuyHopper={buyHopper} hopper={hopper} wallet={wallet} ll={llLeft} boughtLl={boughtLl}
+      {tab === "you" && <YouTab onBreak={beginBreak} onBuyLL={buyLightningLane} onBuyHopper={buyHopper} hopper={hopper} wallet={wallet} freeLeft={freeLL} freeLL={freeLL} ll={llLeft} boughtLl={boughtLl}
         energy={energy} fuel={fuel} comfort={comfort} joy={joy} visited={visited} t={t} seedWeather={seed.weather} />}
       {(() => {
         const shutSoon = PARK_CLOSE.dca - M(t);
@@ -1999,6 +2155,7 @@ export default function HappiestPlace() {
         <Sheet a={dress(selA)} wait={waits[selA.id]} walk={walkMinutes(pos, place(selA), t)}
           hop={pos.park !== selA.park} reps={visited[selA.id] || 0}
           wallet={wallet} llOk={llReady(selA.id)}
+          llFree={!boughtLl && !singlePass[selA.id]} freeLeft={freeLL}
           spPrice={singlePass[selA.id] ? 0 : (SINGLE_PASS[selA.id] || 0)} onBuySingle={buySinglePass}
           mustSwitch={needsSwitch(selA, party)} hopBlocked={hopBlock(selA)} onBuyHopper={buyHopper} t={t}
           onClose={() => setSel(null)} onGo={beginAttraction} onTrain={beginTrain} />
@@ -2036,7 +2193,7 @@ function ParkMap({ park, items, waits, pos, sel, onSelect, visited, basemap, tra
   const v = view || { cx: 500, cy: H / 2, k: 1 };
   const viewRef = useRef(v);
   useEffect(() => { viewRef.current = v; }, [v.cx, v.cy, v.k]);
-  const clampK = (k) => (isFinite(k) ? Math.max(0.35, Math.min(9, k)) : 1);
+  const clampK = (k) => (isFinite(k) ? Math.max(0.35, Math.min(18, k)) : 1);
 
   const paint = (nv) => {
     const g = layer.current;
@@ -2569,7 +2726,7 @@ function ShowListButton({ onClick }) {
 }
 
 /* ---------------- attraction card (list) ---------------- */
-function AttractionCard({ a, wait, walk, reps, llOk, mustSwitch, hopBlocked, parkShut, t, wallet, onOpen, onGo }) {
+function AttractionCard({ a, wait, walk, reps, llOk, llFree, freeLeft, mustSwitch, hopBlocked, parkShut, t, wallet, onOpen, onGo }) {
   const isRide = a.kind === "ride" || a.kind === "night";
   // no wait threshold: Disney lets you book any eligible ride, and spending a
   // skip on a walk-on is a real mistake the player is allowed to make
@@ -2671,11 +2828,19 @@ function AttractionCard({ a, wait, walk, reps, llOk, mustSwitch, hopBlocked, par
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
               <svg width="17" height="17" viewBox="0 0 24 24">{I.ll(C.navy)}</svg>
-              <span style={{ fontSize: 15.5, fontWeight: 800, color: C.navy }}>Multi Pass Experience</span>
+              <span style={{ fontSize: 15.5, fontWeight: 800, color: C.navy }}>
+                {llFree ? "Free Lightning Lane" : "Multi Pass Experience"}
+              </span>
             </div>
             <div style={{ fontSize: 15, color: C.text, marginTop: 3 }}>
               Earliest Time Available <b style={{ color: C.navy }}>{clock(t + walk + 5)}</b>
             </div>
+            {llFree && (
+              <div style={{ fontSize: 14, color: C.grey, marginTop: 2 }}>
+                {freeLeft === 1 ? "Your one free skip" : `${freeLeft} free skips`} — spending it here
+                uses it up.
+              </div>
+            )}
           </div>
           <TextLink onClick={() => onGo(a, true)}>Select</TextLink>
         </InfoBox>
@@ -2705,7 +2870,7 @@ const InfoBox = ({ children }) => (
 );
 
 /* ---------------- detail sheet ---------------- */
-function Sheet({ a, wait, walk, hop, reps, wallet, llOk, spPrice, mustSwitch, hopBlocked, onBuyHopper, t, onClose, onGo, onTrain, onBuySingle }) {
+function Sheet({ a, wait, walk, hop, reps, wallet, llOk, llFree, freeLeft, spPrice, mustSwitch, hopBlocked, onBuyHopper, t, onClose, onGo, onTrain, onBuySingle }) {
   const canLL = llOk;
   const singleOk = singleRiderOpen(a.id, t) && wait >= 10;
   const singleWait = Math.max(5, Math.round((wait * SINGLE_WAIT) / 5) * 5);
@@ -3109,7 +3274,7 @@ function DayLog({ log }) {
   );
 }
 
-function YouTab({ onBreak, onBuyLL, onBuyHopper, hopper, wallet, ll, boughtLl, energy, fuel, comfort, joy, visited, t, seedWeather }) {
+function YouTab({ onBreak, onBuyLL, onBuyHopper, hopper, wallet, ll, boughtLl, freeLeft, freeLL, energy, fuel, comfort, joy, visited, t, seedWeather }) {
   const [openSnack, setOpenSnack] = useState(null);
   const pace = 50 + (t / CLOSE) * 130;   // roughly where an average day sits
   const advice =
@@ -3213,13 +3378,31 @@ function YouTab({ onBreak, onBuyLL, onBuyHopper, hopper, wallet, ll, boughtLl, e
           <svg width="18" height="18" viewBox="0 0 24 24">{I.ll(C.navy)}</svg>
           <span style={{ fontSize: 17, fontWeight: 800, color: C.navy }}>Lightning Lane Multi Pass</span>
         </div>
+        {/* a comped skip is separate from the pass, and holding one must not
+            stop you buying the pass as well */}
+        {freeLL > 0 && (
+          <div style={{
+            fontSize: 15, color: C.blueDeep, fontWeight: 700, background: C.blueTint,
+            borderRadius: 10, padding: "9px 12px", marginBottom: boughtLl ? 0 : 12,
+          }}>
+            {freeLL} free Lightning Lane{freeLL === 1 ? "" : "s"} in hand — each good for any one
+            eligible attraction.
+          </div>
+        )}
         {boughtLl ? (
-          <div style={{ fontSize: 15.5, color: C.text }}>
-            {ll > 0 ? `${ll} eligible attractions still unused. One skip each — they appear on rides with a real line.`
+          <div style={{ fontSize: 15.5, color: C.text, marginTop: freeLL > 0 ? 10 : 0 }}>
+            {ll > 0
+              ? `${ll} eligible attractions still unused. One skip each — they appear on rides with a real line.`
               : "You've used your skip on every eligible attraction."}
           </div>
         ) : (
           <>
+            {freeLeft > 0 && (
+              <Note tone="good">
+                You have {freeLeft} free Lightning Lane{freeLeft === 1 ? "" : "s"} — good for any
+                one eligible ride each, and separate from the pass below.
+              </Note>
+            )}
             <div style={{ fontSize: 15.5, color: C.text, lineHeight: 1.5, marginBottom: 12 }}>
               $32 for the day. One line skip on each of the {LL_OK.size} eligible attractions — not a pool of skips,
               so it rewards spreading them across the headliners rather than repeating one ride.
@@ -3326,7 +3509,7 @@ function Knob({ label, choices, value, onPick, last }) {
   );
 }
 
-function Title({ onStart, onSetup, ready, mode, setMode, party, setParty, season, setSeason, startPark, setStartPark, custom, setCustom }) {
+function Title({ onStart, onSetup, ready, mode, setMode, runMode, setRunMode, party, setParty, season, setSeason, startPark, setStartPark, custom, setCustom }) {
   const isCustom = mode === "custom";
   const budgetVal = isCustom ? custom.budget : DIFFICULTY[mode].budget;
   const budgetLabel = (isCustom ? custom.unlimited : DIFFICULTY[mode].unlimited)
@@ -3362,6 +3545,24 @@ function Title({ onStart, onSetup, ready, mode, setMode, party, setParty, season
           </div>
         </div>
         <div style={{ maxWidth: 340, margin: "0 auto 20px", textAlign: "left" }}>
+          <div style={{ fontSize: 12, letterSpacing: ".08em", fontWeight: 800, color: C.blue, textTransform: "uppercase", marginBottom: 8 }}>
+            How long
+          </div>
+          <div style={{ display: "flex", gap: 6, marginBottom: 7 }}>
+            {Object.entries(RUN_MODES).map(([k, r]) => (
+              <button key={k} onClick={() => setRunMode(k)} style={{
+                flex: 1, padding: "9px 4px", borderRadius: 12, cursor: "pointer", fontFamily: F,
+                fontSize: 14, fontWeight: 800,
+                border: `1.5px solid ${runMode === k ? C.pink : C.border}`,
+                background: runMode === k ? C.pink : C.white, color: runMode === k ? C.white : C.navy,
+              }}>{r.label}</button>
+            ))}
+          </div>
+          <div style={{ fontSize: 14.5, color: C.grey, lineHeight: 1.45, marginBottom: 16 }}>
+            {RUN_MODES[runMode].blurb}
+            {runMode !== "single" && " You wake up in whatever state you went to bed in, unspent money rolls over, and each day is harder than the last."}
+          </div>
+
           <div style={{ fontSize: 12, letterSpacing: ".08em", fontWeight: 800, color: C.blue, textTransform: "uppercase", marginBottom: 8 }}>
             Pick your day
           </div>
@@ -3472,7 +3673,8 @@ function Title({ onStart, onSetup, ready, mode, setMode, party, setParty, season
   );
 }
 
-function End({ joy, t, wallet, energy, comfort, visited, track, log, seed, mode, unlimited, onAgain, onTitle }) {
+function End({ joy, t, wallet, energy, comfort, visited, track, log, seed, mode, unlimited,
+  isRun, runDay, runTotal, runLog, burnedOut, won, onAgain, onTitle }) {
   const [showLog, setShowLog] = useState(false);
   const rides = Object.entries(visited).reduce((s, [id, n]) => {
     const a = byId[id];
@@ -3499,7 +3701,9 @@ function End({ joy, t, wallet, energy, comfort, visited, track, log, seed, mode,
   };
   const earned = earnedMilestones(ctx);
   const bonus = earned.reduce((x, m) => x + m.bonus, 0);
-  const final = Math.round(joy + Math.min(8, unique * 0.4) + (wallet > 0 ? 2 : 0) + (both ? 3 : 0) + bonus);
+  const dayScore = joy + Math.min(8, unique * 0.4) + (wallet > 0 ? 2 : 0) + (both ? 3 : 0) + bonus;
+  // a run is scored on everything you banked, not just the last day
+  const final = Math.round(isRun ? runTotal + dayScore - joy + joy : dayScore);
   const rank =
     final >= 420 ? ["The Happiest Place on Earth", C.pink] :
     final >= 330 ? ["A truly magical day", C.blue] :
@@ -3510,8 +3714,47 @@ function End({ joy, t, wallet, energy, comfort, visited, track, log, seed, mode,
   return (
     <Shell>
       <div style={{ flex: 1, overflowY: "auto", padding: "44px 24px 30px", textAlign: "center" }}>
+        {isRun && (
+          <div style={{
+            background: burnedOut ? "#FCEAEA" : won ? "#E6F5EA" : C.gap,
+            borderRadius: 14, padding: "14px 16px", maxWidth: 340, margin: "0 auto 20px", textAlign: "left",
+          }}>
+            <div style={{ fontSize: 18.5, fontWeight: 800, color: burnedOut ? C.red : won ? C.green : C.navy }}>
+              {burnedOut ? `Burned out on day ${runDay}`
+                : won ? "You made it all five days"
+                : `Called it after ${runDay} ${runDay === 1 ? "day" : "days"}`}
+            </div>
+            <div style={{ fontSize: 15, color: C.text, lineHeight: 1.45, marginTop: 4 }}>
+              {burnedOut === "energy" ? "You ran yourself into the ground."
+                : burnedOut === "hunger" ? "You never did stop to eat properly."
+                : burnedOut === "comfort" ? "The weather won."
+                : won ? "Five days, and still standing at the end of the last one."
+                : "You stopped while you were ahead."}
+            </div>
+            <div style={{ marginTop: 11 }}>
+              {runLog.map((d) => (
+                <div key={d.day} style={{ display: "flex", gap: 8, fontSize: 14.5, padding: "3px 0" }}>
+                  <span style={{ color: C.greyLt, minWidth: 46 }}>Day {d.day}</span>
+                  <span style={{ flex: 1, color: C.text }}>{d.rides} attractions · ${d.spent} spent</span>
+                  <span style={{ fontWeight: 800, color: C.pink }}>{d.joy}</span>
+                </div>
+              ))}
+              <div style={{
+                display: "flex", gap: 8, fontSize: 14.5, padding: "6px 0 0",
+                borderTop: runLog.length ? `1px solid ${C.border}` : "none", marginTop: runLog.length ? 4 : 0,
+              }}>
+                <span style={{ color: C.greyLt, minWidth: 46 }}>Day {runDay}</span>
+                <span style={{ flex: 1, color: C.text }}>today</span>
+                <span style={{ fontWeight: 800, color: C.pink }}>{Math.round(joy)}</span>
+              </div>
+            </div>
+          </div>
+        )}
         <div style={{ fontSize: 12.5, letterSpacing: ".14em", fontWeight: 800, color: C.blue, textTransform: "uppercase" }}>
-          {energy <= 0 ? "You're wiped out" : t < CLOSE ? "Headed home early" : "Park closed"} · {clock(Math.min(t, CLOSE))}
+          {burnedOut === "hunger" ? "You ran on empty"
+            : burnedOut === "comfort" ? "You couldn't take any more"
+            : energy <= 0 ? "You're wiped out"
+            : t < CLOSE ? "Headed home early" : "Park closed"} · {clock(Math.min(t, CLOSE))}
         </div>
         <div style={{ fontSize: 72, fontWeight: 800, color: rank[1], lineHeight: 1.05, margin: "10px 0 0" }}>{final}</div>
         <div style={{ fontSize: 11.5, letterSpacing: ".14em", fontWeight: 800, color: C.greyLt, textTransform: "uppercase", marginBottom: 8 }}>Happiness</div>
