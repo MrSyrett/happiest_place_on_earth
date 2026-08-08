@@ -1,4 +1,4 @@
-/* Offline cache for Happiest Place on Earth.
+/* Offline cache for Ropedrop Run.
 
    index.html carries React, the game and the font, so caching the shell plus the
    map and icons is everything the app needs.
@@ -6,7 +6,7 @@
    IMPORTANT: the page itself is network-FIRST. A cache-first shell meant a newly
    uploaded index.html could never reach a device that had already visited — it
    would keep serving the old build forever. */
-const CACHE = "happiest-place-v3";
+const CACHE = "ropedrop-run-v4";
 const SHELL = ["./", "index.html", "manifest.json", "icon-180.png", "icon-192.png", "icon-512.png",
                "map.jpg", "map.jpeg", "map.png", "map.webp"];
 
