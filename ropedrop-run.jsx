@@ -784,6 +784,9 @@ const applyT = (T, x, y) => (T ? { x: T.a * x - T.b * y + T.tx, y: T.b * x + T.a
 /* ---------------- random events ----------------
    `when`: start = rolled once as the day begins; day = between activities.
    Effects are all optional and applied together. */
+/* Events carry an optional `park`. Anything without one can happen anywhere;
+   the rest only fire while you're actually standing in that park, so a Park
+   Hopper day naturally sees both pools. */
 const EVENTS = [
   // --- good ---
   { id: "pixie", kind: "good", when: "day", w: 10, title: "You got pixie dusted",
@@ -829,7 +832,7 @@ const EVENTS = [
   { id: "underdressed", kind: "bad", when: "start", w: 5, title: "Colder than you dressed for",
     text: "You checked the forecast for a Californian theme park and packed accordingly. The morning has other ideas.",
     comfort: -16, energy: -4, joy: -3 },
-  { id: "cocoa", kind: "good", when: "day", w: 6, title: "Hot chocolate on Main Street",
+  { id: "cocoa", park: "dl", kind: "good", when: "day", w: 6, title: "Hot chocolate on Main Street",
     text: "Whipped cream, a cinnamon stick, and both hands round the cup while the cold afternoon goes by.",
     comfort: 16, fuel: 8, energy: 4, money: -7, joy: 5 },
   { id: "forgot", kind: "bad", when: "start", w: 5, title: "You forgot the sunscreen",
@@ -854,6 +857,15 @@ const EVENTS = [
     text: "Six people 'meeting friends' who were somehow already at the merge point.", joy: -6, comfort: -4 },
   { id: "blister", kind: "bad", when: "day", w: 6, title: "Your feet have had enough",
     text: "That specific hot spot on your heel has become the main character.", energy: -10, comfort: -18, joy: -4 },
+  { id: "wharf", park: "dca", kind: "good", when: "day", w: 7, title: "The sourdough smells incredible",
+    text: "You weren't hungry until you walked past the bakery. Now you are.",
+    fuel: 12, money: -6, joy: 5, comfort: 3 },
+  { id: "carsgold", park: "dca", kind: "good", when: "day", w: 6, title: "Cars Land at golden hour",
+    text: "The whole of Radiator Springs lights up at once and everyone stops walking to watch.",
+    joy: 12, comfort: 4 },
+  { id: "seagull", park: "dca", kind: "bad", when: "day", w: 6, title: "A gull took your churro",
+    text: "Straight out of your hand on Pixar Pier. It didn't even hesitate.",
+    money: -8, joy: -6 },
   { id: "phone", kind: "bad", when: "day", w: 5, title: "Phone at 4%",
     text: "You'll be rationing it from here. Checking wait times suddenly feels expensive.", joy: -5 },
 ];
@@ -905,13 +917,13 @@ const BREAKS = [
    context-dependent rather than balanced 50/50 — the walk-up table is a bargain
    when you're starving and a waste when you've just eaten. */
 const CHOICES = [
-  { id: "dapperdans", w: 10, title: "The Dapper Dans are singing on Main Street",
+  { id: "dapperdans", park: "dl", w: 10, title: "The Dapper Dans are singing on Main Street",
     text: "Four-part harmony, straw hats, the works. A small crowd is gathering.",
     options: [
       { label: "Stop and watch", sub: "Fifteen minutes of your day", joy: 9, energy: 4, comfort: 4, minutesLost: 15 },
       { label: "Keep moving", sub: "You've somewhere to be", joy: -1, comfort: -1 },
     ] },
-  { id: "paradecross", w: 9, title: "A parade is forming across your path",
+  { id: "paradecross", park: "dl", w: 9, title: "A parade is forming across your path",
     text: "The rope is up and cast members are holding the crossing.",
     options: [
       { label: "Wait and watch it go by", sub: "Twenty minutes", joy: 10, energy: 2, comfort: 3, minutesLost: 20 },
@@ -953,11 +965,19 @@ const CHOICES = [
       { label: "Hand it in yourself", sub: "Ten minutes out of your day", joy: 9, energy: -4, comfort: -2, minutesLost: 10 },
       { label: "Tell the nearest cast member", sub: "Someone else's problem now", joy: -1 },
     ] },
-  { id: "fireworkspot", w: 7, title: "Fireworks in twenty minutes and you're across the park",
+  { id: "fireworkspot", park: "dl", w: 7, title: "Fireworks in twenty minutes and you're across the park",
     text: "The hub is already filling up with people staking out spots.",
     options: [
       { label: "Hurry for a good spot", sub: "Costs your legs, worth the view", joy: 14, energy: -15, comfort: -8, minutesLost: 20 },
       { label: "Watch from where you are", sub: "You'll see most of it", joy: 5, comfort: 2, minutesLost: 15 },
+    ] },
+  { id: "club33", park: "dl", w: 3, title: "You've been invited to Club 33",
+    text: "A member you got talking to in the queue has a spare seat at lunch. Behind the unmarked "
+        + "door on Royal Street, up the lift, and into the only place in the park that serves it properly. "
+        + "It will take most of the afternoon.",
+    options: [
+      { label: "Go", sub: "Two hours you will not get back", joy: 46, energy: 26, fuel: 60, comfort: 30, minutesLost: 120 },
+      { label: "Thank them and carry on", sub: "You came here to ride things", joy: -4 },
     ] },
   { id: "pintrade", w: 6, title: "A cast member has a pin you've been after",
     text: "They'll trade for it — but the one they want back is your favourite.",
@@ -1340,7 +1360,7 @@ export default function HappiestPlace() {
     setRunTotal((x) => x + joy);
     setRunLog((L) => [...L, { day: runDay, joy: Math.round(joy), spent: track.spent,
       rides: Object.keys(visited).filter((id) => byId[id]).length }]);
-    const c = { energy, fuel, comfort, wallet };
+    const c = { energy, fuel, comfort, wallet, hopper };   // the Hopper is a run-long upgrade
     setCarry(c);
     setRunDay((d) => d + 1);
     setStartPark(park);
@@ -1377,7 +1397,9 @@ export default function HappiestPlace() {
       ? { park: "dl", x: 595, y: 690, landName: "Main Street" }
       : { park: "dca", x: 590, y: 1000, landName: "Buena Vista St." };
     setPos(gate); setMapPark(gp); setVisited({});
-    setLlUsed({}); setBoughtLl(false); setSinglePass({}); setFreeLL(0); setHopper(false);
+    // Lightning Lane is a daily purchase; the Park Hopper carries across a run
+    setLlUsed({}); setBoughtLl(false); setSinglePass({}); setFreeLL(0);
+    setHopper(c ? !!c.hopper : false);
     setTrack({ minEnergy: 100, minComfort: 100, spent: 0, lastAt: 0, before10: 0 }); setLog([]); setTab("map"); setSel(null); setCat("ride");
     setGoingHome(false); dcaWarned.current = false;
     setMods({ mult: 1, until: 0, closures: {} });
@@ -1543,14 +1565,16 @@ export default function HappiestPlace() {
 
   function fireEvent(when, atTime) {
     if (when === "day" && Math.random() < 0.42) {
-      const total = CHOICES.reduce((x, e) => x + e.w, 0);
+      const pool = CHOICES.filter((e) => !e.park || e.park === pos.park);
+      const total = pool.reduce((x, e) => x + e.w, 0);
       let roll = Math.random() * total;
-      const ev = CHOICES.find((e) => (roll -= e.w) <= 0) || CHOICES[0];
+      const ev = pool.find((e) => (roll -= e.w) <= 0) || pool[0];
+      if (!ev) return;
       lastEvent.current = atTime;
       setEventCard({ ...ev, choice: true, key: Math.random() });
       return;
     }
-    const pool = EVENTS.filter((e) => e.when === when);
+    const pool = EVENTS.filter((e) => e.when === when && (!e.park || e.park === pos.park));
     const total = pool.reduce((x, e) => x + e.w, 0);
     let roll = Math.random() * total;
     const ev = pool.find((e) => (roll -= e.w) <= 0) || pool[0];
