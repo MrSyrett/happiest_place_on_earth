@@ -422,7 +422,7 @@ function comfortRate(a, weather, temp) {
   if (a.kind === "show") return 0.65;
   if (a.kind === "dine") return 0.5;
   if (a.kind === "train") return 0.5;
-  return -0.25;                       // out in it
+  return weather === "drizzle" ? -0.6 : -0.25;   // out in it, and wetter still if it's raining
 }
 
 // comfort bleeds faster the hotter it actually is, and rain is its own penalty
@@ -460,14 +460,24 @@ let CLOSE = 960;              // length of the day in minutes
    against midnight or 1 AM. Modelling that makes the evening a real decision:
    whatever you want from DCA has to happen before it goes dark. */
 let PARK_CLOSE = { dl: 1440, dca: 1320 };
-const DCA_LATEST = 1320;      // 10:00 PM
+/* Park hours are a property of the resort and the time of year, not something
+   the player sets. Absolute minutes past midnight. */
+const SEASON_HOURS = {
+  regular:   { dl: 1440, dca: 1320 },   // midnight / 10 PM
+  lunar:     { dl: 1380, dca: 1260 },   // quieter season, shorter days
+  foodwine:  { dl: 1440, dca: 1320 },
+  halloween: { dl: 1440, dca: 1440 },   // Oogie Boogie Bash runs California Adventure late
+  holidays:  { dl: 1500, dca: 1380 },   // extended holiday hours
+};
+const PARK_OPEN = 480;        // the gates never open before 8 AM
 const MAXW_NOTE = 2600;       // what an uploaded map gets shrunk to
 
 const M = (t) => DAY_START + t;
-function setDayWindow(startMin, endMin) {
-  DAY_START = startMin;
-  CLOSE = Math.max(120, endMin - startMin);
-  PARK_CLOSE = { dl: endMin, dca: Math.min(endMin, DCA_LATEST) };
+function setDayWindow(season) {
+  const h = SEASON_HOURS[season] || SEASON_HOURS.regular;
+  DAY_START = PARK_OPEN;
+  PARK_CLOSE = { dl: h.dl, dca: h.dca };
+  CLOSE = Math.max(120, Math.max(h.dl, h.dca) - DAY_START);
 }
 const parkOpenNow = (park, t) => M(t) <= (PARK_CLOSE[park] || CLOSE);
 const HOP_MINUTES = 5;      // just the turnstile queue at the other gate — bags are already checked
@@ -647,7 +657,6 @@ const DIFFICULTY = {
 };
 /* Custom mode: every knob set by hand rather than rolled. */
 const CUSTOM_DEFAULT = {
-  startMin: 480, endMin: 1440,      // 8:00 AM to midnight
   crowd: 0.85, weather: "clear",
   budget: 150, unlimited: false,
   drain: 1.0, events: true,
@@ -657,11 +666,14 @@ const CUSTOM_DEFAULT = {
    whatever state you went to bed in, unspent money rolls over, and each day is
    harder than the last. Let any meter hit zero and the run is over. */
 const RUN_MODES = {
-  single:   { label: "One day",  days: 0,
+  single:  { label: "Day",     days: 0,
     blurb: "A single day, scored on its own." },
-  campaign: { label: "Campaign", days: 5,
-    blurb: "Five days back to back. Survive all five and you've won." },
-  arcade:   { label: "Arcade",   days: 0, endless: true,
+  weekend: { label: "Weekend", days: 3,
+    blurb: "Three days back to back. Enough to feel the wear without it grinding you down." },
+  week:    { label: "Week",    days: 5,
+    blurb: "Five days — the longest ticket you can buy. By the last one you're running on "
+         + "whatever sleep gives back." },
+  arcade:  { label: "Arcade",  days: 0, endless: true,
     blurb: "Keep going until you burn out. How many days can you last?" },
 };
 /* Sleep gives some of it back, never all of it, and less the deeper into the
@@ -680,11 +692,6 @@ const dayFatigue = (d) => 1 + 0.14 * (d - 1);
 const CROWD_CHOICES = [["Empty", 0.35], ["Light", 0.55], ["Moderate", 0.85], ["Busy", 1.15], ["Packed", 1.45]];
 const BUDGET_CHOICES = [["$0", 0], ["$75", 75], ["$150", 150], ["$300", 300], ["Unlimited", 99999]];
 const DRAIN_CHOICES = [["Gentle", 0.5], ["Normal", 1.0], ["Harsh", 1.4]];
-// the gates never open before 8; later options are simply arriving late
-const TIME_CHOICES = [["8 AM", 480], ["9 AM", 540], ["10 AM", 600], ["11 AM", 660],
-                      ["Noon", 720], ["1 PM", 780], ["3 PM", 900], ["5 PM", 1020]];
-// 6 PM happens on hard-ticket event days; Disneyland runs to midnight or 1 AM
-const END_CHOICES = [["6 PM", 1080], ["9 PM", 1260], ["10 PM", 1320], ["Midnight", 1440], ["1 AM", 1500]];
 
 function rollConditions(mode) {
   const bad = ["hot", "drizzle"];
@@ -879,8 +886,8 @@ const BREAKS = [
     desc: "Find a bench in the shade and let your feet recover." },
   { id: "water", name: "Water and shade", mins: 10, cost: 0, joy: 2, en: 8, fuel: 4, comfort: 18,
     desc: "Free cup of ice water and ten minutes out of the sun." },
-  { id: "people", name: "People watching on Main Street", mins: 30, cost: 0, joy: 5, en: 14, fuel: 0, comfort: 8,
-    desc: "Park yourself by the hub and watch the world go by. Costs nothing but time." },
+  { id: "people", name: "People watching", mins: 30, cost: 0, joy: 5, en: 14, fuel: 0, comfort: 8,
+    desc: "Find a bench somewhere central and watch the world go by. Costs nothing but time." },
   { id: "snack", name: "Grab a snack", mins: 10, cost: 0, joy: 0, en: 0, fuel: 0, comfort: 0,
     desc: "Something from a cart. It's never really about the hunger.",
     options: [
@@ -897,6 +904,8 @@ const BREAKS = [
       { id: "icecream", name: "Mickey Ice Cream Bar", mins: 6, cost: 7, joy: 8, en: 3, fuel: 10, comfort: 9,
         desc: "Eat it fast. The ears go first." },
     ] },
+  { id: "brought", name: "Eat food you brought", mins: 20, cost: 0, joy: -4, en: 6, fuel: 34, comfort: 4,
+    desc: "A squashed sandwich and a warm drink from the bag. It does the job, and it costs nothing." },
   { id: "coffee", name: "Cold brew", mins: 12, cost: 6, joy: 2, en: 14, fuel: 5, comfort: 6,
     desc: "The afternoon wall is real. This helps." },
   { id: "pins", name: "Pin trading", mins: 20, cost: 14, joy: 9, en: -2, fuel: 0, comfort: 4,
@@ -1374,7 +1383,7 @@ export default function HappiestPlace() {
   function start(parkOverride, carryOverride, dayOverride) {
     const c = carryOverride !== undefined ? carryOverride : carry;
     const day = dayOverride !== undefined ? dayOverride : runDay;
-    setDayWindow(isCustom ? custom.startMin : 480, isCustom ? custom.endMin : 1440);
+    setDayWindow(season);
     const cond = isCustom
       ? { weather: custom.weather, crowd: custom.crowd }
       : rollConditions(mode);
@@ -3621,9 +3630,7 @@ function Title({ onStart, onSetup, ready, mode, setMode, runMode, setRunMode, pa
   const budgetVal = isCustom ? custom.budget : DIFFICULTY[mode].budget;
   const budgetLabel = (isCustom ? custom.unlimited : DIFFICULTY[mode].unlimited)
     ? "as much money as you like" : `$${budgetVal}`;
-  const openAt = isCustom ? custom.startMin : 480;
-  const h = Math.floor(openAt / 60), mm = String(openAt % 60).padStart(2, "0");
-  const openLabel = `Rope drop is at ${h % 12 === 0 ? 12 : h % 12}:${mm} ${h >= 12 ? "PM" : "AM"}`;
+  const openLabel = "Rope drop is at 8:00 AM";
   return (
     <Shell>
       <div style={{ flex: 1, overflowY: "auto", padding: "52px 24px 30px", textAlign: "center" }}>
@@ -3685,10 +3692,6 @@ function Title({ onStart, onSetup, ready, mode, setMode, runMode, setRunMode, pa
           </div>
           {mode === "custom" && (
             <div style={{ background: C.gap, borderRadius: 14, padding: 13, marginBottom: 9 }}>
-              <Knob label="Gates open" choices={TIME_CHOICES} value={custom.startMin}
-                onPick={(v) => setCustom((c) => ({ ...c, startMin: Math.min(v, c.endMin - 240) }))} />
-              <Knob label="Park closes" choices={END_CHOICES} value={custom.endMin}
-                onPick={(v) => setCustom((c) => ({ ...c, endMin: Math.max(v, c.startMin + 240) }))} />
               <Knob label="Park capacity" choices={CROWD_CHOICES} value={custom.crowd}
                 onPick={(v) => setCustom((c) => ({ ...c, crowd: v }))} />
               <Knob label="Weather" choices={[["Clear", "clear"], ["Hot", "hot"], ["Drizzle", "drizzle"], ["Cold", "cold"]]}
@@ -3829,14 +3832,14 @@ function End({ joy, t, wallet, energy, comfort, visited, track, log, seed, mode,
           }}>
             <div style={{ fontSize: 18.5, fontWeight: 800, color: burnedOut ? C.red : won ? C.green : C.navy }}>
               {burnedOut ? `Burned out on day ${runDay}`
-                : won ? "You made it all five days"
+                : won ? `You made it all ${RUN_MODES[runMode].days} days`
                 : `Called it after ${runDay} ${runDay === 1 ? "day" : "days"}`}
             </div>
             <div style={{ fontSize: 15, color: C.text, lineHeight: 1.45, marginTop: 4 }}>
               {burnedOut === "energy" ? "You ran yourself into the ground."
                 : burnedOut === "hunger" ? "You never did stop to eat properly."
                 : burnedOut === "comfort" ? "The weather won."
-                : won ? "Five days, and still standing at the end of the last one."
+                : won ? `${RUN_MODES[runMode].days} days, and still standing at the end of the last one.`
                 : "You stopped while you were ahead."}
             </div>
             <div style={{ marginTop: 11 }}>
