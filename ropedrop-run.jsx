@@ -562,8 +562,10 @@ function ropeDropRush(id, min) {
   if (!ROPE_DROP.has(id)) return 0;
   const t = min - PARK_OPEN;
   if (t < 0 || t > 190) return 0;
-  // zero at the gates, peaking about forty minutes in, gone by late morning
-  return 1.5 * Math.min(1, t / 14) * Math.exp(-Math.pow((t - 42) / 58, 2));
+  /* Zero at the gates, a real queue within ten minutes, over half the ride's
+     peak wait by half past, and faded out by late morning. Expressed as a
+     fraction of the ride's own peak, so Rise builds harder than Peter Pan. */
+  return 0.6 * Math.min(1, t / 10) * Math.exp(-Math.pow((t - 35) / 55, 2));
 }
 
 /* In real heat the middle of the day thins out — people leave for the hotel
@@ -585,7 +587,13 @@ function dayCurve(id, ticket, t) {
   const i = Math.floor(x), f = x - i;
   const own = p[i] + (p[Math.min(15, i + 1)] - p[i]) * f;
   const base = crowdAt(min) * (0.82 + 0.18 * own / 0.9);
-  return base * (1 + ropeDropRush(id, min));
+  /* Two separate things are happening in the first hour. The park as a whole
+     takes about forty minutes to fill from the turnstiles — that's `fill`, and
+     it's why everything is a walk-on at 8:00. But the rope-drop crowd is
+     already running, so their eight rides build a queue within minutes and are
+     NOT subject to that ramp. */
+  const fill = Math.max(0, Math.min(1, (min - PARK_OPEN) / 40));
+  return base * fill + ropeDropRush(id, min);
 }
 
 // the hour a ride is typically at its shortest, for the planning hint
