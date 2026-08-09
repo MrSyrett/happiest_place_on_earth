@@ -41,6 +41,7 @@ const DL_RAW = [
   ["treehouse", "Adventureland Treehouse", "Adventureland", "ride", "B", 12, 5, 7, -6, 0, 0, 395, 657],
   ["tiki", "Enchanted Tiki Room", "Adventureland", "show", "B", 17, 10, 9, 8, 0, 0, 505, 597],
   ["bengal", "Bengal Barbecue", "Adventureland", "dine", "—", 20, 10, 10, 8, 28, 14, 429, 630],
+  ["riverbelle", "River Belle Terrace", "Frontierland", "dine", "—", 55, 18, 19, 16, 46, 42, 386, 618],
 
   ["pirates", "Pirates of the Caribbean", "New Orleans Sq.", "ride", "D", 15, 30, 16, 2, 0, 0, 362, 652],
   ["mansion", "Haunted Mansion", "New Orleans Sq.", "ride", "D", 12, 38, 16, 0, 0, 0, 199, 603],
@@ -347,7 +348,7 @@ const PARKS = {
 /* Table service means a host, a menu and a real sit-down. Everything else is
    counter service, where you can take it away instead of finding a table. */
 const TABLE_SERVICE = new Set([
-  "bayou", "carthay", "tianas", "monte", "plazainn", "carnation",
+  "bayou", "carthay", "tianas", "monte", "plazainn", "carnation", "riverbelle",
   "lamplight", "oga", "hollywoodlounge",
 ]);
 const isQuickService = (a) => a.kind === "dine" && !TABLE_SERVICE.has(a.id);
@@ -2939,11 +2940,13 @@ function MapPin({ a, px, py, w, pinK, selected, done, dim, nameLabel, inert, onT
   const closed = w < 0;
   const showNum = isRide && w > 0;
   const label = showNum ? String(w) : null;
-  /* Square-ish: a two-digit wait needs barely more width than the icon, so only
-     three-digit waits get any extra. */
   const digits = label ? label.length : 0;
+  /* Geometry, stated once. The body runs from -(bh+12) down to -12 and the tail
+     hangs below that, so every piece of content is positioned against those two
+     edges — not against bh, which is what let the label escape the box before. */
+  const bh = showNum ? 42 : 38;
   const bw = showNum ? (digits >= 3 ? 46 : 38) : 38;
-  const bh = 38;
+  const TOP = -bh - 12, BOT = -12;
   const bg = selected ? C.blue : closed ? "#F0F2F4" : C.white;
   const fg = selected ? C.white : closed ? C.greyLt : C.navy;
   return (
@@ -2957,20 +2960,21 @@ function MapPin({ a, px, py, w, pinK, selected, done, dim, nameLabel, inert, onT
           <text x="0" y="22" textAnchor="middle" style={{ fontFamily: F, fontSize: 14, fontWeight: 800, fill: C.blue }}>{nameLabel}</text>
         </>
       )}
-      <path d={`M${-bw / 2} ${-bh - 12} h${bw} a8 8 0 018 8 v${bh - 16} a8 8 0 01-8 8 h${-bw / 2 + 7} l-7 12 l-7 -12 h${-bw / 2 + 7} a8 8 0 01-8 -8 v${-bh + 16} a8 8 0 018 -8 z`}
-        transform={`translate(0 ${-2})`} fill={bg} stroke={done ? C.border : "rgba(18,40,63,.14)"} strokeWidth="1.5" />
+      <path d={`M${-bw / 2} ${TOP} h${bw} a8 8 0 018 8 v${bh - 16} a8 8 0 01-8 8 h${-bw / 2 + 7} l-7 12 l-7 -12 h${-bw / 2 + 7} a8 8 0 01-8 -8 v${-bh + 16} a8 8 0 018 -8 z`}
+        transform="translate(0 -2)" fill={bg} stroke={done ? C.border : "rgba(18,40,63,.14)"} strokeWidth="1.5" />
       {closed ? (
         // no wait to show, so fall back to the attraction icon rather than a cross
-        <g transform={`translate(-9 ${-bh + 3}) scale(0.76)`} opacity="0.55">
-          {I.star(C.greyLt, false)}
-        </g>
+        <g transform={`translate(-9 ${TOP + 11}) scale(0.76)`} opacity="0.55">{I.star(C.greyLt, false)}</g>
       ) : showNum ? (
         <>
-          <text x="0" y={-bh + 17} textAnchor="middle" style={{ fontFamily: F, fontSize: digits >= 3 ? 18 : 21, fontWeight: 800, fill: done ? C.greyLt : fg }}>{label}</text>
-          <text x="0" y={-bh + 29} textAnchor="middle" style={{ fontFamily: F, fontSize: 9, fontWeight: 700, letterSpacing: ".06em", fill: selected ? "rgba(255,255,255,.85)" : C.greyLt }}>MIN</text>
+          <text x="0" y={BOT - 16} textAnchor="middle"
+            style={{ fontFamily: F, fontSize: digits >= 3 ? 18 : 21, fontWeight: 800, fill: done ? C.greyLt : fg }}>{label}</text>
+          <text x="0" y={BOT - 6} textAnchor="middle"
+            style={{ fontFamily: F, fontSize: 9, fontWeight: 700, letterSpacing: ".06em",
+                     fill: selected ? "rgba(255,255,255,.85)" : C.greyLt }}>MIN</text>
         </>
       ) : (
-        <g transform={`translate(-9 ${-bh + 2}) scale(0.76)`}>
+        <g transform={`translate(-9 ${TOP + 12}) scale(0.76)`}>
           {a.kind === "train" ? I.train(selected ? C.white : C.navy)
             : a.kind === "dine" ? I.fork(selected ? C.white : C.navy)
             : isRide ? I.star(selected ? C.white : C.navy, true)
