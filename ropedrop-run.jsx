@@ -5,6 +5,7 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
    ========================================================== */
 
 const C = {
+  grass: "#A2B974",   // sampled from the map margin, so the edges stop reading as a cut
   blue: "#0578BE",
   blueDeep: "#0A62A0",
   blueTint: "#E4F1FA",
@@ -423,12 +424,26 @@ function comfortRate(a, weather, temp) {
     const wet = Math.max(-2.6, Math.min(1.8, ((temp === undefined ? 75 : temp) - 78) / 9));
     return wet - (weather === "drizzle" ? 0.7 : 0);
   }
+  /* Enclosed, but the roughest track in the resort — you come off it feeling
+     it, so it costs comfort rather than giving any back. */
+  if (a.id === "matterhorn") return -0.5;
   if (INDOOR.has(a.id)) return 0.55;             // the only thing that recovers
   if (a.kind === "ride") return -0.35;           // out in it, on your feet or in the sun
   return -0.15;                                  // seated or shaded, but still outside
 }
 
 // comfort bleeds faster the hotter it actually is, and rain is its own penalty
+/* Queuing is where discomfort actually bites: you're standing still, in the sun
+   or the rain, pressed in among other people, for far longer than you're moving.
+   This is the total rate while in line, not an addition to the passive one. */
+const AC_QUEUE = new Set(["railway", "falcon", "startours", "midway"]);
+// past this you're eating for the sake of it
+const FULL_AT = 80;
+function queueComfortDrain(weather, t, warm) {
+  if (weather === "drizzle") return 0.70;
+  return 0.25 + 0.52 * heatAt(weather, t, warm) + 0.30 * coldAt(weather, t, warm);
+}
+
 function comfortDrain(weather, t) {
   return (weather === "drizzle" ? 0.14 : 0.07) + 0.15 * heatAt(weather, t);
 }
@@ -1825,11 +1840,18 @@ export default function HappiestPlace() {
     const base = comfortDrain(wx, atMin, seed.warm);
     let dJoy = -0.035 * dr, dEn = -0.03 * hot * dr * fat, dFu = -0.095 * dr, dCf = -base * dr * fat;
     if (phase === "walk") { dEn -= 0.45 * hot * dr * fat; dJoy -= 0.05 * dr; dCf -= base * 1.1 * dr * fat; }
-    if (phase === "wait") { dEn -= 0.06 * dr * fat; dJoy -= r.painRate * dr; dCf -= base * 0.9 * dr * fat; }
+    if (phase === "wait") {
+      dEn -= 0.06 * dr * fat;
+      dJoy -= r.painRate * dr;
+      // replaces the passive rate rather than adding to it; an indoor queue is
+      // still standing, but it is not standing in the weather
+      dCf = -(AC_QUEUE.has(a.id) ? 0.06 : queueComfortDrain(wx, atMin, seed.warm)) * dr * fat;
+    }
     if (phase === "do") {
       dJoy += r.gain / dur;
       dEn += (a.en > 0 ? a.en : a.en * hot) / dur;
-      dFu += a.fuel / dur;
+      dFu += (r.stuffed ? a.fuel * 0.35 : a.fuel) / dur;
+      if (r.stuffed) { dEn -= 0.18 * dr; dCf -= 0.10 * dr; }
       dCf += (r.comfortRate || 0) + (r.comfort || 0) / dur;
     }
     return { dJoy, dEn, dFu, dCf, phase };
@@ -1883,9 +1905,14 @@ export default function HappiestPlace() {
     const reps = visited[a.id] || 0;
     const rep = reps === 0 ? 1 : reps === 1 ? 0.5 : reps === 2 ? 0.28 : 0.15;
     const eF = energy > 60 ? 1 : energy > 35 ? 0.85 : energy > 15 ? 0.62 : 0.4;
-    const fF = fuel > 25 ? 1 : 0.72;
+    const fF = fuel > 60 ? 1 : fuel > 40 ? 0.9 : fuel > 20 ? 0.78 : 0.65;
     const cF = comfort > 60 ? 1 : comfort > 35 ? 0.9 : comfort > 15 ? 0.76 : 0.6;
     let gain = a.joy * rep * eF * fF * cF;
+    /* There is such a thing as too much. Sitting down to a full meal when
+       you're already stuffed is less enjoyable and leaves you sluggish — and
+       most of the food goes to waste. */
+    const stuffed = a.kind === "dine" && a.fuel >= 20 && fuel > FULL_AT;
+    if (stuffed) gain *= 0.55;
     if (seed.weather === "hot" && a.kind === "dine") gain += 2;
     if (seed.weather === "drizzle" && a.kind === "ride") gain -= 1.5;
     if (single) gain *= SINGLE_JOY;
@@ -1910,6 +1937,7 @@ export default function HappiestPlace() {
       // a ride can fail under you, partway through
       breakAt: a.kind === "ride" && Math.random() < BREAKDOWN_CHANCE
         ? walk + wait + Math.max(1, Math.floor(dur * (0.3 + Math.random() * 0.5))) : -1,
+      stuffed,
       i: 0, net: 0, paid: false, from: { ...pos },
     });
   }
@@ -2014,6 +2042,7 @@ export default function HappiestPlace() {
     if (r.wait) bits.push(`${r.wait} min ${r.single ? "single rider" : "line"}`);
     else if (r.posted > 0) bits.push("walked straight on");
     if (a.cost) bits.push(`$${a.cost}`);
+    if (r.stuffed) bits.push("too full to enjoy it");
     push(`${a.name} — ${bits.join(", ")}`, net >= 4 ? "good" : net >= 0 ? "ok" : "bad");
     setFlash({ name: a.name, net, key: Math.random() });
     setTimeout(() => setFlash(null), 2600);
@@ -2850,7 +2879,7 @@ function ParkMap({ park, items, waits, pos, sel, onSelect, visited, basemap, tra
 
   return (
     <div ref={wrap}
-      style={{ position: "absolute", inset: 0, overflow: "hidden", background: "#DCE6EA", touchAction: "none" }}
+      style={{ position: "absolute", inset: 0, overflow: "hidden", background: C.grass, touchAction: "none" }}
       onTouchStart={touchStart} onTouchMove={touchMove} onTouchCancel={touchEnd}
       onTouchEnd={(e) => { touchEnd(e); surfaceTap(e); }}
       onMouseDown={(e) => onDown(e.clientX, e.clientY)} onMouseMove={(e) => onMove(e.clientX, e.clientY)}
