@@ -438,7 +438,13 @@ function comfortRate(a, weather, temp) {
    This is the total rate while in line, not an addition to the passive one. */
 const AC_QUEUE = new Set(["railway", "falcon", "startours", "midway"]);
 // past this you're eating for the sake of it
-const FULL_AT = 80;
+/* Hunger runs 0-150 in three equal bands: under 50 you're hungry, 50-100 is
+   where you want to sit, and over 100 you've overdone it. The old scale topped
+   out at 100 with a "too full" line at 80, which normal meal spacing never
+   crossed — you'd always have drained back under it before eating again. */
+const HUNGER_MAX = 150;
+const SATIATED_LO = 50, SATIATED_HI = 100;
+const clampFuel = (v) => Math.max(0, Math.min(HUNGER_MAX, v));
 function queueComfortDrain(weather, t, warm) {
   if (weather === "drizzle") return 0.70;
   return 0.25 + 0.52 * heatAt(weather, t, warm) + 0.30 * coldAt(weather, t, warm);
@@ -764,7 +770,7 @@ const RUN_MODES = {
 const overnight = {
   energy:  (v, d) => Math.round(Math.max(0, Math.min(100 - (d - 1) * 7, v * 0.62 + 26))),
   comfort: (v, d) => Math.round(Math.max(0, Math.min(100 - (d - 1) * 6, v * 0.58 + 28))),
-  fuel:    (v) => Math.round(Math.max(0, v - 16)),
+  fuel:    (v) => Math.round(Math.max(0, Math.min(HUNGER_MAX, v) - 22)),
 };
 // cumulative fatigue: energy and comfort go faster every day. Nothing else does.
 const dayFatigue = (d) => 1 + 0.14 * (d - 1);
@@ -1468,7 +1474,7 @@ export default function HappiestPlace() {
   const [t, setT] = useState(OPEN);
   const [joy, setJoy] = useState(50);
   const [energy, setEnergy] = useState(100);
-  const [fuel, setFuel] = useState(72);
+  const [fuel, setFuel] = useState(75);
   const [comfort, setComfort] = useState(100);
   /* Comfort has a ceiling that ratchets down as the day wears on: air
      conditioning gives back a portion of what the day took, never all of it.
@@ -1767,7 +1773,7 @@ export default function HappiestPlace() {
       ? REFURB_CANDIDATES[Math.floor(Math.random() * REFURB_CANDIDATES.length)] : null;
     setSeed({ ...cond, lateOpen: late, refurb });
     setScreen("play"); setT(OPEN); setJoy(50);
-    setEnergy(c ? overnight.energy(c.energy, day) : Math.round(100 * PARTY[party].energy)); setFuel(carry ? overnight.fuel(carry.fuel) : 72);
+    setEnergy(c ? overnight.energy(c.energy, day) : Math.round(100 * PARTY[party].energy)); setFuel(carry ? overnight.fuel(carry.fuel) : 75);
     const c0 = c ? overnight.comfort(c.comfort, day) : 100;
     setComfort(c0); setComfortCap(c0); comfortCapRef.current = c0;
     setWallet(budgetOf + (c ? Math.max(0, Math.round(c.wallet)) : 0));
@@ -1825,7 +1831,7 @@ export default function HappiestPlace() {
   function passTime(mins) {
     const hot = 1 + 0.55 * heatAt(seed.weather, t, seed.warm) + 0.30 * coldAt(seed.weather, t, seed.warm);
     setEnergy((e) => clamp(e - (mins / 10) * 0.3 * hot * drain * fatigue));
-    setFuel((f) => clamp(f - (mins / 10) * 0.95 * PARTY[party].hunger * drain));
+    setFuel((f) => clampFuel(f - (mins / 10) * 0.95 * PARTY[party].hunger * drain));
     bumpComfort(-mins * comfortDrain(seed.weather, t, seed.warm) * drain * fatigue);
     setJoy((j) => happy(j - (mins / 10) * 0.35 * drain));
     setT((x) => x + mins);
@@ -1905,13 +1911,16 @@ export default function HappiestPlace() {
     const reps = visited[a.id] || 0;
     const rep = reps === 0 ? 1 : reps === 1 ? 0.5 : reps === 2 ? 0.28 : 0.15;
     const eF = energy > 60 ? 1 : energy > 35 ? 0.85 : energy > 15 ? 0.62 : 0.4;
-    const fF = fuel > 60 ? 1 : fuel > 40 ? 0.9 : fuel > 20 ? 0.78 : 0.65;
+    const fF = fuel < SATIATED_LO
+      ? (fuel > 35 ? 0.9 : fuel > 20 ? 0.78 : 0.65)          // hungry
+      : fuel <= SATIATED_HI ? 1                               // where you want to be
+      : (fuel < 120 ? 0.92 : fuel < 140 ? 0.8 : 0.68);        // overeaten
     const cF = comfort > 60 ? 1 : comfort > 35 ? 0.9 : comfort > 15 ? 0.76 : 0.6;
     let gain = a.joy * rep * eF * fF * cF;
     /* There is such a thing as too much. Sitting down to a full meal when
        you're already stuffed is less enjoyable and leaves you sluggish — and
        most of the food goes to waste. */
-    const stuffed = a.kind === "dine" && a.fuel >= 20 && fuel > FULL_AT;
+    const stuffed = a.kind === "dine" && fuel > SATIATED_HI;
     if (stuffed) gain *= 0.55;
     if (seed.weather === "hot" && a.kind === "dine") gain += 2;
     if (seed.weather === "drizzle" && a.kind === "ride") gain -= 1.5;
@@ -1946,7 +1955,7 @@ export default function HappiestPlace() {
     if (e.waitMult) setMods((m) => ({ ...m, mult: e.waitMult, until: atTime + (e.minutes || 60) }));
     if (e.joy) setJoy((j) => happy(j + e.joy));
     if (e.energy) setEnergy((en) => clamp(en + e.energy));
-    if (e.fuel) setFuel((f) => clamp(f + e.fuel));
+    if (e.fuel) setFuel((f) => clampFuel(f + e.fuel));
     if (e.comfort) bumpComfort(e.comfort);
     if (e.money) setWallet((w) => Math.max(0, w + e.money));
     if (e.ll) grantLL();
@@ -2013,7 +2022,7 @@ export default function HappiestPlace() {
     if (ev.waitMult) setMods((m) => ({ ...m, mult: ev.waitMult, until: atTime + (ev.minutes || 60) }));
     if (ev.joy) setJoy((j) => happy(j + ev.joy));
     if (ev.energy) setEnergy((e) => clamp(e + ev.energy));
-    if (ev.fuel) setFuel((f) => clamp(f + ev.fuel));
+    if (ev.fuel) setFuel((f) => clampFuel(f + ev.fuel));
     if (ev.comfort) bumpComfort(ev.comfort);
     if (ev.money) setWallet((w) => Math.max(0, w + ev.money));
     if (ev.ll) grantLL();
@@ -2063,7 +2072,7 @@ export default function HappiestPlace() {
     setT((x) => x + 1);
     setJoy((j) => happy(j + dJoy));
     setEnergy((e) => { const n = clamp(e + dEn); setTrack((k) => (n < k.minEnergy ? { ...k, minEnergy: n } : k)); return n; });
-    setFuel((f) => clamp(f + dFu));
+    setFuel((f) => clampFuel(f + dFu));
     setComfort((c) => { const n = clamp(c + dCf); setTrack((k) => (n < k.minComfort ? { ...k, minComfort: n } : k)); return n; });
 
     const target = r.board || r.a;   // the train is boarded at a platform, not at the destination
@@ -2125,7 +2134,7 @@ export default function HappiestPlace() {
     setT((x) => x + (stop - r.i));
     setJoy((j) => happy(j + dJ));
     setEnergy((e) => clamp(e + dE));
-    setFuel((f) => clamp(f + dF));
+    setFuel((f) => clampFuel(f + dF));
     bumpComfort(dC);
     if (!r.paid && r.a.cost) setWallet((w) => w - r.a.cost);
     if (r.breakAt > 0 && stop >= r.breakAt) breakDown({ ...r, i: stop - r.walk - r.wait });
@@ -3141,10 +3150,11 @@ function StatusBar({ t, joy, energy, fuel, comfort, comfortCap, wallet, ll, seed
         </div>
         <div style={{ flex: 1, display: "flex", gap: 8 }}>
           <Meter label="Energy" v={energy} c={C.amber} />
-          {/* Full and green when you're fed; drains and reddens as hunger sets in,
-              so it reads the same way as Energy and Comfort. */}
-          <Meter label="Hunger" v={fuel}
-            c={fuel < 25 ? C.red : fuel < 50 ? C.amber : C.green} />
+          {/* Three bands: hungry, satiated, overeaten. Green only in the middle
+              third, amber at either end, so both mistakes read the same way. */}
+          <Meter label="Hunger" v={fuel} max={HUNGER_MAX} band={[SATIATED_LO, SATIATED_HI]}
+            c={fuel < SATIATED_LO ? (fuel < 25 ? C.red : C.amber)
+              : fuel <= SATIATED_HI ? C.green : C.amber} />
           <Meter label="Comfort" v={comfort} cap={comfortCap} c={comfort < 30 ? C.red : C.blue} />
         </div>
       </div>
@@ -3152,14 +3162,21 @@ function StatusBar({ t, joy, energy, fuel, comfort, comfortCap, wallet, ll, seed
   );
 }
 
-function Meter({ label, v, c, cap }) {
+function Meter({ label, v, c, cap, max = 100, band }) {
   return (
     <div style={{ flex: 1 }}>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, fontWeight: 700, color: C.greyLt }}>
         <span>{label}</span><span style={{ color: C.text }}>{Math.round(v)}</span>
       </div>
       <div style={{ height: 4, borderRadius: 2, background: C.rule, marginTop: 2, position: "relative", overflow: "hidden" }}>
-        <div style={{ width: `${clamp(v)}%`, height: "100%", background: c, borderRadius: 3, transition: "width .35s ease" }} />
+        {/* the band you're aiming for, drawn under the fill */}
+        {band && (
+          <div style={{
+            position: "absolute", left: `${(band[0] / max) * 100}%`, width: `${((band[1] - band[0]) / max) * 100}%`,
+            top: 0, bottom: 0, background: "rgba(18,40,63,.10)",
+          }} />
+        )}
+        <div style={{ width: `${clamp((v / max) * 100)}%`, height: "100%", background: c, borderRadius: 3, transition: "width .35s ease", position: "relative" }} />
         {/* how much of the bar the day has taken for good */}
         {cap !== undefined && cap < 99.5 && (
           <div style={{
