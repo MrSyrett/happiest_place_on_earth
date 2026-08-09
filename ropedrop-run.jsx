@@ -211,7 +211,7 @@ const DCA_RAW = [
 ];
 
 // positions confirmed by hand against the real map
-const REVIEWED = new Set(["alice", "auntcass", "autopia", "bakery", "bayou", "bear", "bengal", "bluey", "boardwalk", "buzz", "candy", "canoes", "carnation", "carrousel", "caseyjr", "castlewalk", "chowder", "cinema", "cocina", "columbia", "corndog", "corndogcastle", "critter", "daisy", "djunior", "dolewhip", "dumbo", "edelweiss", "falcon", "fantasmic", "fireworks", "funnel", "gadget", "gibson", "goofyyard", "grill", "guardians", "harbour", "hideaway", "hollywoodlounge", "horseshoe", "indy", "jellyfish", "jolly", "julep", "jungle", "launchbay", "lincoln", "mansion", "matterhorn", "maurice", "mickeyhouse", "milkstand", "minniehouse", "monorail", "monte", "nemo", "oga", "orbitor", "parade", "peterpan", "pinocchio", "pirates", "pixiehollow", "pizzaplanet", "plazainn", "pooh", "popcorn", "pym", "railroad", "railway", "rancho", "redrose", "rise", "roger", "ronto", "royaltheatre", "rr_nos", "rr_tom", "rr_toon", "shootin", "smallworld", "snow", "space", "startours", "storybook", "teacups", "thunder", "tiana", "tiki", "toad", "tomsawyer", "trattoria", "treehouse", "trolley", "turkeyleg", "turtletalk", "twain", "vehicles", "webslingers"]);
+const REVIEWED = new Set(["alice", "auntcass", "autopia", "bakery", "bayou", "bear", "bengal", "bluey", "boardwalk", "buzz", "candy", "canoes", "carnation", "carrousel", "caseyjr", "castlewalk", "chowder", "cinema", "cocina", "columbia", "corndog", "corndogcastle", "cozy", "critter", "daisy", "djunior", "dockingbay", "dolewhip", "dumbo", "edelweiss", "falcon", "fantasmic", "fireworks", "flos", "funnel", "gadget", "gibson", "goofyyard", "grill", "guardians", "harbour", "hideaway", "hollywoodlounge", "horseshoe", "indy", "jellyfish", "jolly", "julep", "jungle", "launchbay", "lincoln", "luigi", "mansion", "mater", "matterhorn", "maurice", "mickeyhouse", "milkstand", "minniehouse", "monorail", "monte", "nemo", "oga", "orbitor", "parade", "peterpan", "pinocchio", "pirates", "pixarshorts", "pixiehollow", "pizzaplanet", "plazainn", "pooh", "popcorn", "pym", "railroad", "railway", "rancho", "redrose", "rise", "riverbelle", "roger", "ronto", "royaltheatre", "rr_nos", "rr_tom", "rr_toon", "shootin", "smallworld", "snow", "space", "startours", "storybook", "teacups", "thunder", "tiana", "tianas", "tiki", "toad", "tomsawyer", "trattoria", "treehouse", "trolley", "turkeyleg", "turtletalk", "twain", "vehicles", "webslingers"]);
 
 /* The Disneyland Railroad runs a one-way grand circle. These are the minutes
    between consecutive stops; a full loop is about twenty minutes. */
@@ -532,11 +532,60 @@ const CURVE = {
 };
 
 // hourly points, linearly interpolated so waits drift rather than jump
+/* ---------------- how busy the park is ----------------
+   Waits are driven mostly by how many people are actually inside, which follows
+   the same shape every day: nobody at rope drop, a trickle until ten, the bulk
+   arriving mid-morning, a long flat peak through the afternoon, then a steady
+   drain from about eight as families with small children give up. */
+const ARRIVALS = [
+  [480, 0.04], [500, 0.11], [520, 0.19], [540, 0.28], [570, 0.40],
+  [600, 0.58], [630, 0.76], [660, 0.88], [690, 0.95], [720, 0.99],
+  [780, 1.00], [1140, 1.00], [1200, 0.97], [1230, 0.90], [1260, 0.82],
+  [1290, 0.73], [1320, 0.63], [1350, 0.52], [1380, 0.41], [1410, 0.31], [1500, 0.20],
+];
+function crowdAt(min) {
+  if (min <= ARRIVALS[0][0]) return ARRIVALS[0][1];
+  for (let i = 1; i < ARRIVALS.length; i++) {
+    if (min <= ARRIVALS[i][0]) {
+      const [a, av] = ARRIVALS[i - 1], [b, bv] = ARRIVALS[i];
+      return av + (bv - av) * ((min - a) / (b - a));
+    }
+  }
+  return ARRIVALS[ARRIVALS.length - 1][1];
+}
+
+/* The rides everyone sprints to at rope drop. They build a queue within minutes
+   of the gates opening, long before the park as a whole fills up. */
+const ROPE_DROP = new Set(["peterpan", "indy", "rise", "space", "racers",
+                           "guardians", "incredicoaster", "midway"]);
+function ropeDropRush(id, min) {
+  if (!ROPE_DROP.has(id)) return 0;
+  const t = min - PARK_OPEN;
+  if (t < 0 || t > 190) return 0;
+  // zero at the gates, peaking about forty minutes in, gone by late morning
+  return 1.5 * Math.min(1, t / 14) * Math.exp(-Math.pow((t - 42) / 58, 2));
+}
+
+/* In real heat the middle of the day thins out — people leave for the hotel
+   pool, and the queues get noticeably shorter for a couple of hours. */
+function heatDip(weather, min, warm) {
+  if (weather !== "hot") return 1;
+  const t = tempAt(weather, min - DAY_START, warm);
+  if (t < 88) return 1;
+  // fade the window in and out so the queues don't jump at its edges
+  const win = Math.max(0, Math.min(1, (min - 660) / 60, (1050 - min) / 90));
+  return 1 - 0.16 * win * Math.min(1, (t - 88) / 9);
+}
+
 function dayCurve(id, ticket, t) {
+  const min = M(t);
+  // the park-wide pattern dominates; the ride's own profile just tints it
   const p = PROFILES[CURVE[id] || (ticket === "E" ? "thrill" : "steady")];
-  const x = Math.max(0, Math.min(15, M(t) / 60 - 8));
+  const x = Math.max(0, Math.min(15, min / 60 - 8));
   const i = Math.floor(x), f = x - i;
-  return p[i] + (p[Math.min(15, i + 1)] - p[i]) * f;
+  const own = p[i] + (p[Math.min(15, i + 1)] - p[i]) * f;
+  const base = crowdAt(min) * (0.82 + 0.18 * own / 0.9);
+  return base * (1 + ropeDropRush(id, min));
 }
 
 // the hour a ride is typically at its shortest, for the planning hint
@@ -571,12 +620,12 @@ function waitFor(a, t, crowd, weather, mods) {
   // the fireworks pull people off the queues for about forty minutes
   const fw = M(t) >= 1260 && M(t) <= 1300 ? 0.9 : 1;
   const mult = mods && mods.until > t ? mods.mult : 1;
-  const w = a.wait * dayCurve(a.id, a.ticket, t) * crowd * jitter * wx * fw * mult;
-  /* At the moment the rope drops nobody is in a queue yet — everything is a
-     walk-on. Lines build over the first forty minutes or so. This keys off the
-     clock, not off t, so arriving at 3 PM gets no such gift. */
-  const ramp = Math.max(0, Math.min(1, (M(t) - 480) / 40));
-  const posted = Math.round((w * ramp) / 5) * 5;
+  const w = a.wait * dayCurve(a.id, a.ticket, t) * crowd * jitter * wx * fw * mult
+    * heatDip(weather, M(t), mods && mods.warm);
+  /* dayCurve already carries the arrival pattern, so the only thing left is to
+     scale the ride's own floor the same way — an empty park has no minimum. */
+  const ramp = Math.min(1, crowdAt(M(t)) / 0.9);
+  const posted = Math.round(w / 5) * 5;
   const floor = Math.round((MIN_WAIT[a.id] || 0) * ramp);
   /* The Disney app never posts zero — an open ride reads 5 minutes even when
      you'll walk straight on. actualWait() turns a posted 5 back into 0. */
