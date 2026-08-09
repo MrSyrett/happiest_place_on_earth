@@ -132,6 +132,7 @@ const DL_RAW = [
   ["goofyyard", "Goofy's How-to-Play Yard", "Toontown", "ride", "A", 12, 5, 6, -4, 0, 0, 592, 111],
 
   ["space", "Space Mountain", "Tomorrowland", "ride", "E", 8, 58, 21, -8, 0, 0, 790, 630],
+  ["pixarshorts", "Pixar Short Film Spotlight", "Tomorrowland", "show", "B", 20, 8, 12, 9, 0, 0, 748, 638],
   ["startours", "Star Tours", "Tomorrowland", "ride", "D", 12, 35, 14, -5, 0, 0, 696, 563],
   ["buzz", "Buzz Lightyear Astro Blasters", "Tomorrowland", "ride", "C", 8, 30, 10, -2, 0, 0, 719, 537],
   ["nemo", "Finding Nemo Submarines", "Tomorrowland", "ride", "C", 15, 30, 10, 4, 0, 0, 834, 452],
@@ -142,6 +143,7 @@ const DL_RAW = [
 
 const DCA_RAW = [
   ["carthay", "Carthay Circle Restaurant", "Buena Vista St.", "dine", "—", 70, 18, 24, 22, 52, 68, 581, 1212],
+  ["fivedime", "Five & Dime", "Buena Vista St.", "show", "B", 15, 6, 11, 4, 0, 0, 556, 1192],
   ["trolley", "Red Car Trolley", "Buena Vista St.", "ride", "B", 8, 8, 6, 4, 0, 0, 795, 1214],
   ["fiddler", "Fiddler, Fifer & Practical Café", "Buena Vista St.", "dine", "—", 18, 10, 8, 8, 24, 13, 528, 1140],
 
@@ -190,6 +192,7 @@ const DCA_RAW = [
   ["snowman", "Adorable Snowman Frosted Treats", "Pixar Pier", "dine", "—", 10, 12, 12, 4, 18, 9, 401, 1540],
   ["angrydogs", "Angry Dogs", "Pixar Pier", "dine", "—", 12, 10, 10, 5, 24, 13, 192, 1578],
   ["gardengrill", "Paradise Garden Grill", "Paradise Gardens", "dine", "—", 20, 12, 12, 10, 30, 18, 50, 1410],
+  ["boardwalkpizza", "Boardwalk Pizza & Pasta", "Paradise Gardens", "dine", "—", 24, 14, 12, 9, 32, 19, 62, 1448],
   ["bayside", "Bayside Brews", "Paradise Gardens", "dine", "—", 10, 8, 8, 4, 12, 11, 117, 1446],
   ["lucky", "Lucky Fortune Cookery", "San Fransokyo", "dine", "—", 18, 12, 11, 8, 26, 16, 477, 1465],
   ["trattoria", "Wine Country Trattoria", "San Fransokyo", "dine", "—", 60, 20, 20, 18, 46, 44, 450, 1350],
@@ -2936,8 +2939,11 @@ function MapPin({ a, px, py, w, pinK, selected, done, dim, nameLabel, inert, onT
   const closed = w < 0;
   const showNum = isRide && w > 0;
   const label = showNum ? String(w) : null;
-  const bw = showNum ? 74 : 46;
-  const bh = showNum ? 56 : 46;
+  /* Square-ish: a two-digit wait needs barely more width than the icon, so only
+     three-digit waits get any extra. */
+  const digits = label ? label.length : 0;
+  const bw = showNum ? (digits >= 3 ? 46 : 38) : 38;
+  const bh = 38;
   const bg = selected ? C.blue : closed ? "#F0F2F4" : C.white;
   const fg = selected ? C.white : closed ? C.greyLt : C.navy;
   return (
@@ -2946,25 +2952,25 @@ function MapPin({ a, px, py, w, pinK, selected, done, dim, nameLabel, inert, onT
       style={{ cursor: inert ? "crosshair" : "pointer", pointerEvents: inert ? "none" : "auto" }}>
       {nameLabel && selected && (
         <>
-          <text x="0" y="24" textAnchor="middle" stroke={C.white} strokeWidth="4.5" strokeLinejoin="round"
-            style={{ fontFamily: F, fontSize: 15, fontWeight: 800 }}>{nameLabel}</text>
-          <text x="0" y="24" textAnchor="middle" style={{ fontFamily: F, fontSize: 15, fontWeight: 800, fill: C.blue }}>{nameLabel}</text>
+          <text x="0" y="22" textAnchor="middle" stroke={C.white} strokeWidth="4.5" strokeLinejoin="round"
+            style={{ fontFamily: F, fontSize: 14, fontWeight: 800 }}>{nameLabel}</text>
+          <text x="0" y="22" textAnchor="middle" style={{ fontFamily: F, fontSize: 14, fontWeight: 800, fill: C.blue }}>{nameLabel}</text>
         </>
       )}
       <path d={`M${-bw / 2} ${-bh - 12} h${bw} a8 8 0 018 8 v${bh - 16} a8 8 0 01-8 8 h${-bw / 2 + 7} l-7 12 l-7 -12 h${-bw / 2 + 7} a8 8 0 01-8 -8 v${-bh + 16} a8 8 0 018 -8 z`}
         transform={`translate(0 ${-2})`} fill={bg} stroke={done ? C.border : "rgba(18,40,63,.14)"} strokeWidth="1.5" />
       {closed ? (
         // no wait to show, so fall back to the attraction icon rather than a cross
-        <g transform={`translate(-11 ${-bh + 3}) scale(0.92)`} opacity="0.55">
+        <g transform={`translate(-9 ${-bh + 3}) scale(0.76)`} opacity="0.55">
           {I.star(C.greyLt, false)}
         </g>
       ) : showNum ? (
         <>
-          <text x="0" y={-bh + 20} textAnchor="middle" style={{ fontFamily: F, fontSize: 27, fontWeight: 800, fill: done ? C.greyLt : fg }}>{label}</text>
-          <text x="0" y={-bh + 38} textAnchor="middle" style={{ fontFamily: F, fontSize: 13, fontWeight: 600, fill: selected ? C.white : C.grey }}>Min Wait</text>
+          <text x="0" y={-bh + 17} textAnchor="middle" style={{ fontFamily: F, fontSize: digits >= 3 ? 18 : 21, fontWeight: 800, fill: done ? C.greyLt : fg }}>{label}</text>
+          <text x="0" y={-bh + 29} textAnchor="middle" style={{ fontFamily: F, fontSize: 9, fontWeight: 700, letterSpacing: ".06em", fill: selected ? "rgba(255,255,255,.85)" : C.greyLt }}>MIN</text>
         </>
       ) : (
-        <g transform={`translate(-11 ${-bh - 1}) scale(0.92)`}>
+        <g transform={`translate(-9 ${-bh + 2}) scale(0.76)`}>
           {a.kind === "train" ? I.train(selected ? C.white : C.navy)
             : a.kind === "dine" ? I.fork(selected ? C.white : C.navy)
             : isRide ? I.star(selected ? C.white : C.navy, true)
