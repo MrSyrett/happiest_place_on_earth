@@ -113,6 +113,7 @@ const DL_RAW = [
   ["castlewalk", "Sleeping Beauty Castle Walkthrough", "Fantasyland", "ride", "A", 8, 5, 6, -2, 0, 0, 551, 434],
   ["pixiehollow", "Pixie Hollow", "Fantasyland", "show", "A", 10, 20, 7, 0, 0, 0, 671, 492],
   ["bluey", "Bluey's Best Day Ever!", "Fantasyland", "show", "C", 25, 15, 12, 8, 0, 0, 580, 202],
+  ["troubadour", "Troubadour Tavern", "Fantasyland", "dine", "—", 18, 10, 10, 8, 26, 15, 614, 208],
   ["royaltheatre", "Royal Theatre", "Fantasyland", "show", "B", 25, 10, 11, 10, 0, 0, 515, 500],
 
   // --- Frontierland & Bayou Country river attractions ---
@@ -1750,6 +1751,10 @@ export default function HappiestPlace() {
     const c0 = c ? overnight.comfort(c.comfort, day) : 100;
     setComfort(c0); setComfortCap(c0); comfortCapRef.current = c0;
     setWallet(budgetOf + (c ? Math.max(0, Math.round(c.wallet)) : 0));
+    /* Whatever was in progress when the day ended does not carry over. Left
+       running, it would finish on the next morning's clock and drop you at the
+       old park, overriding the park you just picked. */
+    setRun(null); setSel(null); setEventCard(null); setFlash(null);
     const gp = (parkOverride === "dl" || parkOverride === "dca") ? parkOverride : startPark;
     const gate = gp === "dl"
       ? { park: "dl", x: 595, y: 690, landName: "Main Street" }
@@ -3001,9 +3006,9 @@ function MapPin({ a, px, py, w, pinK, selected, done, dim, nameLabel, inert, onT
   /* Geometry, stated once. The body runs from -(bh+12) down to -12 and the tail
      hangs below that, so every piece of content is positioned against those two
      edges — not against bh, which is what let the label escape the box before. */
-  const bh = showNum ? 42 : 38;
-  // "Min Wait" sets the width, not the number — 8 characters at 8.5px plus padding
-  const bw = showNum ? (digits >= 3 ? 54 : 48) : 38;
+  const bh = showNum ? 50 : 38;
+  // "Min Wait" sets the width, not the number — 8 characters at 9px plus padding
+  const bw = showNum ? (digits >= 3 ? 56 : 50) : 38;
   const TOP = -bh - 12, BOT = -12;
   const bg = selected ? C.blue : closed ? "#F0F2F4" : C.white;
   const fg = selected ? C.white : closed ? C.greyLt : C.navy;
@@ -3025,10 +3030,10 @@ function MapPin({ a, px, py, w, pinK, selected, done, dim, nameLabel, inert, onT
         <g transform={`translate(-9 ${TOP + 11}) scale(0.76)`} opacity="0.55">{I.star(C.greyLt, false)}</g>
       ) : showNum ? (
         <>
-          <text x="0" y={BOT - 16} textAnchor="middle"
-            style={{ fontFamily: F, fontSize: digits >= 3 ? 18 : 21, fontWeight: 800, fill: done ? C.greyLt : fg }}>{label}</text>
-          <text x="0" y={BOT - 6} textAnchor="middle"
-            style={{ fontFamily: F, fontSize: 8.5, fontWeight: 700,
+          <text x="0" y={BOT - 21} textAnchor="middle"
+            style={{ fontFamily: F, fontSize: digits >= 3 ? 23 : 27, fontWeight: 800, fill: done ? C.greyLt : fg }}>{label}</text>
+          <text x="0" y={BOT - 7} textAnchor="middle"
+            style={{ fontFamily: F, fontSize: 9, fontWeight: 700,
                      fill: selected ? "rgba(255,255,255,.85)" : C.greyLt }}>Min Wait</text>
         </>
       ) : (
