@@ -18,7 +18,9 @@ const C = {
   gap: "#EDF2F5",
   white: "#FFFFFF",
   pink: "#E5397F",
-  amber: "#F0A02A",
+  amber: "#F2C230",   // Energy at full: a true yellow, so orange can mean "warning"
+  warn:  "#EE7B2E",   // the multiplier is down but not bottomed out
+
   green: "#2FA84F",
   red: "#D64541",
   shadow: "0 1px 3px rgba(18,40,63,.16), 0 4px 12px rgba(18,40,63,.10)",
@@ -3149,13 +3151,14 @@ function StatusBar({ t, joy, energy, fuel, comfort, comfortCap, wallet, ll, seed
           </span>
         </div>
         <div style={{ flex: 1, display: "flex", gap: 8 }}>
-          <Meter label="Energy" v={energy} c={C.amber} />
-          {/* Three bands: hungry, satiated, overeaten. Green only in the middle
-              third, amber at either end, so both mistakes read the same way. */}
+          {/* One rule on all three bars: full colour while the multiplier is 1.0,
+              orange once it drops, red once it can drop no further. */}
+          <Meter label="Energy" v={energy} c={energy <= 15 ? C.red : energy <= 60 ? C.warn : C.amber} />
           <Meter label="Hunger" v={fuel} max={HUNGER_MAX} band={[SATIATED_LO, SATIATED_HI]}
-            c={fuel < SATIATED_LO ? (fuel < 25 ? C.red : C.amber)
-              : fuel <= SATIATED_HI ? C.green : C.amber} />
-          <Meter label="Comfort" v={comfort} cap={comfortCap} c={comfort < 30 ? C.red : C.blue} />
+            c={fuel <= 20 || fuel >= 140 ? C.red
+              : fuel < SATIATED_LO || fuel > SATIATED_HI ? C.warn : C.green} />
+          <Meter label="Comfort" v={comfort} cap={comfortCap}
+            c={comfort <= 15 ? C.red : comfort <= 60 ? C.warn : C.blue} />
         </div>
       </div>
     </div>
@@ -3163,20 +3166,25 @@ function StatusBar({ t, joy, energy, fuel, comfort, comfortCap, wallet, ll, seed
 }
 
 function Meter({ label, v, c, cap, max = 100, band }) {
+  /* The track itself is the good zone in light grey. Anything outside `band`
+     is shaded darker, so both ends of a two-sided meter read as trouble
+     without needing a legend. */
+  const pct = (n) => (n / max) * 100;
   return (
     <div style={{ flex: 1 }}>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, fontWeight: 700, color: C.greyLt }}>
-        <span>{label}</span><span style={{ color: C.text }}>{Math.round(v)}</span>
+        <span>{label}</span><span style={{ color: c === C.red ? C.red : C.text }}>{Math.round(v)}</span>
       </div>
       <div style={{ height: 4, borderRadius: 2, background: C.rule, marginTop: 2, position: "relative", overflow: "hidden" }}>
-        {/* the band you're aiming for, drawn under the fill */}
         {band && (
-          <div style={{
-            position: "absolute", left: `${(band[0] / max) * 100}%`, width: `${((band[1] - band[0]) / max) * 100}%`,
-            top: 0, bottom: 0, background: "rgba(18,40,63,.10)",
-          }} />
+          <>
+            <div style={{ position: "absolute", left: 0, width: `${pct(band[0])}%`, top: 0, bottom: 0,
+              background: "rgba(18,40,63,.20)" }} />
+            <div style={{ position: "absolute", left: `${pct(band[1])}%`, right: 0, top: 0, bottom: 0,
+              background: "rgba(18,40,63,.20)" }} />
+          </>
         )}
-        <div style={{ width: `${clamp((v / max) * 100)}%`, height: "100%", background: c, borderRadius: 3, transition: "width .35s ease", position: "relative" }} />
+        <div style={{ width: `${clamp(pct(v))}%`, height: "100%", background: c, borderRadius: 3, transition: "width .35s ease, background .35s ease", position: "relative" }} />
         {/* how much of the bar the day has taken for good */}
         {cap !== undefined && cap < 99.5 && (
           <div style={{
