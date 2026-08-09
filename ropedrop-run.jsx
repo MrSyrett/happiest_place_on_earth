@@ -160,7 +160,7 @@ const DCA_RAW = [
   ["pym", "Pym Test Kitchen", "Avengers Campus", "dine", "—", 25, 15, 13, 10, 32, 24, 733, 1307],
 
   ["racers", "Radiator Springs Racers", "Cars Land", "ride", "E", 8, 75, 25, -6, 0, 0, 630, 1558],
-  ["mater", "Mater's Junkyard Jamboree", "Cars Land", "ride", "C", 4, 18, 8, -4, 0, 0, 563, 1369],
+  ["mater", "Mater's Junkyard Jamboree", "Cars Land", "ride", "C", 4, 18, 8, -4, 0, 0, 658, 1441],
   ["luigi", "Luigi's Rollickin' Roadsters", "Cars Land", "ride", "C", 4, 18, 8, -3, 0, 0, 685, 1477],
   ["flos", "Flo's V8 Café", "Cars Land", "dine", "—", 22, 12, 11, 9, 30, 18, 570, 1486],
   ["cozy", "Cozy Cone Motel", "Cars Land", "dine", "—", 10, 8, 7, 4, 16, 11, 612, 1424],
@@ -2945,7 +2945,8 @@ function MapPin({ a, px, py, w, pinK, selected, done, dim, nameLabel, inert, onT
      hangs below that, so every piece of content is positioned against those two
      edges — not against bh, which is what let the label escape the box before. */
   const bh = showNum ? 42 : 38;
-  const bw = showNum ? (digits >= 3 ? 46 : 38) : 38;
+  // "Min Wait" sets the width, not the number — 8 characters at 8.5px plus padding
+  const bw = showNum ? (digits >= 3 ? 54 : 48) : 38;
   const TOP = -bh - 12, BOT = -12;
   const bg = selected ? C.blue : closed ? "#F0F2F4" : C.white;
   const fg = selected ? C.white : closed ? C.greyLt : C.navy;
@@ -2970,8 +2971,8 @@ function MapPin({ a, px, py, w, pinK, selected, done, dim, nameLabel, inert, onT
           <text x="0" y={BOT - 16} textAnchor="middle"
             style={{ fontFamily: F, fontSize: digits >= 3 ? 18 : 21, fontWeight: 800, fill: done ? C.greyLt : fg }}>{label}</text>
           <text x="0" y={BOT - 6} textAnchor="middle"
-            style={{ fontFamily: F, fontSize: 9, fontWeight: 700, letterSpacing: ".06em",
-                     fill: selected ? "rgba(255,255,255,.85)" : C.greyLt }}>MIN</text>
+            style={{ fontFamily: F, fontSize: 8.5, fontWeight: 700,
+                     fill: selected ? "rgba(255,255,255,.85)" : C.greyLt }}>Min Wait</text>
         </>
       ) : (
         <g transform={`translate(-9 ${TOP + 12}) scale(0.76)`}>
