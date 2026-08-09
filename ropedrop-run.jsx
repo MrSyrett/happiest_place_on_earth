@@ -113,7 +113,7 @@ const DL_RAW = [
   ["castlewalk", "Sleeping Beauty Castle Walkthrough", "Fantasyland", "ride", "A", 8, 5, 6, -2, 0, 0, 551, 434],
   ["pixiehollow", "Pixie Hollow", "Fantasyland", "show", "A", 10, 20, 7, 0, 0, 0, 671, 492],
   ["bluey", "Bluey's Best Day Ever!", "Fantasyland", "show", "C", 25, 15, 12, 8, 0, 0, 580, 202],
-  ["troubadour", "Troubadour Tavern", "Fantasyland", "dine", "—", 18, 10, 10, 8, 26, 15, 614, 208],
+  ["troubadour", "Troubadour Tavern", "Fantasyland", "dine", "—", 18, 10, 10, 8, 26, 15, 611, 213],
   ["royaltheatre", "Royal Theatre", "Fantasyland", "show", "B", 25, 10, 11, 10, 0, 0, 515, 500],
 
   // --- Frontierland & Bayou Country river attractions ---
@@ -144,10 +144,10 @@ const DL_RAW = [
 ];
 
 const DCA_RAW = [
-  ["carthay", "Carthay Circle Restaurant", "Buena Vista St.", "dine", "—", 70, 18, 24, 22, 52, 68, 581, 1212],
-  ["fivedime", "Five & Dime", "Buena Vista St.", "show", "B", 15, 6, 11, 4, 0, 0, 556, 1192],
+  ["carthay", "Carthay Circle Restaurant", "Buena Vista St.", "dine", "—", 70, 18, 24, 22, 52, 68, 572, 1210],
+  ["fivedime", "Five & Dime", "Buena Vista St.", "show", "B", 15, 6, 11, 4, 0, 0, 552, 1188],
   ["trolley", "Red Car Trolley", "Buena Vista St.", "ride", "B", 8, 8, 6, 4, 0, 0, 795, 1214],
-  ["fiddler", "Fiddler, Fifer & Practical Café", "Buena Vista St.", "dine", "—", 18, 10, 8, 8, 24, 13, 528, 1140],
+  ["fiddler", "Fiddler, Fifer & Practical Café", "Buena Vista St.", "dine", "—", 18, 10, 8, 8, 24, 13, 539, 1153],
 
   ["monsters", "Monsters, Inc. Mike & Sulley", "Hollywood Land", "ride", "C", 6, 20, 9, -1, 0, 0, 775, 1107],
   ["philhar", "Mickey's PhilharMagic", "Hollywood Land", "show", "C", 14, 15, 11, 8, 0, 0, 707, 1158],
@@ -155,13 +155,13 @@ const DCA_RAW = [
   ["turtletalk", "Turtle Talk with Crush", "Hollywood Land", "show", "B", 15, 15, 11, 11, 0, 0, 725, 1201],
 
   ["webslingers", "WEB SLINGERS", "Avengers Campus", "ride", "D", 6, 45, 14, -3, 0, 0, 630, 1307],
-  ["spiderman", "The Amazing Spider-Man!", "Avengers Campus", "show", "B", 10, 12, 12, 4, 0, 0, 592, 1313],
+  ["spiderman", "The Amazing Spider-Man!", "Avengers Campus", "show", "B", 10, 12, 12, 4, 0, 0, 590, 1302],
   ["guardians", "Guardians of the Galaxy", "Avengers Campus", "ride", "E", 7, 50, 21, -9, 0, 0, 835, 1298],
-  ["danceoff", "Guardians of the Galaxy: Awesome Dance Off!", "Avengers Campus", "show", "B", 15, 10, 11, 2, 0, 0, 806, 1319],
+  ["danceoff", "Guardians of the Galaxy: Awesome Dance Off!", "Avengers Campus", "show", "B", 15, 10, 11, 2, 0, 0, 852, 1415],
   ["pym", "Pym Test Kitchen", "Avengers Campus", "dine", "—", 25, 15, 13, 10, 32, 24, 733, 1307],
 
   ["racers", "Radiator Springs Racers", "Cars Land", "ride", "E", 8, 75, 25, -6, 0, 0, 630, 1558],
-  ["mater", "Mater's Junkyard Jamboree", "Cars Land", "ride", "C", 4, 18, 8, -4, 0, 0, 658, 1441],
+  ["mater", "Mater's Junkyard Jamboree", "Cars Land", "ride", "C", 4, 18, 8, -4, 0, 0, 554, 1373],
   ["luigi", "Luigi's Rollickin' Roadsters", "Cars Land", "ride", "C", 4, 18, 8, -3, 0, 0, 685, 1477],
   ["flos", "Flo's V8 Café", "Cars Land", "dine", "—", 22, 12, 11, 9, 30, 18, 570, 1486],
   ["cozy", "Cozy Cone Motel", "Cars Land", "dine", "—", 10, 8, 7, 4, 16, 11, 612, 1424],
@@ -176,14 +176,14 @@ const DCA_RAW = [
   ["whirlwind", "Inside Out Emotional Whirlwind", "Pixar Pier", "ride", "C", 5, 15, 8, -2, 0, 0, 122, 1532],
 
   ["mermaid", "Little Mermaid", "Paradise Gardens", "ride", "C", 6, 12, 9, 4, 0, 0, 332, 1381],
-  ["cappuccino", "Cappuccino Cart", "Paradise Gardens", "dine", "—", 8, 8, 8, 8, 12, 8, 372, 1398],
+  ["cappuccino", "Cappuccino Cart", "Paradise Gardens", "dine", "—", 8, 8, 8, 8, 12, 8, 378, 1417],
   ["skyschool", "Goofy's Sky School", "Paradise Gardens", "ride", "D", 4, 30, 10, -6, 0, 0, 103, 1378],
   ["swings", "Silly Symphony Swings", "Paradise Gardens", "ride", "C", 5, 15, 9, -3, 0, 0, 146, 1469],
   ["zephyr", "Golden Zephyr", "Paradise Gardens", "ride", "B", 4, 10, 6, -1, 0, 0, 188, 1423],
   ["jellyfish", "Jumpin' Jellyfish", "Paradise Gardens", "ride", "A", 3, 12, 5, -1, 0, 0, 148, 1410],
 
   ["soarin", "Soarin'", "Grizzly Peak", "ride", "E", 12, 40, 20, 2, 0, 0, 457, 1090],
-  ["grizzly", "Grizzly River Run", "Grizzly Peak", "ride", "E", 8, 40, 17, -8, 0, 0, 356, 1215],
+  ["grizzly", "Grizzly River Run", "Grizzly Peak", "ride", "E", 8, 40, 17, -8, 0, 0, 341, 1225],
   ["redwood", "Redwood Creek Challenge Trail", "Grizzly Peak", "ride", "B", 20, 0, 8, -10, 0, 0, 279, 1299],
   ["smokejumpers", "Smokejumpers Grill", "Grizzly Peak", "dine", "—", 20, 12, 9, 8, 28, 17, 493, 1138],
 
@@ -195,7 +195,7 @@ const DCA_RAW = [
   ["angrydogs", "Angry Dogs", "Pixar Pier", "dine", "—", 12, 10, 10, 5, 24, 13, 192, 1578],
   ["gardengrill", "Paradise Garden Grill", "Paradise Gardens", "dine", "—", 20, 12, 12, 10, 30, 18, 50, 1410],
   ["boardwalkpizza", "Boardwalk Pizza & Pasta", "Paradise Gardens", "dine", "—", 24, 14, 12, 9, 32, 19, 62, 1448],
-  ["bayside", "Bayside Brews", "Paradise Gardens", "dine", "—", 10, 8, 8, 4, 12, 11, 117, 1446],
+  ["bayside", "Bayside Brews", "Paradise Gardens", "dine", "—", 10, 8, 8, 4, 12, 11, 122, 1445],
   ["lucky", "Lucky Fortune Cookery", "San Fransokyo", "dine", "—", 18, 12, 11, 8, 26, 16, 477, 1465],
   ["trattoria", "Wine Country Trattoria", "San Fransokyo", "dine", "—", 60, 20, 20, 18, 46, 44, 450, 1350],
   ["poultry", "Poultry Palace", "Pixar Pier", "dine", "—", 14, 10, 10, 6, 26, 14, 295, 1598],
@@ -208,11 +208,11 @@ const DCA_RAW = [
   ["djunior", "Disney Jr. Mickey Mouse Clubhouse Live", "Hollywood Land", "show", "B", 22, 10, 9, 8, 0, 0, 652, 1205],
   ["bakery", "The Bakery Tour", "San Fransokyo", "dine", "—", 15, 5, 8, 4, 14, 7, 488, 1418],
 
-  ["woc", "World of Color", "Paradise Bay", "night", "E", 25, 45, 29, -6, 0, 0, 252, 1492],
+  ["woc", "World of Color", "Paradise Bay", "night", "E", 25, 45, 29, -6, 0, 0, 289, 1464],
 ];
 
 // positions confirmed by hand against the real map
-const REVIEWED = new Set(["alice", "auntcass", "autopia", "bakery", "bayou", "bear", "bengal", "bluey", "boardwalk", "buzz", "candy", "canoes", "carnation", "carrousel", "caseyjr", "castlewalk", "chowder", "cinema", "cocina", "columbia", "corndog", "corndogcastle", "cozy", "critter", "daisy", "djunior", "dockingbay", "dolewhip", "dumbo", "edelweiss", "falcon", "fantasmic", "fireworks", "flos", "funnel", "gadget", "gibson", "goofyyard", "grill", "guardians", "harbour", "hideaway", "hollywoodlounge", "horseshoe", "indy", "jellyfish", "jolly", "julep", "jungle", "launchbay", "lincoln", "luigi", "mansion", "mater", "matterhorn", "maurice", "mickeyhouse", "milkstand", "minniehouse", "monorail", "monte", "nemo", "oga", "orbitor", "parade", "peterpan", "pinocchio", "pirates", "pixarshorts", "pixiehollow", "pizzaplanet", "plazainn", "pooh", "popcorn", "pym", "railroad", "railway", "rancho", "redrose", "rise", "riverbelle", "roger", "ronto", "royaltheatre", "rr_nos", "rr_tom", "rr_toon", "shootin", "smallworld", "snow", "space", "startours", "storybook", "teacups", "thunder", "tiana", "tianas", "tiki", "toad", "tomsawyer", "trattoria", "treehouse", "trolley", "turkeyleg", "turtletalk", "twain", "vehicles", "webslingers"]);
+const REVIEWED = new Set(["alice", "auntcass", "autopia", "bakery", "bayou", "bayside", "bear", "bengal", "bluey", "boardwalk", "buzz", "candy", "canoes", "cappuccino", "carnation", "carrousel", "carthay", "caseyjr", "castlewalk", "chowder", "cinema", "cocina", "columbia", "corndog", "corndogcastle", "cozy", "critter", "daisy", "danceoff", "djunior", "dockingbay", "dolewhip", "dumbo", "edelweiss", "falcon", "fantasmic", "fiddler", "fireworks", "fivedime", "flos", "funnel", "fw1", "fw2", "fw3", "gadget", "gibson", "goofyyard", "grill", "grizzly", "guardians", "harbour", "hideaway", "hol1", "hollywoodlounge", "horseshoe", "hw1", "indy", "jellyfish", "jolly", "julep", "jungle", "launchbay", "lincoln", "luigi", "lunar1", "mansion", "mater", "matterhorn", "maurice", "mickeyhouse", "milkstand", "minniehouse", "monorail", "monte", "nemo", "oga", "oogie_grove", "oogie_mickey", "oogie_parade", "oogie_trails", "orbitor", "parade", "peterpan", "pinocchio", "pirates", "pixarshorts", "pixiehollow", "pizzaplanet", "plazainn", "pooh", "popcorn", "pym", "railroad", "railway", "rancho", "redrose", "rise", "riverbelle", "roger", "ronto", "royaltheatre", "rr_nos", "rr_tom", "rr_toon", "shootin", "smallworld", "snow", "space", "spiderman", "startours", "storybook", "teacups", "thunder", "tiana", "tianas", "tiki", "toad", "tomsawyer", "trattoria", "treehouse", "trolley", "troubadour", "turkeyleg", "turtletalk", "twain", "vehicles", "webslingers", "woc"]);
 
 /* The Disneyland Railroad runs a one-way grand circle. These are the minutes
    between consecutive stops; a full loop is about twenty minutes. */
@@ -291,12 +291,12 @@ const SEASONS = {
     blurb: "No festival, no overlay. The park as it usually is." },
   lunar:    { label: "Lunar New Year", crowd: 0.95, warm: -8,
     blurb: "Late January into February. Cool, and quieter than you'd expect.",
-    booths: [["lunar1", "Lunar New Year Marketplace", "Paradise Gardens", 16, 12, 30]] },
+    booths: [["lunar1", "Lunar New Year Marketplace", "Paradise Gardens", 16, 12, 30, 468, 1389]] },
   foodwine: { label: "Food & Wine Festival", crowd: 1.08, warm: -2,
     blurb: "March to April at California Adventure. Mild, and the food is the point.",
-    booths: [["fw1", "Festival Marketplace: Coastal", "Paradise Gardens", 15, 13, 28],
-             ["fw2", "Festival Marketplace: Citrus Grove", "San Fransokyo", 14, 12, 26],
-             ["fw3", "Festival Marketplace: Nuts About Cheese", "Hollywood Land", 15, 14, 28]] },
+    booths: [["fw1", "Festival Marketplace: Coastal", "Paradise Gardens", 15, 13, 28, 311, 1426],
+             ["fw2", "Festival Marketplace: Citrus Grove", "San Fransokyo", 14, 314, 1258, 314, 1258],
+             ["fw3", "Festival Marketplace: Nuts About Cheese", "Hollywood Land", 15, 14, 28, 437, 1404]] },
   halloween:{ label: "Halloween Time", crowd: 1.18, warm: 6,
     blurb: "Late August to October. Hot, busy, and the overlays are worth it. "
          + "Oogie Boogie Bash takes over California Adventure in the evening.",
@@ -306,21 +306,21 @@ const SEASONS = {
        Bash — a different ride track, and the queue reflects it. */
     nightFrom: 1020,                                   // 5:00 PM, when the Bash starts
     nightOverlay: { guardians: { name: "Guardians of the Galaxy \u2013 Monsters After Dark", joy: 7, waitMult: 1.25 } },
-    booths: [["hw1", "Plaza de la Familia Marketplace", "San Fransokyo", 14, 12, 26]],
+    booths: [["hw1", "Plaza de la Familia Marketplace", "San Fransokyo", 14, 12, 26, 89, 1388]],
     /* Oogie Boogie Bash is a separately ticketed evening event. These only
        exist during Halloween, and only after 5 PM. */
     extras: [
-      ["oogie_trails", "Oogie Boogie Bash: Treat Trails", "Hollywood Land", "dine", 20, 14, 15, 6, 34, 0, 700, 1218],
-      ["oogie_parade", "Frightfully Fun Parade", "Buena Vista St.", "night", 25, 20, 22, -2, 0, 0, 596, 1188],
-      ["oogie_grove", "Villains Grove", "Grizzly Peak", "show", 18, 22, 19, 4, 0, 0, 430, 1250],
-      ["oogie_mickey", "Mickey's Trick and Treat", "Hollywood Land", "show", 25, 18, 17, 8, 0, 0, 668, 1228],
+      ["oogie_trails", "Oogie Boogie Bash: Treat Trails", "Hollywood Land", "dine", 20, 14, 15, 6, 34, 0, 584, 1120],
+      ["oogie_parade", "Frightfully Fun Parade", "Buena Vista St.", "night", 25, 20, 22, -2, 0, 0, 551, 1212],
+      ["oogie_grove", "Villains Grove", "Grizzly Peak", "show", 18, 22, 19, 4, 0, 0, 287, 1303],
+      ["oogie_mickey", "Mickey's Trick and Treat", "Hollywood Land", "show", 25, 18, 17, 8, 0, 0, 769, 1139],
     ] },
   holidays: { label: "The Holidays", crowd: 1.32, warm: -10,
     blurb: "Mid-November to early January. The busiest and the prettiest.",
     overlay: { mansion: "Haunted Mansion Holiday", smallworld: "\"it's a small world\" Holiday",
                fireworks: "Believe… in Holiday Magic" },
     boost: { mansion: 6, smallworld: 7, fireworks: 6 },
-    booths: [["hol1", "Festival of Holidays Marketplace", "Paradise Gardens", 15, 13, 28]] },
+    booths: [["hol1", "Festival of Holidays Marketplace", "Paradise Gardens", 15, 13, 28, 238, 1414]] },
 };
 
 const SEASON_FOOD = Object.entries(SEASONS).flatMap(([sk, sv]) => (sv.booths || []).map(
@@ -634,12 +634,17 @@ function waitFor(a, t, crowd, weather, mods) {
   /* dayCurve already carries the arrival pattern, so the only thing left is to
      scale the ride's own floor the same way — an empty park has no minimum. */
   const ramp = Math.min(1, crowdAt(M(t)) / 0.9);
-  const posted = Math.round(w / 5) * 5;
-  const floor = Math.round((MIN_WAIT[a.id] || 0) * ramp);
+  /* Take the floor BEFORE rounding, or a scaled floor lands on a number the
+     board could never show — a 10-minute minimum at half ramp reads "6". */
+  const raw = Math.max(w, (MIN_WAIT[a.id] || 0) * ramp);
+  let board = Math.round(raw / 5) * 5;
   /* The Disney app never posts zero — an open ride reads 5 minutes even when
      you'll walk straight on. actualWait() turns a posted 5 back into 0. */
-  const board = Math.max(floor, posted);
-  return a.kind === "ride" ? Math.max(5, board) : board;
+  if (a.kind === "ride") board = Math.max(5, board);
+  /* Haunted Mansion is the one exception in the resort: it never posts below
+     13, walk-on or not, and only joins the 5-minute steps at 15 and above. */
+  if (a.id === "mansion" && board < 15) board = 13;
+  return board;
 }
 
 /* Coordinates are measured off the real resort map, so distance is now
@@ -798,7 +803,7 @@ const FRAME_DEFAULT = {
   ],
   dca: [
     { label: "Pixar Pal-A-Round", hint: "the Ferris wheel at Pixar Pier", x: 201, y: 1530 },
-    { label: "Carthay Circle", hint: "the domed tower at the top of Buena Vista Street", x: 581, y: 1212 },
+    { label: "Carthay Circle", hint: "the domed tower at the top of Buena Vista Street", x: 572, y: 1210 },
   ],
 };
 /* iOS keeps a home-screen web app's storage completely separate from Safari's.
