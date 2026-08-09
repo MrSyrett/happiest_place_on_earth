@@ -1462,7 +1462,7 @@ export default function HappiestPlace() {
   const comfortCapRef = useRef(100);
   useEffect(() => { comfortCapRef.current = comfortCap; }, [comfortCap]);
   const [wallet, setWallet] = useState(DIFFICULTY.medium.budget);
-  const [pos, setPos] = useState({ park: "dl", x: 592, y: 675, landName: "Main Street" });
+  const [pos, setPos] = useState({ park: "dl", x: 581, y: 928, landName: "Main Street" });
   const [mapPark, setMapPark] = useState("dl");
   const [visited, setVisited] = useState({});
   const [track, setTrack] = useState({ minEnergy: 100, minComfort: 100, spent: 0, lastAt: 0, before10: 0 });
@@ -1757,7 +1757,7 @@ export default function HappiestPlace() {
     setRun(null); setSel(null); setEventCard(null); setFlash(null);
     const gp = (parkOverride === "dl" || parkOverride === "dca") ? parkOverride : startPark;
     const gate = gp === "dl"
-      ? { park: "dl", x: 595, y: 690, landName: "Main Street" }
+      ? { park: "dl", x: 581, y: 928, landName: "Main Street" }
       : { park: "dca", x: 590, y: 1000, landName: "Buena Vista St." };
     setPos(gate); setMapPark(gp); setVisited({});
     // Lightning Lane is a daily purchase; the Park Hopper carries across a run
