@@ -582,6 +582,14 @@ function crowdAt(min) {
    of the gates opening, long before the park as a whole fills up. */
 const ROPE_DROP = new Set(["peterpan", "indy", "rise", "space", "racers",
                            "guardians", "incredicoaster", "midway"]);
+/* What each of them is posting within five minutes of the rope dropping, at
+   average crowds. Only the very front of the sprint rides these without
+   waiting — everyone behind them is already in a queue. Scales with the day's
+   crowd, and stops binding once the ordinary curve climbs past it. */
+const ROPE_DROP_FLOOR = {
+  peterpan: 27, space: 35, indy: 32, rise: 35,
+  guardians: 37, racers: 65, incredicoaster: 30, midway: 30,
+};
 function ropeDropRush(id, min) {
   if (!ROPE_DROP.has(id)) return 0;
   const t = min - PARK_OPEN;
@@ -665,7 +673,12 @@ function waitFor(a, t, crowd, weather, mods) {
   const ramp = Math.min(1, crowdAt(M(t)) / 0.9);
   /* Take the floor BEFORE rounding, or a scaled floor lands on a number the
      board could never show — a 10-minute minimum at half ramp reads "6". */
-  const raw = Math.max(w, (MIN_WAIT[a.id] || 0) * ramp);
+  let raw = Math.max(w, (MIN_WAIT[a.id] || 0) * ramp);
+  const rd = ROPE_DROP_FLOOR[a.id], since = M(t) - PARK_OPEN;
+  if (rd && since >= 0 && since <= 190) {
+    const formed = Math.min(1, since / 5);          // a real queue by 8:05
+    raw = Math.max(raw, rd * Math.max(0.92, Math.min(1.35, crowd)) * formed);
+  }
   let board = Math.round(raw / 5) * 5;
   /* The Disney app never posts zero — an open ride reads 5 minutes even when
      you'll walk straight on. actualWait() turns a posted 5 back into 0. */
