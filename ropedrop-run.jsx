@@ -603,7 +603,7 @@ function heatDip(weather, min, warm) {
   return 1 - 0.16 * win * Math.min(1, (t - 88) / 9);
 }
 
-function dayCurve(id, ticket, t) {
+function dayCurve(id, ticket, t, crowd = 1) {
   const min = M(t);
   // the park-wide pattern dominates; the ride's own profile just tints it
   const p = PROFILES[CURVE[id] || (ticket === "E" ? "thrill" : "steady")];
@@ -617,7 +617,13 @@ function dayCurve(id, ticket, t) {
      already running, so their eight rides build a queue within minutes and are
      NOT subject to that ramp. */
   const fill = Math.max(0, Math.min(1, (min - PARK_OPEN) / 40));
-  return base * fill + ropeDropRush(id, min);
+  /* And on a busy day the forty-minute fill is wrong on its own. People queue
+     outside before the gates, so the park is substantially full within minutes
+     and waits sit on a plateau until the ordinary curve catches up around 9:30.
+     Quiet days get none of this; packed days get all of it. */
+  const early = Math.max(0, Math.min(1, (crowd - 0.7) / 0.85));
+  const floorEarly = early * 0.28 * Math.min(1, (min - PARK_OPEN) / 8);
+  return Math.max(base * fill, min - PARK_OPEN <= 120 ? floorEarly : 0) + ropeDropRush(id, min);
 }
 
 // the hour a ride is typically at its shortest, for the planning hint
@@ -652,7 +658,7 @@ function waitFor(a, t, crowd, weather, mods) {
   // the fireworks pull people off the queues for about forty minutes
   const fw = M(t) >= 1260 && M(t) <= 1300 ? 0.9 : 1;
   const mult = mods && mods.until > t ? mods.mult : 1;
-  const w = a.wait * dayCurve(a.id, a.ticket, t) * crowd * jitter * wx * fw * mult
+  const w = a.wait * dayCurve(a.id, a.ticket, t, crowd) * crowd * jitter * wx * fw * mult
     * heatDip(weather, M(t), mods && mods.warm);
   /* dayCurve already carries the arrival pattern, so the only thing left is to
      scale the ride's own floor the same way — an empty park has no minimum. */
