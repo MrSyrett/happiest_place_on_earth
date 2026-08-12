@@ -796,6 +796,38 @@ const overnight = {
 // cumulative fatigue: energy and comfort go faster every day. Nothing else does.
 const dayFatigue = (d) => 1 + 0.14 * (d - 1);
 
+/* ---------------- leaderboard ----------------
+   Runs are kept on the device. There's no server behind this, so to compare
+   with anyone else the score is packed into a short code you can paste into a
+   chat; pasting one back in files it under their name. The code carries the
+   settings too, so a $300 Easy day can't quietly sit next to a Hard one. */
+const LB_KEY = "bde:scores";
+const LB_MAX = 60;
+
+function packScore(r) {
+  // name is last so it can contain anything except the separator
+  const bits = [r.score, r.days, r.mode[0], r.party[0], r.season.slice(0, 3),
+    r.attractions, r.spent, r.burned ? 1 : 0, r.at, r.name];
+  return "RR1-" + btoa(unescape(encodeURIComponent(bits.join("~")))).replace(/=+$/, "");
+}
+function unpackScore(code) {
+  try {
+    const raw = String(code).trim().replace(/^RR1-/, "");
+    const bits = decodeURIComponent(escape(atob(raw))).split("~");
+    if (bits.length < 10) return null;
+    const n = (i) => { const v = Number(bits[i]); return Number.isFinite(v) ? v : 0; };
+    const r = {
+      score: Math.round(n(0)), days: Math.round(n(1)),
+      mode: { e: "easy", m: "medium", h: "hard", c: "custom" }[bits[2]] || "medium",
+      party: { s: "solo", p: "partner", c: "child", g: "grandparents" }[bits[3]] || "solo",
+      season: bits[4], attractions: Math.round(n(5)), spent: Math.round(n(6)),
+      burned: bits[7] === "1", at: n(8), name: bits.slice(9).join("~").slice(0, 24),
+    };
+    return r.score > 0 && r.score < 100000 ? r : null;
+  } catch (e) { return null; }
+}
+const scoreKey = (r) => `${r.name}|${r.score}|${r.at}`;
+
 const CROWD_CHOICES = [["Empty", 0.35], ["Light", 0.55], ["Moderate", 0.85], ["Busy", 1.15], ["Packed", 1.45]];
 const BUDGET_CHOICES = [["$0", 0], ["$75", 75], ["$150", 150], ["$300", 300], ["Unlimited", 99999]];
 const DRAIN_CHOICES = [["Gentle", 0.5], ["Normal", 1.0], ["Harsh", 1.4]];
@@ -1528,6 +1560,8 @@ export default function HappiestPlace() {
   const [startPark, setStartPark] = useState("dl");
   const [custom, setCustom] = useState(CUSTOM_DEFAULT);
   const [runMode, setRunMode] = useState("single");
+  const [scores, setScores] = useState([]);
+  const [playerName, setPlayerName] = useState("");
   const [runDay, setRunDay] = useState(1);
   const [runTotal, setRunTotal] = useState(0);
   const [runLog, setRunLog] = useState([]);        // one line per completed day
@@ -1821,6 +1855,14 @@ export default function HappiestPlace() {
     for (const id of Object.keys(late)) if (byId[id]) notes.push(`${byId[id].name} opens about ${late[id]} minutes late.`);
     if (notes.length) setTimeout(() => push(notes.join(" "), "bad"), 700);
   }
+
+  /* Why a ride is shut. refurb and lateOpen live on `seed`, not `mods` — the
+     wait calculation merges them in, and the labels have to read the same
+     source or a full-day refurbishment reports as a passing closure. */
+  const closedReason = (id) =>
+    seed.refurb === id ? "refurb"
+    : (seed.lateOpen && t < (seed.lateOpen[id] || 0)) ? "late"
+    : "closure";
 
   const waits = useMemo(() => {
     const w = {};
@@ -2264,6 +2306,7 @@ export default function HappiestPlace() {
   if (screen === "end")
     return <End joy={joy} t={t} wallet={wallet} energy={energy} comfort={comfort} visited={visited} track={track} log={log} seed={seed} mode={mode} unlimited={unlimited} closeAt={closeAt}
       isRun={isRun} runDay={runDay} runTotal={runTotal} runLog={runLog} burnedOut={burnedOut}
+      scores={scores} setScores={setScores} playerName={playerName} setPlayerName={setPlayerName} onRecord={recordScore}
       won={isRun && RUN_MODES[runMode].days > 0 && runDay >= RUN_MODES[runMode].days && !burnedOut}
       onAgain={() => { setRunDay(1); setRunTotal(0); setRunLog([]); setCarry(null); setBurnedOut(null); start(); }} onTitle={() => setScreen("title")} />;
 
@@ -2566,6 +2609,23 @@ export default function HappiestPlace() {
     );
   }
 
+  /* Called once when a run finishes. Keeps the best runs, newest first among
+     equals, and never grows past LB_MAX. */
+  function recordScore(final) {
+    const row = {
+      score: Math.round(final), days: isRun ? runDay : 1, mode, party, season,
+      attractions: Object.keys(visited).filter((id) => byId[id]).length,
+      spent: Math.round(track.spent), burned: !!burnedOut,
+      at: Date.now(), name: (playerName || "You").slice(0, 24),
+    };
+    setScores((L) => {
+      const next = [...L.filter((x) => scoreKey(x) !== scoreKey(row)), row];
+      next.sort((a, b) => b.score - a.score || b.at - a.at);
+      return next.slice(0, LB_MAX);
+    });
+    return row;
+  }
+
   /* ---------- overnight recap ---------- */
   if (screen === "recap") {
     const total = RUN_MODES[runMode].days;
@@ -2685,8 +2745,7 @@ export default function HappiestPlace() {
           {listed.map(({ a, w }) => (
             <AttractionCard key={a.id} a={dress(a)} wait={waits[a.id]} walk={w} reps={visited[a.id] || 0}
               llOk={llReady(a.id)} llFree={!boughtLl && !singlePass[a.id]} freeLeft={freeLL}
-              closedWhy={mods.refurb === a.id ? "refurb"
-                : (mods.lateOpen && t < (mods.lateOpen[a.id] || 0)) ? "late" : "closure"}
+              closedWhy={closedReason(a.id)}
               mustSwitch={needsSwitch(a, party)} hopBlocked={hopBlock(a)} parkShut={!parkOpenNow(a.park, t)} t={t} wallet={wallet}
               onOpen={() => setSel(a.id)} onGo={beginAttraction} />
           ))}
@@ -2741,8 +2800,7 @@ export default function HappiestPlace() {
           hop={pos.park !== selA.park} reps={visited[selA.id] || 0}
           wallet={wallet} llOk={llReady(selA.id)}
           llFree={!boughtLl && !singlePass[selA.id]} freeLeft={freeLL}
-          closedWhy={mods.refurb === selA.id ? "refurb"
-            : (mods.lateOpen && t < (mods.lateOpen[selA.id] || 0)) ? "late" : "closure"}
+          closedWhy={closedReason(selA.id)}
           spPrice={singlePass[selA.id] ? 0 : (SINGLE_PASS[selA.id] || 0)} onBuySingle={buySinglePass}
           mustSwitch={needsSwitch(selA, party)} hopBlocked={hopBlock(selA)} onBuyHopper={buyHopper} t={t}
           onClose={() => setSel(null)} onGo={beginAttraction} onTrain={beginTrain} />
@@ -3486,7 +3544,9 @@ function AttractionCard({ a, wait, walk, reps, llOk, llFree, freeLeft, mustSwitc
           onClick={() => (a.kind === "train" ? onOpen() : onGo(a, mustSwitch ? "switch" : false))}>
           {hopBlocked === "hopper" ? "Needs a Park Hopper"
             : parkShut ? `${PARKS[a.park].short} has closed`
-            : wait < 0 ? "Temporarily Closed" : mustSwitch ? `Rider Switch · ${HEIGHT[a.id]}" minimum`
+            : wait < 0 ? (closedWhy === "refurb" ? "Closed for Refurbishment"
+                        : closedWhy === "late" ? "Not Open Yet" : "Temporarily Closed")
+            : mustSwitch ? `Rider Switch · ${HEIGHT[a.id]}" minimum`
             : a.kind === "train" ? "Choose a Destination"
             : broke ? "Not enough money" : a.kind === "dine" ? `Eat Here${a.cost ? ` · $${a.cost}` : ""}`
             : isRide ? "Join Standby Line" : "Go Watch"}
@@ -4322,6 +4382,7 @@ function Title({ onStart, onSetup, ready, mode, setMode, runMode, setRunMode, pa
 }
 
 function End({ joy, t, wallet, energy, comfort, visited, track, log, seed, mode, unlimited, closeAt,
+  scores, setScores, playerName, setPlayerName, onRecord,
   isRun, runDay, runTotal, runLog, burnedOut, won, onAgain, onTitle }) {
   const [showLog, setShowLog] = useState(false);
   const rides = Object.entries(visited).reduce((s, [id, n]) => {
@@ -4359,6 +4420,35 @@ function End({ joy, t, wallet, energy, comfort, visited, track, log, seed, mode,
     final >= 190 ? ["A good day", C.navy] :
     final >= 125 ? ["A perfectly fine day", C.navy] :
     ["You should've stayed at the hotel", C.grey];
+
+  /* Record once, on arrival, and remember the row so this run can be picked
+     out of the table and turned into a share code. */
+  const [mine, setMine] = useState(null);
+  const [showLb, setShowLb] = useState(false);
+  const [paste, setPaste] = useState("");
+  const [pasteMsg, setPasteMsg] = useState("");
+  const [copied, setCopied] = useState(false);
+  useEffect(() => { setMine(onRecord(final)); }, []);
+  const rankedIdx = mine ? scores.findIndex((x) => scoreKey(x) === scoreKey(mine)) : -1;
+
+  const addCode = () => {
+    const r = unpackScore(paste);
+    if (!r) { setPasteMsg("That doesn't look like a Ropedrop Run code."); return; }
+    if (scores.some((x) => scoreKey(x) === scoreKey(r))) { setPasteMsg(`${r.name}'s run is already here.`); return; }
+    setScores((L) => [...L, r].sort((a, b) => b.score - a.score || b.at - a.at).slice(0, LB_MAX));
+    setPaste(""); setPasteMsg(`Added ${r.name} — ${r.score}.`);
+  };
+  const copyMine = () => {
+    if (!mine) return;
+    const code = packScore(mine);
+    try {
+      if (navigator.clipboard) navigator.clipboard.writeText(code);
+      else { const el = document.createElement("textarea"); el.value = code; document.body.appendChild(el);
+        el.select(); document.execCommand("copy"); document.body.removeChild(el); }
+      setCopied(true); setTimeout(() => setCopied(false), 2200);
+    } catch (e) {}
+  };
+
   return (
     <Shell>
       <div style={{ flex: 1, overflowY: "auto", padding: "44px 24px 30px", textAlign: "center" }}>
@@ -4470,6 +4560,83 @@ function End({ joy, t, wallet, energy, comfort, visited, track, log, seed, mode,
         <div style={{ fontSize: 14, color: C.greyLt, marginBottom: 14 }}>
           {earned.length} of {MILESTONES.length} milestones found
         </div>
+
+        {/* ---------------- leaderboard ---------------- */}
+        <div style={{ maxWidth: 340, margin: "0 auto 20px", textAlign: "left" }}>
+          <TextLink onClick={() => setShowLb((v) => !v)} style={{ display: "block", textAlign: "center" }}>
+            {showLb ? "Hide the leaderboard"
+              : rankedIdx >= 0 ? `Leaderboard · you're #${rankedIdx + 1} of ${scores.length}`
+              : "Leaderboard"}
+          </TextLink>
+
+          {showLb && (
+            <div style={{ marginTop: 12 }}>
+              <div style={{ display: "flex", gap: 7, marginBottom: 10 }}>
+                <input value={playerName} onChange={(e) => setPlayerName(e.target.value.slice(0, 24))}
+                  placeholder="Your name" style={{
+                    flex: 1, padding: "9px 11px", borderRadius: 10, border: `1.5px solid ${C.border}`,
+                    fontFamily: F, fontSize: 15, color: C.navy, background: C.white, minWidth: 0,
+                  }} />
+                <button onClick={copyMine} style={{
+                  padding: "9px 13px", borderRadius: 10, border: "none", cursor: "pointer",
+                  fontFamily: F, fontSize: 14.5, fontWeight: 800,
+                  background: copied ? C.green : C.blue, color: C.white, whiteSpace: "nowrap",
+                }}>{copied ? "Copied" : "Copy code"}</button>
+              </div>
+
+              <div style={{ background: C.gap, borderRadius: 12, padding: "4px 2px", maxHeight: 260, overflowY: "auto" }}>
+                {scores.length === 0 ? (
+                  <div style={{ padding: 12, fontSize: 14.5, color: C.grey }}>No runs yet.</div>
+                ) : scores.map((r, i) => {
+                  const isMine = mine && scoreKey(r) === scoreKey(mine);
+                  return (
+                    <div key={scoreKey(r)} style={{
+                      display: "flex", alignItems: "baseline", gap: 9, padding: "7px 10px",
+                      background: isMine ? C.blueTint : "transparent", borderRadius: 9,
+                    }}>
+                      <span style={{ fontSize: 13, fontWeight: 800, color: C.greyLt, minWidth: 22 }}>{i + 1}</span>
+                      <span style={{ flex: 1, fontSize: 15, fontWeight: isMine ? 800 : 600, color: C.navy }}>
+                        {r.name}
+                        <span style={{ fontSize: 12.5, fontWeight: 600, color: C.greyLt, marginLeft: 6 }}>
+                          {r.days > 1 ? `${r.days}d · ` : ""}{DIFFICULTY[r.mode] ? DIFFICULTY[r.mode].label : r.mode}
+                          {r.burned ? " · burned out" : ""}
+                        </span>
+                      </span>
+                      <span style={{ fontSize: 16, fontWeight: 800, color: isMine ? C.blue : C.text }}>{r.score}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div style={{ fontSize: 13.5, color: C.grey, lineHeight: 1.45, margin: "10px 0 7px" }}>
+                Copy your code into a chat, and paste a friend's here to add them.
+              </div>
+              <div style={{ display: "flex", gap: 7 }}>
+                <input value={paste} onChange={(e) => { setPaste(e.target.value); setPasteMsg(""); }}
+                  placeholder="Paste a code" style={{
+                    flex: 1, padding: "9px 11px", borderRadius: 10, border: `1.5px solid ${C.border}`,
+                    fontFamily: F, fontSize: 14, color: C.navy, background: C.white, minWidth: 0,
+                  }} />
+                <button onClick={addCode} disabled={!paste.trim()} style={{
+                  padding: "9px 15px", borderRadius: 10, border: "none",
+                  cursor: paste.trim() ? "pointer" : "default", fontFamily: F, fontSize: 14.5, fontWeight: 800,
+                  background: paste.trim() ? C.navy : C.rule, color: paste.trim() ? C.white : C.greyLt,
+                }}>Add</button>
+              </div>
+              {pasteMsg && (
+                <div style={{ fontSize: 13.5, color: /doesn't look/.test(pasteMsg) ? C.red : C.green, marginTop: 6 }}>
+                  {pasteMsg}
+                </div>
+              )}
+              {scores.length > 0 && (
+                <TextLink onClick={() => setScores([])} style={{ display: "block", textAlign: "center", marginTop: 12 }}>
+                  Clear the leaderboard
+                </TextLink>
+              )}
+            </div>
+          )}
+        </div>
+
         <BigButton onClick={onAgain}>Do It Again</BigButton>
         <TextLink onClick={onTitle} style={{ display: "block", margin: "16px auto 0" }}>
           Back to the start screen
