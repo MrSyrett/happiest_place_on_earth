@@ -772,6 +772,42 @@ const CUSTOM_DEFAULT = {
    A single day is self-contained. A RUN chains days together: you wake up in
    whatever state you went to bed in, unspent money rolls over, and each day is
    harder than the last. Let any meter hit zero and the run is over. */
+/* Scoring across different run lengths.
+   A five-day run banks far more than a single day, so a flat threshold makes
+   the top title automatic. Instead a run is judged against what a strong run
+   of THAT length would bank — later days count for less, because fatigue rises
+   and the recovery ceiling falls. The single-day cut-offs are unchanged; they
+   are simply expressed as a fraction of a strong day. */
+const STRONG_DAY = 553;
+function strongTotal(days) {
+  let t = 0;
+  for (let d = 1; d <= days; d++) t += STRONG_DAY * ((100 - (d - 1) * 7) / 100) / (1 + 0.14 * (d - 1));
+  return t;
+}
+const PACE_BANDS = [0.759, 0.596, 0.461, 0.343, 0.226];
+
+/* Titles are earned two ways at once: how well you played, and whether you
+   lasted. Only finishing the run unlocks the top title. */
+const TITLES = {
+  day:    ["The Happiest Place on Earth", "A truly magical day", "A great day",
+           "A good day", "A perfectly fine day", "You should've stayed at the hotel"],
+  won:    ["You did the impossible", "A trip they'll talk about for years", "A brilliant trip",
+           "A good trip", "You got through it", "You survived, and that's about it"],
+  quit:   ["Left on a high", "Stopped while you were ahead", "A decent run, cut short",
+           "You'd had enough", "It wasn't really working", "Probably for the best"],
+  burned: ["Burned out at the very top", "Went out in a blaze", "Pushed it too far",
+           "Ran out of road", "It all caught up with you", "You never stood a chance"],
+};
+function rankTitle(final, days, isRun, won, burnedOut) {
+  const pace = final / Math.max(1, strongTotal(days));
+  let i = PACE_BANDS.findIndex((b) => pace >= b);
+  if (i < 0) i = PACE_BANDS.length;
+  const set = !isRun ? TITLES.day : burnedOut ? TITLES.burned : won ? TITLES.won : TITLES.quit;
+  // the top title is only ever available for a run you actually finished
+  if (isRun && !won && i === 0) i = 1;
+  return [set[i], i];
+}
+
 const RUN_MODES = {
   single:  { label: "Day",     days: 0,
     blurb: "A single day, scored on its own." },
@@ -4413,13 +4449,9 @@ function End({ joy, t, wallet, energy, comfort, visited, track, log, seed, mode,
   const dayScore = joy + Math.min(8, unique * 0.4) + (wallet > 0 ? 2 : 0) + (both ? 3 : 0) + bonus;
   // a run is scored on everything you banked, not just the last day
   const final = Math.round(isRun ? runTotal + dayScore - joy + joy : dayScore);
-  const rank =
-    final >= 420 ? ["The Happiest Place on Earth", C.pink] :
-    final >= 330 ? ["A truly magical day", C.blue] :
-    final >= 255 ? ["A great day", C.blue] :
-    final >= 190 ? ["A good day", C.navy] :
-    final >= 125 ? ["A perfectly fine day", C.navy] :
-    ["You should've stayed at the hotel", C.grey];
+  const days = isRun ? runDay : 1;
+  const [title, band] = rankTitle(final, days, isRun, won, burnedOut);
+  const rank = [title, band === 0 ? C.pink : band <= 2 ? C.blue : band <= 4 ? C.navy : C.grey];
 
   /* Record once, on arrival, and remember the row so this run can be picked
      out of the table and turned into a share code. */
